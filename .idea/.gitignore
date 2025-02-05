@@ -1,0 +1,11 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+misc.xml
+/inspectionProfiles/Project_Default.xml
+deploymentTargetSelector.xml
+vcs.xml
+workspace.xml
+compiler.xml
+appInsightsSettings.xml
+migrations.xml
