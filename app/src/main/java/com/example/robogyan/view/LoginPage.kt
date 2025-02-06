@@ -53,6 +53,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.CharcoalBlack
+import com.example.robogyan.ui.theme.NavyBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 
 @Composable
@@ -69,7 +70,7 @@ fun LoginPage(navController: NavController) {
                 modifier = Modifier
                     .padding()
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(NavyBlue)
             ){
                 Column(
                     modifier = Modifier
@@ -229,8 +230,11 @@ fun LoginPage(navController: NavController) {
                                     .fillMaxWidth()
                                     .clip(shape = RoundedCornerShape(50)),
                                 onClick = {
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
                                 },
-                                containerColor = Color(0xFF1B1B1B),
+                                containerColor = NavyBlue,
                             ) {
                                 Text(
                                     modifier = Modifier.padding(top = 12.dp, bottom = 12.dp),

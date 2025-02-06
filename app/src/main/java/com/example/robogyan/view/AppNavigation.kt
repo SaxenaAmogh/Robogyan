@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "splash"
+        startDestination = "home"
     ){
         composable("splash"){
             SplashScreen(navController)
@@ -23,9 +23,9 @@ fun AppNavigation(navController: NavHostController) {
 //        composable("otp"){
 //            OtpPage(navController)
 //        }
-//        composable("home"){
-//            HomePage(navController)
-//        }
+        composable("home"){
+            HomePage(navController)
+        }
 //        composable("explore"){
 //            ExplorePage(navController)
 //        }

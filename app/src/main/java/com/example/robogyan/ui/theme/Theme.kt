@@ -13,30 +13,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = ElectricBlue,           // For primary UI elements like buttons
-    secondary = NeonGreen,            // For accents and highlights
-    background = CharcoalBlack,       // Background color
-    surface = GunmetalGray,           // For cards, surfaces, etc.
-    onPrimary = PureWhite,            // Text on primary color (ElectricBlue)
-    onSecondary = PureWhite,          // Text on secondary color (NeonGreen)
-    onBackground = PureWhite,         // Text on dark background (CharcoalBlack)
-    onSurface = LightGray             // Text on surfaces (GunmetalGray)
+    primary = NavyBlue,               // Main color for app bars, buttons, etc.
+    secondary = Cyan,                 // Accent color for highlights, icons, buttons
+    background = CharcoalBlack,               // Background color for screens
+    surface = NavyBlue,      // Slightly lighter than pure black for cards/surfaces
+    onPrimary = White,                // Text on primary (Navy Blue)
+    onSecondary = White,              // Text on secondary (Cyan buttons)
+    onBackground = White,             // Main text color on dark background
+    onSurface = White                 // Text on surfaces/cards
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = ElectricBlue,           // For primary UI elements like buttons
-    secondary = Cyan,                 // For accents and highlights
-    background = PureWhite,          // Background color
-    surface = Color(0xFFF5F5F5),      // For cards, surfaces, etc.
-    onPrimary = PureWhite,            // Text on primary color (ElectricBlue)
-    onSecondary = DarkSlateGray,      // Text on secondary color (Cyan)
-    onBackground = DarkSlateGray,     // Text on light background (PureWhite)
-    onSurface = DarkSlateGray         // Text on surfaces (light grayish background)
+    primary = Black,               // Main color for app bars, buttons
+    secondary = Cyan,                 // Accent color for highlights
+    background = White,               // Background for light mode
+    surface = Color(0xFFE0E0E0),      // Light gray surface for cards
+    onPrimary = White,                // Text on primary (Navy Blue)
+    onSecondary = Black,              // Text on secondary (Cyan buttons)
+    onBackground = Black,             // Main text color on white background
+    onSurface = Black                 // Text on surfaces/cards
 )
 
 @Composable
 fun RobogyanTheme(
-    darkTheme: Boolean = true,  // Default dark mode
+    darkTheme: Boolean = isSystemInDarkTheme(),  // Default dark mode
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme

@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.CharcoalBlack
+import com.example.robogyan.ui.theme.NavyBlue
 import kotlinx.coroutines.delay
 
 @SuppressLint("UseOfNonLambdaOffsetOverload")
