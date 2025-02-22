@@ -67,6 +67,13 @@ fun HomePage(navController: NavHostController) {
     val screenHeight = configuration.screenHeightDp.dp
     var door by remember { mutableStateOf(false) }
 
+    val colorList2 = listOf(
+        Color(0xFFffca47),
+        Color(0xFF4acfff),
+        Color(0xFF8156ff),
+        Color(0xFF272428),
+    )
+
     Scaffold(
         content = { innerPadding ->
             Column(
@@ -221,6 +228,7 @@ fun HomePage(navController: NavHostController) {
                                 ) {
                                     Text(
                                         text = "Members",
+                                        fontFamily = latoFontFamily,
                                         color = Black,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.W500
@@ -228,9 +236,17 @@ fun HomePage(navController: NavHostController) {
                                     Spacer(modifier = Modifier.size(5.dp))
                                     Text(
                                         text = "See All",
+                                        fontFamily = latoFontFamily,
                                         color = Cyan,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.W500,
+                                        modifier = Modifier.clickable {
+                                            navController.navigate("member"){
+                                                popUpTo("member"){
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
                                     )
                                 }
                                 LazyRow(
@@ -269,11 +285,13 @@ fun HomePage(navController: NavHostController) {
                                             Text(
                                                 text = "Vidhi",
                                                 color = Color.Black,
+                                                fontFamily = latoFontFamily,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.W500,
                                             )
                                             Text(
                                                 text = "President",
+                                                fontFamily = latoFontFamily,
                                                 color = Color(0xFFE0E0E0),
                                                 fontSize = 13.sp,
                                                 fontWeight = FontWeight.W500,
@@ -306,6 +324,7 @@ fun HomePage(navController: NavHostController) {
                                 ) {
                                     Text(
                                         text = "RG Lab Logs",
+                                        fontFamily = latoFontFamily,
                                         color = Black,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.W500
@@ -313,9 +332,17 @@ fun HomePage(navController: NavHostController) {
                                     Spacer(modifier = Modifier.size(5.dp))
                                     Text(
                                         text = "See All",
+                                        fontFamily = latoFontFamily,
                                         color = Cyan,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.W500,
+                                        modifier = Modifier.clickable {
+                                            navController.navigate("logs"){
+                                                popUpTo("logs"){
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
                                     )
                                 }
                                 Column(
@@ -345,6 +372,7 @@ fun HomePage(navController: NavHostController) {
                                             Text(
                                                 text = "Opened by Amogh at 10:00 AM",
                                                 color = Black,
+                                                fontFamily = latoFontFamily,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.W500
                                             )
@@ -391,6 +419,7 @@ fun HomePage(navController: NavHostController) {
                                 ) {
                                     Text(
                                         text = "Projects & Events",
+                                        fontFamily = latoFontFamily,
                                         color = Black,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.W500
@@ -398,6 +427,7 @@ fun HomePage(navController: NavHostController) {
                                     Spacer(modifier = Modifier.size(5.dp))
                                     Text(
                                         text = "See All",
+                                        fontFamily = latoFontFamily,
                                         color = Cyan,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.W500,
@@ -429,6 +459,7 @@ fun HomePage(navController: NavHostController) {
                                             }
                                             Text(
                                                 text = "LivPol - Started: 10th Oct 2021",
+                                                fontFamily = latoFontFamily,
                                                 color = Black,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.W500
@@ -490,6 +521,11 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
+                                navController.navigate("logs"){
+                                    popUpTo("logs"){
+                                        inclusive = true
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -505,6 +541,11 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
+                                navController.navigate("member"){
+                                    popUpTo("member"){
+                                        inclusive = true
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -534,7 +575,13 @@ fun HomePage(navController: NavHostController) {
                         }
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
-                            onClick = {},
+                            onClick = {
+                                navController.navigate("profile"){
+                                    popUpTo("profile"){
+                                        inclusive = true
+                                    }
+                                }
+                            },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)

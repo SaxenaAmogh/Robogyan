@@ -14,26 +14,20 @@ fun AppNavigation(navController: NavHostController) {
         composable("splash"){
             SplashScreen(navController)
         }
-//        composable("landing"){
-//            LandingPage(navController)
-//        }
+        composable("member"){
+            MemberPage(navController)
+        }
         composable("login"){
             LoginPage(navController)
         }
-//        composable("otp"){
-//            OtpPage(navController)
-//        }
+        composable("logs"){
+            LogPage(navController)
+        }
         composable("home"){
             HomePage(navController)
         }
-//        composable("explore"){
-//            ExplorePage(navController)
-//        }
-//        composable("cart"){
-//            CartPage(navController)
-//        }
-//        composable("profile"){
-//            ProfilePage(navController)
-//        }
+        composable("profile"){
+            ProfilePage(navController)
+        }
     }
 }

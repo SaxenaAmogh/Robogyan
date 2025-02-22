@@ -62,7 +62,6 @@ fun LoginPage(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    var login by remember { mutableStateOf(true) }
 
     Scaffold(
         content = { innerPadding ->
@@ -70,7 +69,7 @@ fun LoginPage(navController: NavController) {
                 modifier = Modifier
                     .padding()
                     .fillMaxSize()
-                    .background(NavyBlue)
+                    .background(CharcoalBlack)
             ){
                 Column(
                     modifier = Modifier
