@@ -4,12 +4,15 @@ data class Member(
     val id: String,
     val name: String,
     val pos: String,
+    val uid: String,
     val batch: String,
     val email: String,
     val mobileNum: Long,
     val enrollment: Long,
     val techStack: String,
     val labAccess: Boolean,
+    val clearance: String,
+    val image: String,
     val created: String,
     val updated: String
 )

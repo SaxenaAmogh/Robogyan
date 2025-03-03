@@ -1,10 +1,8 @@
 package com.example.robogyan.repository
 
-import com.example.robogyan.model.Member
 import com.example.robogyan.model.MemberResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 
 interface MemberApi {
     @GET("api/collections/members/records")

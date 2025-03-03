@@ -1,5 +1,7 @@
 package com.example.robogyan.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +39,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
@@ -57,7 +62,13 @@ import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.GateLogsViewModel
+import com.example.robogyan.viewmodel.MemberViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogPage(navController: NavController) {
@@ -67,6 +78,10 @@ fun LogPage(navController: NavController) {
     val screenHeight = configuration.screenHeightDp.dp
     var searchItem by remember { mutableStateOf("") }
     var door by remember { mutableStateOf(false) }
+    val memberViewModel: MemberViewModel = viewModel()
+    val members by memberViewModel.members.observeAsState(emptyList())
+    val gateLogViewModel: GateLogsViewModel = viewModel()
+    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
 
     Scaffold(
         content = { innerPadding ->
@@ -86,7 +101,8 @@ fun LogPage(navController: NavController) {
                                 horizontal = 0.035 * screenWidth
                             )
                             .fillMaxSize()
-                            .align(Alignment.TopCenter)
+                            .align(Alignment.TopCenter),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         item {
                             Row(
@@ -376,35 +392,53 @@ fun LogPage(navController: NavController) {
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
                         }
                         item{
-                            repeat(12){
-                                Row(
+                            if(gateLogs.isEmpty()){
+                                CircularProgressIndicator(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            color = Color(0xFFE0E0E0),
-                                            shape = RoundedCornerShape(18.dp)
-                                        ),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    IconButton(
-                                        onClick = { },
+                                        .size(80.dp),
+                                    color = Color.White
+                                )
+                            }else {
+                                repeat(gateLogs.size) {
+                                    val x = (gateLogs.size-1) - it
+                                    var name by remember { mutableStateOf("") }
+                                    for (i in members){
+                                        if (i.uid == gateLogs[x].uid){
+                                            name = i.name
+                                            break
+                                        }
+                                    }
+                                    val created = gateLogs[x].created ?: "2021-09-01 00:00:00"
+                                    val (createdDate, createdTime) = convertToIST(created)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = Color(0xFFE0E0E0),
+                                                shape = RoundedCornerShape(18.dp)
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(
-                                            Icons.Default.Info,
-                                            contentDescription = "Order",
-                                            tint = Color.Gray,
-                                            modifier = Modifier.size(28.dp),
+                                        IconButton(
+                                            onClick = { },
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Info,
+                                                contentDescription = "Order",
+                                                tint = Color.Gray,
+                                                modifier = Modifier.size(28.dp),
+                                            )
+                                        }
+                                        Text(
+                                            text = "Opened by $name: $createdDate at $createdTime",
+                                            color = Black,
+                                            fontSize = 15.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.W500
                                         )
                                     }
-                                    Text(
-                                        text = "Opened by Amogh: 08-02-25 at 10:00 AM",
-                                        color = Black,
-                                        fontSize = 15.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
-                                    )
+                                    Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                 }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
                             }
                             Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.07 * screenHeight))
                         }
@@ -522,6 +556,7 @@ fun LogPage(navController: NavController) {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun LogPagePreview() {

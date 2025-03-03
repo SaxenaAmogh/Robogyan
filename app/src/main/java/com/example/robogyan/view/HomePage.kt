@@ -1,5 +1,7 @@
 package com.example.robogyan.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,25 +18,23 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,19 +46,49 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.GateLogsViewModel
+import com.example.robogyan.viewmodel.MemberViewModel
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertToIST(utcDateTime: String): Pair<String, String> {
+    return try {
+        // Parse the UTC time
+        val utcFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX")
+            .withZone(ZoneId.of("UTC"))
+        val instant = Instant.from(utcFormatter.parse(utcDateTime))
+
+        // Convert to IST
+        val istZone = ZoneId.of("Asia/Kolkata")
+        val istFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(istZone)
+        val istDateTime = istFormatter.format(instant)
+
+        // Split Date and Time
+        val (date, time) = istDateTime.split(" ")
+        date to time
+    } catch (e: Exception) {
+        e.printStackTrace()
+        "Invalid Date" to "Invalid Time"
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomePage(navController: NavHostController) {
 
@@ -66,13 +96,11 @@ fun HomePage(navController: NavHostController) {
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     var door by remember { mutableStateOf(false) }
-
-    val colorList2 = listOf(
-        Color(0xFFffca47),
-        Color(0xFF4acfff),
-        Color(0xFF8156ff),
-        Color(0xFF272428),
-    )
+    val memberViewModel: MemberViewModel = viewModel()
+    val members by memberViewModel.members.observeAsState(emptyList())
+    val gateLogViewModel: GateLogsViewModel = viewModel()
+    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
+    val count = members.size
 
     Scaffold(
         content = { innerPadding ->
@@ -102,7 +130,7 @@ fun HomePage(navController: NavHostController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ){
                                 Text(
-                                    text = "Hi Vidhi!",
+                                    text = "Hi Amogh!",
                                     color = Color.White,
                                     fontSize = 32.sp,
                                     fontFamily = latoFontFamily,
@@ -213,7 +241,8 @@ fun HomePage(navController: NavHostController) {
                                     .background(
                                         color = Color(0xFFE0E0E0),
                                         shape = RoundedCornerShape(20.dp)
-                                    )
+                                    ),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -249,54 +278,65 @@ fun HomePage(navController: NavHostController) {
                                         }
                                     )
                                 }
-                                LazyRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 0.015 * screenWidth,
-                                            end = 0.015 * screenWidth,
-                                            bottom = 0.03 * screenWidth
-                                        )
-                                ) {
-                                    items(6) {
-                                        Column(
-                                            modifier = Modifier
-                                                .padding(
-                                                    start = 0.015 * screenWidth,
-                                                    end = 0.015 * screenWidth,
-                                                    top = 0.03 * screenWidth
-                                                )
-                                                .background(
-                                                    color = Cyan,
-                                                    shape = RoundedCornerShape(15.dp)
-                                                ),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.me),
-                                                contentDescription = "Profile",
+                                if (members.isEmpty()){
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(50.dp),
+                                        color = Color.Black
+                                    )
+                                }
+                                else {
+                                    LazyRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 0.015 * screenWidth,
+                                                end = 0.015 * screenWidth,
+                                                bottom = 0.03 * screenWidth
+                                            )
+                                    ) {
+                                        items(count) {
+                                            Column(
                                                 modifier = Modifier
-                                                    .padding(0.01 * screenWidth)
-                                                    .clip(RoundedCornerShape(15.dp))
-                                                    .size(0.25 * screenWidth),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                            Spacer(modifier = Modifier.size(0.0035 * screenHeight))
-                                            Text(
-                                                text = "Vidhi",
-                                                color = Color.Black,
-                                                fontFamily = latoFontFamily,
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.W500,
-                                            )
-                                            Text(
-                                                text = "President",
-                                                fontFamily = latoFontFamily,
-                                                color = Color(0xFFE0E0E0),
-                                                fontSize = 13.sp,
-                                                fontWeight = FontWeight.W500,
-                                            )
-                                            Spacer(modifier = Modifier.size(0.002 * screenHeight))
+                                                    .padding(
+                                                        start = 0.015 * screenWidth,
+                                                        end = 0.015 * screenWidth,
+                                                        top = 0.03 * screenWidth
+                                                    )
+                                                    .background(
+                                                        color = Cyan,
+                                                        shape = RoundedCornerShape(15.dp)
+                                                    ),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                AsyncImage(
+                                                    model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}",
+                                                    contentDescription = "Profile",
+                                                    modifier = Modifier
+                                                        .padding(0.01 * screenWidth)
+                                                        .clip(RoundedCornerShape(15.dp))
+                                                        .size(0.25 * screenWidth),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                                Spacer(modifier = Modifier.size(0.0035 * screenHeight))
+                                                Text(
+                                                    text = if (members[it].name.length > 6) members[it].name.take(
+                                                        6
+                                                    ) + "" else members[it].name,
+                                                    color = Color.Black,
+                                                    fontFamily = latoFontFamily,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.W500
+                                                )
+                                                Text(
+                                                    text = members[it].pos,
+                                                    fontFamily = latoFontFamily,
+                                                    color = Color(0xFFE0E0E0),
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.W500,
+                                                )
+                                                Spacer(modifier = Modifier.size(0.002 * screenHeight))
+                                            }
                                         }
                                     }
                                 }
@@ -309,7 +349,8 @@ fun HomePage(navController: NavHostController) {
                                     .background(
                                         color = Color(0xFFE0E0E0),
                                         shape = RoundedCornerShape(20.dp)
-                                    )
+                                    ),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ){
                                 Row(
                                     modifier = Modifier
@@ -323,7 +364,7 @@ fun HomePage(navController: NavHostController) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "RG Lab Logs",
+                                        text = "RG Gate Logs",
                                         fontFamily = latoFontFamily,
                                         color = Black,
                                         fontSize = 20.sp,
@@ -345,54 +386,64 @@ fun HomePage(navController: NavHostController) {
                                         }
                                     )
                                 }
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            bottom = 0.03 * screenWidth
-                                        )
-                                ) {
-                                    repeat(6){
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            IconButton(
-                                                onClick = { },
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.Info,
-                                                    contentDescription = "Order",
-                                                    tint = Color.Gray,
-                                                    modifier = Modifier.size(28.dp),
-                                                )
-                                            }
-                                            Text(
-                                                text = "Opened by Amogh at 10:00 AM",
-                                                color = Black,
-                                                fontFamily = latoFontFamily,
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.W500
+                                if(gateLogs.isEmpty()){
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(50.dp),
+                                        color = Color.Black
+                                    )
+                                }else{
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                bottom = 0.03 * screenWidth
                                             )
-                                            IconButton(
-                                                onClick = { },
+                                    ) {
+                                        repeat(
+                                            if (gateLogs.size > 6) 6 else gateLogs.size
+                                        ){
+                                            val x = (gateLogs.size-1) - it
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
                                             ) {
-                                                Icon(
-                                                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                                    contentDescription = "enter",
-                                                    tint = Color.Gray,
-                                                    modifier = Modifier.size(34.dp),
+                                                IconButton(
+                                                    onClick = { },
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Info,
+                                                        contentDescription = "Order",
+                                                        tint = Color.Gray,
+                                                        modifier = Modifier.size(28.dp),
+                                                    )
+                                                }
+                                                var name by remember { mutableStateOf("") }
+                                                for (i in members){
+                                                    if (i.uid == gateLogs[x].uid){
+                                                        name = i.name
+                                                        break
+                                                    }
+                                                }
+                                                val created = gateLogs[x].created ?: "2021-09-01 00:00:00"
+                                                val (createdDate, createdTime) = convertToIST(created)
+                                                Text(
+                                                    text = "Opened by $name at $createdDate on $createdTime",
+                                                    color = Black,
+                                                    fontFamily = latoFontFamily,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.W500
                                                 )
                                             }
+                                            HorizontalDivider(
+                                                modifier = Modifier.padding(
+                                                    start = 0.03 * screenWidth,
+                                                    end = 0.03 * screenWidth,
+                                                )
+                                            )
                                         }
-                                        HorizontalDivider(
-                                            modifier = Modifier.padding(
-                                                start = 0.03 * screenWidth,
-                                                end = 0.03 * screenWidth,
-                                            )
-                                        )
                                     }
                                 }
                             }
@@ -600,6 +651,7 @@ fun HomePage(navController: NavHostController) {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun HomePagePreview() {

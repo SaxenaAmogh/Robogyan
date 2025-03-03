@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.CharcoalBlack
@@ -188,6 +189,7 @@ fun MemberPage(navController: NavController) {
                             }
                             else {
                                 repeat(count) {
+                                    Log.d("ImageData", "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}")
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -209,8 +211,8 @@ fun MemberPage(navController: NavController) {
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.Start
                                         ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.me),
+                                            AsyncImage(
+                                                model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}",
                                                 contentDescription = "Profile",
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(25.dp))
@@ -309,8 +311,8 @@ fun MemberPage(navController: NavController) {
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.me),
+                                        AsyncImage(
+                                            model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[id].id}/${members[id].image}",
                                             contentDescription = "Profile",
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(50.dp))
