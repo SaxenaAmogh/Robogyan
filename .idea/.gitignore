@@ -9,3 +9,7 @@ workspace.xml
 compiler.xml
 appInsightsSettings.xml
 migrations.xml
+gradle.xml
+kotlinc.xml
+runConfigurations.xml
+AndroidProjectSystem.xml

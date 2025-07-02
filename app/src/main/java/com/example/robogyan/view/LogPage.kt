@@ -19,24 +19,20 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -47,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,15 +55,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.Black
-import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
+import com.example.robogyan.ui.theme.ThemeBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.GateLogsViewModel
 import com.example.robogyan.viewmodel.MemberViewModel
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +83,7 @@ fun LogPage(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(Color.White)
             ) {
                 Box(
                     modifier = Modifier
@@ -110,69 +105,58 @@ fun LogPage(navController: NavController) {
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Lab Access Logs",
-                                    color = Color.White,
-                                    fontSize = 30.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
+                            ){
+                                Icon(
+                                    painter = painterResource(R.drawable.notification),
+                                    contentDescription = "notification",
+                                    Modifier.size(32.dp),
+                                    tint = ThemeBlue
                                 )
-                                Row {
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(46.dp),
-                                        onClick = { },
-                                        containerColor = Color(0xFFE0E0E0),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.edit),
-                                            contentDescription = "cart",
-                                            Modifier.size(30.dp),
-                                            tint = Black
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Image(
-                                        painter = painterResource(id = R.drawable.me),
-                                        contentDescription = "Profile",
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(50.dp))
-                                            .size(46.dp)
-                                    )
-                                }
+                                Text(
+                                    text = "Gate Logs",
+                                    color = ThemeBlue,
+                                    fontSize = 20.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = "notification",
+                                    Modifier.size(35.dp),
+                                    tint = ThemeBlue
+                                )
                             }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
-                        item {
+                        item{
                             OutlinedTextField(
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = Color(0xFF2a2a2a),
-                                    unfocusedBorderColor = Color(0xFF2a2a2a),
-                                    cursorColor = Color(0xFFFFFFFF),
-                                    containerColor = Color(0xFF2a2a2a),
+                                    focusedBorderColor = Color(0xFFECECEC),
+                                    unfocusedBorderColor = Color(0xFFECECEC),
+                                    cursorColor = Color(0xFF000000),
+                                    containerColor = Color(0xFFf7f7f7),
                                 ),
                                 modifier = Modifier
                                     .padding(
                                         start = 0.005 * screenWidth,
                                         end = 0.005 * screenWidth,
                                     )
-                                    .fillMaxWidth()
-                                    .clip(shape = RoundedCornerShape(35)),
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(35),
                                 leadingIcon = {
                                     Icon(
                                         modifier = Modifier.size(22.dp),
                                         painter = painterResource(id = R.drawable.search),
-                                        contentDescription = "search"
+                                        contentDescription = "search",
+                                        tint = ThemeBlue
                                     )
                                 },
                                 value = searchItem,
                                 onValueChange = { searchItem = it },
                                 placeholder = {
                                     Text(
-                                        color = Color(0x9EFFFFFF),
-                                        text = "Search for lab access logs",
+                                        color = ThemeBlue,
+                                        text = "Search for a member",
                                         fontFamily = latoFontFamily,
                                     )
                                 }
@@ -183,210 +167,148 @@ fun LogPage(navController: NavController) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(
-                                        if (door) Color(0xFF4CAF50) else Color(0xFFCC443A)
+                                    .clip(RoundedCornerShape(25.dp))
+                                    .border(
+                                        width = 2.dp,
+                                        color = ThemeBlue,
+                                        shape = RoundedCornerShape(25.dp)
                                     )
                                     .padding(
-                                        horizontal = 0.03 * screenWidth,
-                                        vertical = 0.05 * screenWidth
+                                        horizontal = 0.07 * screenWidth,
+                                        vertical = 0.035 * screenWidth
                                     )
                                     .clickable { door = !door }
                             ) {
                                 Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
-                                ){
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(36.dp),
-                                        onClick = { },
-                                        containerColor = Color(0xFFFFFFFF),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.lock),
-                                            contentDescription = "cart",
-                                            Modifier.size(24.dp),
-                                            tint = Black
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Welcome!",
+                                            color = ThemeBlue,
+                                            fontSize = 22.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Experience Engineering",
+                                            color = ThemeBlue,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Text(
-                                        text = "Door Status",
-                                        color = Black,
-                                        fontSize = 20.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                }
-                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                Text(
-                                    text = if (door) "Door is Open" else "Door is Closed",
-                                    color = Black,
-                                    fontSize = 26.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
-                                )
-                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                FloatingActionButton(
-                                    modifier = Modifier
-                                        .clip(shape = RoundedCornerShape(50))
-                                        .size(width = 120.dp, height = 35.dp),
-                                    containerColor = Color.White,
-                                    onClick = { door = !door },
-                                ){
-                                    Text(
-                                        text = "Open Door",
-                                        color = Color.Black,
-                                        fontFamily = latoFontFamily
+                                    Image(
+                                        painter = painterResource(R.drawable.rg),
+                                        contentDescription = "rg",
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
                         }
-                        item{
+                        item {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                            ){
-                                Column(
+                            ) {
+                                Box(
                                     modifier = Modifier
-                                        .width(0.45 * screenWidth)
                                         .clip(RoundedCornerShape(20.dp))
-                                        .background(
-                                            Color(0xFFE8B225)
-                                        )
+                                        .background(ThemeBlue)
                                         .padding(
-                                            horizontal = 0.03 * screenWidth,
-                                            vertical = 0.03 * screenWidth
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.035 * screenWidth
                                         )
-                                        .clickable { door = !door }
-                                ) {
+                                        .size(0.4 * screenWidth)
+                                        .clickable {
+                                        }
+                                ){
+                                    Text(
+                                        text = " Last Opened by",
+                                        color = Color(0xFFDADADA),
+                                        fontSize = 14.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
                                     Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .align(Alignment.Center),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
                                         verticalAlignment = Alignment.CenterVertically
                                     ){
-                                        FloatingActionButton(
-                                            modifier = Modifier
-                                                .clip(shape = RoundedCornerShape(50))
-                                                .size(36.dp),
-                                            onClick = { },
-                                            containerColor = Color(0xFFFFFFFF),
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.lock),
-                                                contentDescription = "cart",
-                                                Modifier.size(24.dp),
-                                                tint = Black
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.size(5.dp))
+                                        Icon(
+                                            painter = painterResource(R.drawable.unlocked),
+                                            contentDescription = "notification",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(38.dp)
+                                        )
                                         Text(
-                                            text = "Last Opened",
-                                            color = Black,
-                                            fontSize = 20.sp,
+                                            text = "Macle",
+                                            color = Color.White,
+                                            fontSize = 24.sp,
                                             fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.W500
+                                            fontWeight = FontWeight.Bold,
                                         )
                                     }
-                                    Spacer(modifier = Modifier.size(0.015 * screenHeight))
                                     Text(
-                                        text = "By Amogh",
-                                        color = Black,
-                                        fontSize = 26.sp,
+                                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp),
+                                        text = "View All",
+                                        color = Color(0xFFDADADA),
+                                        fontSize = 18.sp,
                                         fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
                                     )
-                                    Text(
-                                        text = "At 12:00 PM",
-                                        color = Color(0xFFE0E0E0),
-                                        fontSize = 16.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(width = 120.dp, height = 35.dp),
-                                        containerColor = Color.White,
-                                        onClick = { door = !door },
-                                    ){
-                                        Text(
-                                            text = "View Member",
-                                            color = Color.Black,
-                                            fontFamily = latoFontFamily
-                                        )
-                                    }
                                 }
-                                Column(
+                                Box(
                                     modifier = Modifier
-                                        .width(0.45 * screenWidth)
                                         .clip(RoundedCornerShape(20.dp))
-                                        .background(
-                                            Color(0xFF4CAF50)
-                                        )
+                                        .background(Color(0xFFC3E1FF))
                                         .padding(
-                                            horizontal = 0.03 * screenWidth,
-                                            vertical = 0.03 * screenWidth
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.035 * screenWidth
                                         )
-                                        .clickable { door = !door }
-                                ) {
+                                        .size(0.4 * screenWidth)
+                                        .clickable {
+                                        }
+                                ){
+                                    Text(
+                                        text = " 5 People have access",
+                                        color = Color.Black,
+                                        fontSize = 14.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
                                     Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .align(Alignment.Center),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
                                         verticalAlignment = Alignment.CenterVertically
                                     ){
-                                        FloatingActionButton(
-                                            modifier = Modifier
-                                                .clip(shape = RoundedCornerShape(50))
-                                                .size(36.dp),
-                                            onClick = { },
-                                            containerColor = Color(0xFFFFFFFF),
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.lock),
-                                                contentDescription = "cart",
-                                                Modifier.size(24.dp),
-                                                tint = Black
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.size(5.dp))
-                                        Text(
-                                            text = "Lab Access",
-                                            color = Black,
-                                            fontSize = 20.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.W500
+                                        Icon(
+                                            painter = painterResource(R.drawable.security),
+                                            contentDescription = "notification",
+                                            tint = ThemeBlue,
+                                            modifier = Modifier.size(38.dp)
                                         )
-                                    }
-                                    Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                    Text(
-                                        text = "12 People",
-                                        color = Black,
-                                        fontSize = 26.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Text(
-                                        text = "can unlock the lab",
-                                        color = Color(0xFFE0E0E0),
-                                        fontSize = 16.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(width = 120.dp, height = 35.dp),
-                                        containerColor = Color.White,
-                                        onClick = { door = !door },
-                                    ){
                                         Text(
-                                            text = "View Access",
+                                            text = "Gate Access",
                                             color = Color.Black,
-                                            fontFamily = latoFontFamily
+                                            fontSize = 22.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold,
                                         )
                                     }
+                                    Text(
+                                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp),
+                                        text = "Edit Access",
+                                        color = Color.Gray,
+                                        fontSize = 18.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
                                 }
                             }
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
@@ -451,45 +373,24 @@ fun LogPage(navController: NavController) {
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .padding(
-                                horizontal = 0.035 * screenWidth
                             )
                             .background(
                                 shape = RoundedCornerShape(40),
-                                color = Cyan
+                                color = AccentColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
                             onClick = {
-                                navController.navigate("home"){
-                                    popUpTo("home"){
-                                        inclusive = true
-                                    }
-                                }
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.home),
+                                painter = painterResource(R.drawable.home_d),
                                 contentDescription = "home",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.log_d),
-                                contentDescription = "explore",
                                 Modifier.size(32.dp),
                                 tint = Black
                             )
@@ -517,13 +418,33 @@ fun LogPage(navController: NavController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
+                                navController.navigate("logs"){
+                                    popUpTo("logs"){
+                                        inclusive = true
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.event),
+                                painter = painterResource(R.drawable.security),
+                                contentDescription = "explore",
+                                Modifier.size(32.dp),
+                                tint = Black
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(12.dp))
+                        IconButton(
+                            onClick = {
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .size(55.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
                                 Modifier.size(32.dp),
                                 tint = Black
@@ -537,13 +458,13 @@ fun LogPage(navController: NavController) {
                                         inclusive = true
                                     }
                                 }
-                                      },
+                            },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.user),
+                                painter = painterResource(R.drawable.res),
                                 contentDescription = "account",
                                 Modifier.size(32.dp),
                                 tint = Black

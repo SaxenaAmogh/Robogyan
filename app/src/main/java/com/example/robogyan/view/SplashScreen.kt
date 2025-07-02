@@ -35,8 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.NavyBlue
+import com.example.robogyan.ui.theme.ThemeBlue
 import kotlinx.coroutines.delay
 
 @SuppressLint("UseOfNonLambdaOffsetOverload")
@@ -62,7 +65,7 @@ fun SplashScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(BackgroundColor)
             ) {
                 Box(
                     modifier = Modifier

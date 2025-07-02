@@ -1,9 +1,12 @@
 package com.example.robogyan.view
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,13 +29,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,20 +56,30 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
+import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
+
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
+import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.SecondaryColor
+import com.example.robogyan.ui.theme.TextColor
+import com.example.robogyan.ui.theme.ThemeBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.GateLogsViewModel
 import com.example.robogyan.viewmodel.MemberViewModel
@@ -88,6 +110,8 @@ fun convertToIST(utcDateTime: String): Pair<String, String> {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomePage(navController: NavHostController) {
@@ -101,20 +125,29 @@ fun HomePage(navController: NavHostController) {
     val gateLogViewModel: GateLogsViewModel = viewModel()
     val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
     val count = members.size
+    var gateStatus by remember { mutableStateOf(true) }
+    val focusManager = LocalFocusManager.current
 
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
+    if (windowInsetsController != null) {
+        windowInsetsController.isAppearanceLightStatusBars = false
+    }
+    
     Scaffold(
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(BackgroundColor)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
                         .padding(
-                            horizontal = 0.035 * screenWidth
+                            horizontal = 0.04 * screenWidth
                         )
                 ){
                     LazyColumn(
@@ -129,413 +162,444 @@ fun HomePage(navController: NavHostController) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ){
-                                Text(
-                                    text = "Hi Amogh!",
-                                    color = Color.White,
-                                    fontSize = 32.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
+                                Icon(
+                                    painter = painterResource(R.drawable.notification),
+                                    contentDescription = "notification",
+                                    Modifier.size(32.dp),
+                                    tint = AccentColor
                                 )
-                                Row {
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(46.dp),
-                                        onClick = { },
-                                        containerColor = Color(0xFFE0E0E0),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.notification),
-                                            contentDescription = "cart",
-                                            Modifier.size(32.dp),
-                                            tint = Black
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Image(
-                                        painter = painterResource(id = R.drawable.me),
-                                        contentDescription = "Profile",
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(50.dp))
-                                            .size(46.dp)
-                                    )
-                                }
+                                Text(
+                                    text = "Home",
+                                    color = TextColor,
+                                    fontSize = 20.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Icon(
+                                    painter = painterResource(R.drawable.user),
+                                    contentDescription = "account",
+                                    Modifier.size(32.dp),
+                                    tint = AccentColor
+                                )
                             }
-                            Spacer(modifier = Modifier.size(0.027 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(
-                                        if (door) Color(0xFF4CAF50) else Color(0xFFCC443A)
+                                    .clip(RoundedCornerShape(25.dp))
+                                    .border(
+                                        width = 1.2.dp,
+                                        color = AccentColor,
+                                        shape = RoundedCornerShape(25.dp)
                                     )
+                                    .background(SecondaryColor)
                                     .padding(
-                                        horizontal = 0.03 * screenWidth,
+                                        horizontal = 0.07 * screenWidth,
+                                        vertical = 0.035 * screenWidth
+                                    )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Welcome!",
+                                            color = TextColor,
+                                            fontSize = 22.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Experience Engineering",
+                                            color = TextColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    Image(
+                                        painter = painterResource(R.drawable.rg),
+                                        contentDescription = "rg",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.size(0.022 * screenHeight))
+                        }
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(SecondaryColor)
+                                    .padding(
+                                        horizontal = 0.05 * screenWidth,
                                         vertical = 0.05 * screenWidth
                                     )
                                     .clickable { door = !door }
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ){
-                                    FloatingActionButton(
+                                Row{
+                                    VerticalDivider(
                                         modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(36.dp),
-                                        onClick = { },
-                                        containerColor = Color(0xFFFFFFFF),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.lock),
-                                            contentDescription = "cart",
-                                            Modifier.size(24.dp),
-                                            tint = Black
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.size(5.dp))
+                                            .height(30.dp)
+                                            .padding(end = 8.dp)
+                                            .clip(RoundedCornerShape(30)),
+                                        color = AccentColor,
+                                        thickness = 5.dp
+                                    )
                                     Text(
-                                        text = "Door Status",
-                                        color = Black,
-                                        fontSize = 20.sp,
+                                        text = "Live Updates",
+                                        color = TextColor,
+                                        fontSize = 22.sp,
                                         fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.W500
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
-                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
+                                Spacer(modifier = Modifier.size(0.005 * screenHeight))
                                 Text(
-                                    text = if (door) "Door is Open" else "Door is Closed",
-                                    color = Black,
-                                    fontSize = 26.sp,
+                                    text = "Society Meeting at 1:00 PM",
+                                    color = TextColor,
+                                    fontSize = 18.sp,
                                     fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
                                 )
-                                Text(
-                                    text = "Opened by Amogh at 10:00 AM",
-                                    color = Color(0xFFE0E0E0),
-                                    fontSize = 16.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
-                                )
-                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                FloatingActionButton(
-                                    modifier = Modifier
-                                        .clip(shape = RoundedCornerShape(50))
-                                        .size(width = 120.dp, height = 35.dp),
-                                    containerColor = Color.White,
-                                    onClick = { door = !door },
-                                ){
-                                    Text(
-                                        text = "Open Door",
-                                        color = Color.Black,
-                                        fontFamily = latoFontFamily
-                                    )
-                                }
                             }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
                         }
                         item {
-                            Column(
+                            Spacer(modifier = Modifier.size(0.022 * screenHeight))
+                            Text(
+                                text = "Upcoming Events",
+                                color = TextColor,
+                                fontSize = 20.sp,
+                                fontFamily = latoFontFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Row(
                                 modifier = Modifier
-                                    .background(
-                                        color = Color(0xFFE0E0E0),
-                                        shape = RoundedCornerShape(20.dp)
-                                    ),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 0.03 * screenWidth,
-                                            end = 0.03 * screenWidth,
-                                            top = 0.03 * screenWidth
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Members",
-                                        fontFamily = latoFontFamily,
-                                        color = Black,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Text(
-                                        text = "See All",
-                                        fontFamily = latoFontFamily,
-                                        color = Cyan,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.W500,
-                                        modifier = Modifier.clickable {
-                                            navController.navigate("member"){
-                                                popUpTo("member"){
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    )
-                                }
-                                if (members.isEmpty()){
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .size(50.dp),
-                                        color = Color.Black
-                                    )
-                                }
-                                else {
-                                    LazyRow(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                start = 0.015 * screenWidth,
-                                                end = 0.015 * screenWidth,
-                                                bottom = 0.03 * screenWidth
-                                            )
-                                    ) {
-                                        items(count) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .padding(
-                                                        start = 0.015 * screenWidth,
-                                                        end = 0.015 * screenWidth,
-                                                        top = 0.03 * screenWidth
-                                                    )
-                                                    .background(
-                                                        color = Cyan,
-                                                        shape = RoundedCornerShape(15.dp)
-                                                    ),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                AsyncImage(
-                                                    model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}",
-                                                    contentDescription = "Profile",
-                                                    modifier = Modifier
-                                                        .padding(0.01 * screenWidth)
-                                                        .clip(RoundedCornerShape(15.dp))
-                                                        .size(0.25 * screenWidth),
-                                                    contentScale = ContentScale.Crop
-                                                )
-                                                Spacer(modifier = Modifier.size(0.0035 * screenHeight))
-                                                Text(
-                                                    text = if (members[it].name.length > 6) members[it].name.take(
-                                                        6
-                                                    ) + "" else members[it].name,
-                                                    color = Color.Black,
-                                                    fontFamily = latoFontFamily,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.W500
-                                                )
-                                                Text(
-                                                    text = members[it].pos,
-                                                    fontFamily = latoFontFamily,
-                                                    color = Color(0xFFE0E0E0),
-                                                    fontSize = 13.sp,
-                                                    fontWeight = FontWeight.W500,
-                                                )
-                                                Spacer(modifier = Modifier.size(0.002 * screenHeight))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
-                        }
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .background(
-                                        color = Color(0xFFE0E0E0),
-                                        shape = RoundedCornerShape(20.dp)
-                                    ),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ){
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 0.03 * screenWidth,
-                                            end = 0.03 * screenWidth,
-                                            top = 0.03 * screenWidth
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "RG Gate Logs",
-                                        fontFamily = latoFontFamily,
-                                        color = Black,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Text(
-                                        text = "See All",
-                                        fontFamily = latoFontFamily,
-                                        color = Cyan,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.W500,
-                                        modifier = Modifier.clickable {
-                                            navController.navigate("logs"){
-                                                popUpTo("logs"){
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    )
-                                }
-                                if(gateLogs.isEmpty()){
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .size(50.dp),
-                                        color = Color.Black
-                                    )
-                                }else{
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                bottom = 0.03 * screenWidth
-                                            )
-                                    ) {
-                                        repeat(
-                                            if (gateLogs.size > 6) 6 else gateLogs.size
-                                        ){
-                                            val x = (gateLogs.size-1) - it
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.SpaceBetween
-                                            ) {
-                                                IconButton(
-                                                    onClick = { },
-                                                ) {
-                                                    Icon(
-                                                        Icons.Default.Info,
-                                                        contentDescription = "Order",
-                                                        tint = Color.Gray,
-                                                        modifier = Modifier.size(28.dp),
-                                                    )
-                                                }
-                                                var name by remember { mutableStateOf("") }
-                                                for (i in members){
-                                                    if (i.uid == gateLogs[x].uid){
-                                                        name = i.name
-                                                        break
-                                                    }
-                                                }
-                                                val created = gateLogs[x].created ?: "2021-09-01 00:00:00"
-                                                val (createdDate, createdTime) = convertToIST(created)
-                                                Text(
-                                                    text = "Opened by $name at $createdDate on $createdTime",
-                                                    color = Black,
-                                                    fontFamily = latoFontFamily,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.W500
-                                                )
-                                            }
-                                            HorizontalDivider(
-                                                modifier = Modifier.padding(
-                                                    start = 0.03 * screenWidth,
-                                                    end = 0.03 * screenWidth,
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
-                        }
-                        item{
-                            Column(
-                                modifier = Modifier
-                                    .background(
-                                        color = Color(0xFFE0E0E0),
-                                        shape = RoundedCornerShape(20.dp)
-                                    )
-                            ){
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 0.03 * screenWidth,
-                                            end = 0.03 * screenWidth,
-                                            top = 0.03 * screenWidth
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Projects & Events",
-                                        fontFamily = latoFontFamily,
-                                        color = Black,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.W500
-                                    )
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Text(
-                                        text = "See All",
-                                        fontFamily = latoFontFamily,
-                                        color = Cyan,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.W500,
-                                    )
-                                }
                                 Column(
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
                                         .padding(
-                                            bottom = 0.03 * screenWidth
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.035 * screenWidth
                                         )
-                                ) {
-                                    repeat(4){
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            IconButton(
-                                                onClick = { },
-                                            ) {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.event_d),
-                                                    contentDescription = "Order",
-                                                    tint = Color.Gray,
-                                                    modifier = Modifier.size(28.dp),
-                                                )
-                                            }
-                                            Text(
-                                                text = "LivPol - Started: 10th Oct 2021",
-                                                fontFamily = latoFontFamily,
-                                                color = Black,
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.W500
-                                            )
-                                            IconButton(
-                                                onClick = { },
-                                            ) {
-                                                Icon(
-                                                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                                    contentDescription = "enter",
-                                                    tint = Color.Gray,
-                                                    modifier = Modifier.size(34.dp),
-                                                )
+                                        .weight(1f)
+                                        .clickable {
+                                            navController.navigate("member") {
+                                                popUpTo("member") {
+                                                    inclusive = true
+                                                }
                                             }
                                         }
-                                        HorizontalDivider(
-                                            modifier = Modifier.padding(
-                                                start = 0.03 * screenWidth,
-                                                end = 0.03 * screenWidth,
-                                            )
+                                ){
+                                    Column(){
+                                        Text(
+                                            text = " Hackathon",
+                                            color = Color.White,
+                                            fontSize = 22.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                        Text(
+                                            text = " August 21, 2025",
+                                            color = Color(0xFFDADADA),
+                                            fontSize = 17.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.size(0.03 * screenHeight))
+                                    Text(
+                                        modifier = Modifier.padding(bottom = 5.dp),
+                                        text = "View Details",
+                                        color = Color(0xFFDADADA),
+                                        fontSize = 14.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.035 * screenWidth
+                                        )
+                                        .weight(1f)
+                                        .clickable {
+                                            navController.navigate("member") {
+                                                popUpTo("member") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
+                                ){
+                                    Column(){
+                                        Text(
+                                            text = " Workshop",
+                                            color = Color.White,
+                                            fontSize = 22.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                        Text(
+                                            text = " August 26, 2025",
+                                            color = Color(0xFFDADADA),
+                                            fontSize = 17.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.size(0.03 * screenHeight))
+                                    Text(
+                                        modifier = Modifier.padding(bottom = 5.dp),
+                                        text = "View Details",
+                                        color = Color(0xFFDADADA),
+                                        fontSize = 16.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.size(0.022 * screenHeight))
+                        }
+                        item {
+                            Text(
+                                text = "Lab Access Status",
+                                color = TextColor,
+                                fontSize = 20.sp,
+                                fontFamily = latoFontFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(SecondaryColor)
+                                    .padding(
+                                        horizontal = 0.05 * screenWidth,
+                                        vertical = 0.03 * screenWidth
+                                    )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ){
+                                    Switch(
+                                        checked = gateStatus,
+                                        onCheckedChange = {
+                                            focusManager.clearFocus() // Hide the keyboard
+                                            gateStatus = it
+                                        },
+                                        colors = SwitchColors(
+                                            checkedThumbColor = Color.Black,
+                                            uncheckedThumbColor = Color(0xFFB2B2B2),
+                                            checkedTrackColor = AccentColor,
+                                            uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
+                                            checkedBorderColor = Color.Transparent,
+                                            checkedIconColor = Color.Transparent,
+                                            uncheckedBorderColor = Color.Transparent,
+                                            uncheckedIconColor = Color.Transparent,
+                                            disabledCheckedThumbColor = Color.Transparent,
+                                            disabledCheckedTrackColor = Color.Transparent,
+                                            disabledCheckedBorderColor = Color.Transparent,
+                                            disabledCheckedIconColor = Color.Transparent,
+                                            disabledUncheckedThumbColor = Color.Transparent,
+                                            disabledUncheckedTrackColor = Color.Transparent,
+                                            disabledUncheckedBorderColor = Color.Transparent,
+                                            disabledUncheckedIconColor = Color.Transparent,
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    Text(
+                                        text = if (gateStatus) "Gate Open" else "Gate Closed",
+                                        color = TextColor,
+                                        fontSize = 22.sp,
+                                        fontFamily = latoFontFamily,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Text(
+                                    text = "Last opened by Macle at 10:46 AM",
+                                    color = TextColor,
+                                    fontSize = 16.sp,
+                                    fontFamily = latoFontFamily,
+                                )
+                            }
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.05 * screenWidth
+                                        )
+                                        .weight(1f)
+                                        .clickable {
+                                            navController.navigate("member") {
+                                                popUpTo("member") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.member_d),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(40.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Society Members",
+                                            color = PrimaryColor,
+                                            fontSize = 20.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.size(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.05 * screenWidth
+                                        )
+                                        .weight(1f)
+                                        .clickable {
+//                                            navController.navigate("member") {
+//                                                popUpTo("member") {
+//                                                    inclusive = true
+//                                                }
+//                                            }
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.projects_d),
+                                            contentDescription = "projects",
+                                            modifier = Modifier.size(40.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Projects",
+                                            color = PrimaryColor,
+                                            fontSize = 20.sp,
+                                            fontFamily = latoFontFamily,
                                         )
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.07 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.05 * screenWidth
+                                        )
+                                        .weight(1f)
+                                        .clickable {
+                                            navController.navigate("logs") {
+                                                popUpTo("member") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.security_d),
+                                            contentDescription = "security",
+                                            modifier = Modifier.size(40.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Assets and Lab",
+                                            color = PrimaryColor,
+                                            fontSize = 20.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.size(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.046 * screenWidth
+                                        )
+                                        .weight(1f)
+                                        .clickable {
+//                                            navController.navigate("member") {
+//                                                popUpTo("member") {
+//                                                    inclusive = true
+//                                                }
+//                                            }
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.res_d),
+                                            contentDescription = "projects",
+                                            modifier = Modifier.size(44.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Docs & Resources",
+                                            color = PrimaryColor,
+                                            fontSize = 20.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.size(0.12 * screenHeight))
                         }
                     }
 
@@ -549,14 +613,13 @@ fun HomePage(navController: NavHostController) {
                             )
                             .background(
                                 shape = RoundedCornerShape(40),
-                                color = Cyan
+                                color = AccentColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
                             onClick = {
-
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -565,26 +628,6 @@ fun HomePage(navController: NavHostController) {
                             Icon(
                                 painter = painterResource(R.drawable.home_d),
                                 contentDescription = "home",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                                navController.navigate("logs"){
-                                    popUpTo("logs"){
-                                        inclusive = true
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.log),
-                                contentDescription = "explore",
                                 Modifier.size(32.dp),
                                 tint = Black
                             )
@@ -612,13 +655,33 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
+                                navController.navigate("logs"){
+                                    popUpTo("logs"){
+                                        inclusive = true
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.event),
+                                painter = painterResource(R.drawable.security),
+                                contentDescription = "explore",
+                                Modifier.size(32.dp),
+                                tint = Black
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(12.dp))
+                        IconButton(
+                            onClick = {
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .size(55.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
                                 Modifier.size(32.dp),
                                 tint = Black
@@ -638,9 +701,9 @@ fun HomePage(navController: NavHostController) {
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.user),
+                                painter = painterResource(R.drawable.res),
                                 contentDescription = "account",
-                                Modifier.size(32.dp),
+                                Modifier.size(36.dp),
                                 tint = Black
                             )
                         }

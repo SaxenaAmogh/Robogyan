@@ -1,5 +1,6 @@
 package com.example.robogyan.view
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +25,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -49,6 +53,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -56,14 +62,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
+import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
+import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.SecondaryColor
+import com.example.robogyan.ui.theme.TextColor
+import com.example.robogyan.ui.theme.ThemeBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.MemberViewModel
 
@@ -83,94 +96,97 @@ fun MemberPage(navController: NavController) {
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var searchItem by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
+    if (windowInsetsController != null) {
+        windowInsetsController.isAppearanceLightStatusBars = false
+    }
 
     Scaffold(
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(BackgroundColor)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                        .padding(
+                            horizontal = 0.035 * screenWidth
+                        )
                 ) {
                     LazyColumn(
                         modifier = Modifier
-                            .padding(
-                                horizontal = 0.035 * screenWidth
-                            )
                             .fillMaxSize()
                     ) {
-                        item{
+                        item {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Member Details",
-                                    color = Color.White,
-                                    fontSize = 30.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.W500
+                            ){
+                                Icon(
+                                    painter = painterResource(R.drawable.notification),
+                                    contentDescription = "notification",
+                                    Modifier.size(32.dp),
+                                    tint = AccentColor
                                 )
-                                Row {
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .clip(shape = RoundedCornerShape(50))
-                                            .size(46.dp),
-                                        onClick = { },
-                                        containerColor = Color(0xFFE0E0E0),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.edit),
-                                            contentDescription = "cart",
-                                            Modifier.size(30.dp),
-                                            tint = Black
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.size(5.dp))
-                                    Image(
-                                        painter = painterResource(id = R.drawable.me),
-                                        contentDescription = "Profile",
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(50.dp))
-                                            .size(46.dp)
-                                    )
-                                }
+                                Text(
+                                    text = "Society Members",
+                                    color = TextColor,
+                                    fontSize = 20.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Icon(
+                                    painter = painterResource(R.drawable.user),
+                                    contentDescription = "account",
+                                    Modifier.size(32.dp),
+                                    tint = AccentColor
+                                )
                             }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item{
                             OutlinedTextField(
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = Color(0xFF2a2a2a),
-                                    unfocusedBorderColor = Color(0xFF2a2a2a),
-                                    cursorColor = Color(0xFFFFFFFF),
-                                    containerColor = Color(0xFF2a2a2a),
+                                    focusedBorderColor = AccentColor,
+                                    unfocusedBorderColor = Color(0xFFECECEC),
+                                    cursorColor = AccentColor,
+                                    containerColor = SecondaryColor,
                                 ),
                                 modifier = Modifier
                                     .padding(
                                         start = 0.005 * screenWidth,
                                         end = 0.005 * screenWidth,
                                     )
-                                    .fillMaxWidth()
-                                    .clip(shape = RoundedCornerShape(35)),
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(35),
                                 leadingIcon = {
                                     Icon(
                                         modifier = Modifier.size(22.dp),
                                         painter = painterResource(id = R.drawable.search),
-                                        contentDescription = "search"
+                                        contentDescription = "search",
+                                        tint = AccentColor
                                     )
                                 },
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                    }
+                                ),
+                                singleLine = true,
                                 value = searchItem,
                                 onValueChange = { searchItem = it },
                                 placeholder = {
                                     Text(
-                                        color = Color(0x9EFFFFFF),
+                                        color = TextColor,
                                         text = "Search for a member",
                                         fontFamily = latoFontFamily,
                                     )
@@ -184,17 +200,19 @@ fun MemberPage(navController: NavController) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .size(50.dp),
-                                    color = Color(0xFFE0E0E0)
+                                    color = AccentColor
                                 )
                             }
                             else {
                                 repeat(count) {
-                                    Log.d("ImageData", "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}")
+//                                    Log.d("ImageData", "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}")
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .background(
-                                                color = Color(0xFFE0E0E0),
+                                            .clip(RoundedCornerShape(25.dp))
+                                            .border(
+                                                width = 2.dp,
+                                                color = AccentColor,
                                                 shape = RoundedCornerShape(25.dp)
                                             )
                                             .padding(
@@ -207,7 +225,7 @@ fun MemberPage(navController: NavController) {
                                             }
                                     ) {
                                         Row(
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.Start
                                         ) {
@@ -217,11 +235,6 @@ fun MemberPage(navController: NavController) {
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(25.dp))
                                                     .size(130.dp)
-                                                    .border(
-                                                        width = 3.dp,
-                                                        color = Color(0xFFFFFFFF),
-                                                        shape = RoundedCornerShape(25.dp)
-                                                    )
                                             )
                                             Spacer(modifier = Modifier.size(0.04 * screenWidth))
                                             Box(
@@ -235,14 +248,14 @@ fun MemberPage(navController: NavController) {
                                                     Text(
                                                         text = members[it].name,
                                                         fontFamily = latoFontFamily,
-                                                        color = Color.Black,
+                                                        color = AccentColor,
                                                         fontSize = 22.sp,
-                                                        fontWeight = FontWeight.W500,
+                                                        fontWeight = FontWeight.Bold,
                                                         modifier = Modifier
                                                     )
                                                     Text(
                                                         text = members[it].pos,
-                                                        color = Color.Black,
+                                                        color = PrimaryColor,
                                                         fontFamily = latoFontFamily,
                                                         fontSize = 18.sp,
                                                         fontWeight = FontWeight.W500,
@@ -269,7 +282,7 @@ fun MemberPage(navController: NavController) {
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
-                                if (showSheet) Color(0xFF000000).copy(alpha = 0.75f) else Color.Transparent
+                                if (showSheet) Color(0xFF000000).copy(alpha = 0.85f) else Color.Transparent
                             )
                     ){}
 
@@ -278,7 +291,7 @@ fun MemberPage(navController: NavController) {
                             onDismissRequest = { showSheet = false },
                             sheetState = sheetState,
                             scrimColor = Color.Transparent,
-                            containerColor = Color.White,
+                            containerColor = SecondaryColor,
                             dragHandle = null,
                             windowInsets = WindowInsets(
                                 top = innerPadding.calculateTopPadding() + 0.27 * screenHeight,
@@ -287,7 +300,7 @@ fun MemberPage(navController: NavController) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color.White),
+                                    .background(SecondaryColor),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Box(
@@ -295,7 +308,7 @@ fun MemberPage(navController: NavController) {
                                         .padding(10.dp)
                                         .width(50.dp)
                                         .height(5.dp)
-                                        .background(Color.Black, shape = RoundedCornerShape(50))
+                                        .background(AccentColor, shape = RoundedCornerShape(50))
                                 )
                                 Column(
                                     modifier = Modifier
@@ -315,27 +328,27 @@ fun MemberPage(navController: NavController) {
                                             model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[id].id}/${members[id].image}",
                                             contentDescription = "Profile",
                                             modifier = Modifier
-                                                .clip(RoundedCornerShape(50.dp))
+                                                .clip(RoundedCornerShape(30.dp))
                                                 .size(130.dp)
                                                 .border(
-                                                    width = 3.dp,
-                                                    color = Color(0xFFE0E0E0),
-                                                    shape = RoundedCornerShape(50.dp)
+                                                    width = 1.dp,
+                                                    color = AccentColor,
+                                                    shape = RoundedCornerShape(30.dp)
                                                 )
                                         )
                                         Spacer(modifier = Modifier.size(0.05 * screenWidth))
                                         Column{
                                             Text(
                                                 text = members[id].name,
-                                                color = Color.Black,
+                                                color = AccentColor,
                                                 fontSize = 22.sp,
-                                                fontWeight = FontWeight.W500,
+                                                fontWeight = FontWeight.Bold,
                                                 fontFamily = latoFontFamily,
                                                 modifier = Modifier
                                             )
                                             Text(
                                                 text = members[id].pos,
-                                                color = Color.Black,
+                                                color = PrimaryColor,
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.W500,
                                                 fontFamily = latoFontFamily,
@@ -369,7 +382,7 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : ${members[id].email}",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
                                             fontFamily = latoFontFamily,
@@ -395,7 +408,7 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : +91 ${members[id].mobileNum}",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
@@ -421,7 +434,7 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : ${members[id].enrollment}",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
@@ -447,7 +460,7 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : ${if (members[id].labAccess) "Yes" else "No"}",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.W500,
@@ -473,7 +486,7 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : --",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
@@ -499,14 +512,14 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : ${members[id].techStack}",
-                                            color = Color.Black,
+                                            color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
                                             modifier = Modifier
                                         )
                                     }
-                                    Spacer(modifier = Modifier.size(0.005 * screenHeight))
+                                    Spacer(modifier = Modifier.size(0.02 * screenHeight))
                                 }
                             }
                         }
@@ -519,19 +532,18 @@ fun MemberPage(navController: NavController) {
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .padding(
-                                horizontal = 0.035 * screenWidth
                             )
                             .background(
                                 shape = RoundedCornerShape(40),
-                                color = Cyan
+                                color = AccentColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
                             onClick = {
-                                navController.navigate("home"){
-                                    popUpTo("home"){
+                                navController.navigate("home") {
+                                    popUpTo("home") {
                                         inclusive = true
                                     }
                                 }
@@ -543,6 +555,20 @@ fun MemberPage(navController: NavController) {
                             Icon(
                                 painter = painterResource(R.drawable.home),
                                 contentDescription = "home",
+                                Modifier.size(32.dp),
+                                tint = Black
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(12.dp))
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .size(55.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.member_d),
+                                contentDescription = "cart_na",
                                 Modifier.size(32.dp),
                                 tint = Black
                             )
@@ -561,7 +587,7 @@ fun MemberPage(navController: NavController) {
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.log),
+                                painter = painterResource(R.drawable.security),
                                 contentDescription = "explore",
                                 Modifier.size(32.dp),
                                 tint = Black
@@ -576,22 +602,7 @@ fun MemberPage(navController: NavController) {
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.member_d),
-                                contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.event),
+                                painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
                                 Modifier.size(32.dp),
                                 tint = Black
@@ -611,7 +622,7 @@ fun MemberPage(navController: NavController) {
                                 .size(55.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.user),
+                                painter = painterResource(R.drawable.res),
                                 contentDescription = "account",
                                 Modifier.size(32.dp),
                                 tint = Black
