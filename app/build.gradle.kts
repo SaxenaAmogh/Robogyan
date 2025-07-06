@@ -37,6 +37,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packagingOptions {
+        resources.excludes.add("**/dump_syms/linux/dump_syms.bin")
+    }
 }
 
 dependencies {
@@ -46,6 +50,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx.v261)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.retrofit)
+    implementation(libs.accompanist.pager)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)

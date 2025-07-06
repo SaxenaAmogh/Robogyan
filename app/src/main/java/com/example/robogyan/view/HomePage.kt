@@ -24,31 +24,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,20 +61,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
-
-import com.example.robogyan.ui.theme.CharcoalBlack
-import com.example.robogyan.ui.theme.Cyan
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
+import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
-import com.example.robogyan.ui.theme.ThemeBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.GateLogsViewModel
 import com.example.robogyan.viewmodel.MemberViewModel
+import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -111,7 +104,6 @@ fun convertToIST(utcDateTime: String): Pair<String, String> {
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomePage(navController: NavHostController) {
@@ -119,6 +111,8 @@ fun HomePage(navController: NavHostController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
+    val context = LocalView.current.context
+
     var door by remember { mutableStateOf(false) }
     val memberViewModel: MemberViewModel = viewModel()
     val members by memberViewModel.members.observeAsState(emptyList())
@@ -128,15 +122,29 @@ fun HomePage(navController: NavHostController) {
     var gateStatus by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
 
+    val pagerState = rememberPagerState(pageCount = {8})
+    val coroutineScope = rememberCoroutineScope()
+
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
     val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
-    
+
+    val imageUrls = listOf(
+        R.drawable.pic1,
+        R.drawable.pic2,
+        R.drawable.pic3,
+        R.drawable.pic4,
+        R.drawable.pic5,
+        R.drawable.pic6,
+        R.drawable.pic7,
+        R.drawable.pic8,
+    )
+
     Scaffold(
-        content = { innerPadding ->
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -185,6 +193,119 @@ fun HomePage(navController: NavHostController) {
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item {
+                            Row{
+                                VerticalDivider(
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .padding(horizontal = 8.dp)
+                                        .clip(RoundedCornerShape(30)),
+                                    color = AccentColor,
+                                    thickness = 5.dp
+                                )
+                                Text(
+                                    text = "Live Updates",
+                                    color = TextColor,
+                                    fontSize = 22.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(SecondaryColor)
+                                    .border(
+                                        width = 0.5.dp,
+                                        color = Color(0xFF2D2D2D),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .padding(
+                                        horizontal = 0.05 * screenWidth,
+                                        vertical = 0.05 * screenWidth
+                                    )
+                                    .clickable { door = !door }
+                            ) {
+                                Spacer(modifier = Modifier.size(0.005 * screenHeight))
+                                Text(
+                                    text = "- Lab is currently open",
+                                    color = TextColor,
+                                    fontSize = 18.sp,
+                                    fontFamily = latoFontFamily,
+                                )
+                                Spacer(modifier = Modifier.size(0.005 * screenHeight))
+                                Text(
+                                    text = "- Society Meeting at 1:00 PM",
+                                    color = TextColor,
+                                    fontSize = 18.sp,
+                                    fontFamily = latoFontFamily,
+                                )
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ){
+                                    Switch(
+                                        checked = gateStatus,
+                                        onCheckedChange = {
+                                            focusManager.clearFocus() // Hide the keyboard
+                                        },
+                                        colors = SwitchColors(
+                                            checkedThumbColor = Color.Black,
+                                            uncheckedThumbColor = Color(0xFFB2B2B2),
+                                            checkedTrackColor = AccentColor,
+                                            uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
+                                            checkedBorderColor = Color.Transparent,
+                                            checkedIconColor = Color.Transparent,
+                                            uncheckedBorderColor = Color.Transparent,
+                                            uncheckedIconColor = Color.Transparent,
+                                            disabledCheckedThumbColor = Color.Transparent,
+                                            disabledCheckedTrackColor = Color.Transparent,
+                                            disabledCheckedBorderColor = Color.Transparent,
+                                            disabledCheckedIconColor = Color.Transparent,
+                                            disabledUncheckedThumbColor = Color.Transparent,
+                                            disabledUncheckedTrackColor = Color.Transparent,
+                                            disabledUncheckedBorderColor = Color.Transparent,
+                                            disabledUncheckedIconColor = Color.Transparent,
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    Text(
+                                        text = if (gateStatus) "Gate Open" else "Gate Closed",
+                                        color = TextColor,
+                                        fontSize = 22.sp,
+                                        fontFamily = latoFontFamily,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Text(
+                                    text = "Last opened by Macle at 10:46 AM",
+                                    color = TextColor,
+                                    fontSize = 16.sp,
+                                    fontFamily = latoFontFamily,
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.size(0.022 * screenHeight))
+                            Row{
+                                VerticalDivider(
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .padding(start = 8.dp, end = 8.dp)
+                                        .clip(RoundedCornerShape(30)),
+                                    color = AccentColor,
+                                    thickness = 5.dp
+                                )
+                                Text(
+                                    text = "RG Glimpses",
+                                    color = TextColor,
+                                    fontSize = 22.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -195,89 +316,55 @@ fun HomePage(navController: NavHostController) {
                                         shape = RoundedCornerShape(25.dp)
                                     )
                                     .background(SecondaryColor)
-                                    .padding(
-                                        horizontal = 0.07 * screenWidth,
-                                        vertical = 0.035 * screenWidth
-                                    )
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "Welcome!",
-                                            color = TextColor,
-                                            fontSize = 22.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Experience Engineering",
-                                            color = TextColor,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold
-                                        )
+                                LaunchedEffect(Unit) {
+                                    while (true) {
+                                        delay(1500)
+                                        val nextPage = (pagerState.currentPage + 1) % imageUrls.size
+                                        pagerState.animateScrollToPage(nextPage)
+                                        if (pagerState.currentPage==8){
+                                            delay(1500)
+                                            pagerState.scrollToPage(0)
+                                        }
                                     }
-                                    Image(
-                                        painter = painterResource(R.drawable.rg),
-                                        contentDescription = "rg",
-                                        contentScale = ContentScale.Crop
+                                }
+
+                                HorizontalPager(
+                                    state = pagerState,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(240.dp)
+                                ) { page ->
+                                    AsyncImage(
+                                        model = imageUrls[page],
+                                        contentDescription = "Image $page",
+                                        error = painterResource(R.drawable.hide),
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.size(0.022 * screenHeight))
                         }
+
                         item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                                    .padding(
-                                        horizontal = 0.05 * screenWidth,
-                                        vertical = 0.05 * screenWidth
-                                    )
-                                    .clickable { door = !door }
-                            ) {
-                                Row{
-                                    VerticalDivider(
-                                        modifier = Modifier
-                                            .height(30.dp)
-                                            .padding(end = 8.dp)
-                                            .clip(RoundedCornerShape(30)),
-                                        color = AccentColor,
-                                        thickness = 5.dp
-                                    )
-                                    Text(
-                                        text = "Live Updates",
-                                        color = TextColor,
-                                        fontSize = 22.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Spacer(modifier = Modifier.size(0.005 * screenHeight))
+                            Row{
+                                VerticalDivider(
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .padding(start = 8.dp, end = 8.dp)
+                                        .clip(RoundedCornerShape(30)),
+                                    color = AccentColor,
+                                    thickness = 5.dp
+                                )
                                 Text(
-                                    text = "Society Meeting at 1:00 PM",
+                                    text = "Upcoming Events",
                                     color = TextColor,
-                                    fontSize = 18.sp,
+                                    fontSize = 22.sp,
                                     fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.size(0.022 * screenHeight))
-                            Text(
-                                text = "Upcoming Events",
-                                color = TextColor,
-                                fontSize = 20.sp,
-                                fontFamily = latoFontFamily,
-                                fontWeight = FontWeight.Bold
-                            )
                             Spacer(modifier = Modifier.size(0.01 * screenHeight))
                             Row(
                                 modifier = Modifier
@@ -286,8 +373,13 @@ fun HomePage(navController: NavHostController) {
                             ) {
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
                                         .background(SecondaryColor)
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.035 * screenWidth
@@ -311,7 +403,7 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         Text(
                                             text = " August 21, 2025",
-                                            color = Color(0xFFDADADA),
+                                            color = SecondaryText,
                                             fontSize = 17.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -328,8 +420,13 @@ fun HomePage(navController: NavHostController) {
                                 Spacer(modifier = Modifier.size(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
                                         .background(SecondaryColor)
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.035 * screenWidth
@@ -371,66 +468,21 @@ fun HomePage(navController: NavHostController) {
                             Spacer(modifier = Modifier.size(0.022 * screenHeight))
                         }
                         item {
-                            Text(
-                                text = "Lab Access Status",
-                                color = TextColor,
-                                fontSize = 20.sp,
-                                fontFamily = latoFontFamily,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                                    .padding(
-                                        horizontal = 0.05 * screenWidth,
-                                        vertical = 0.03 * screenWidth
-                                    )
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ){
-                                    Switch(
-                                        checked = gateStatus,
-                                        onCheckedChange = {
-                                            focusManager.clearFocus() // Hide the keyboard
-                                            gateStatus = it
-                                        },
-                                        colors = SwitchColors(
-                                            checkedThumbColor = Color.Black,
-                                            uncheckedThumbColor = Color(0xFFB2B2B2),
-                                            checkedTrackColor = AccentColor,
-                                            uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
-                                            checkedBorderColor = Color.Transparent,
-                                            checkedIconColor = Color.Transparent,
-                                            uncheckedBorderColor = Color.Transparent,
-                                            uncheckedIconColor = Color.Transparent,
-                                            disabledCheckedThumbColor = Color.Transparent,
-                                            disabledCheckedTrackColor = Color.Transparent,
-                                            disabledCheckedBorderColor = Color.Transparent,
-                                            disabledCheckedIconColor = Color.Transparent,
-                                            disabledUncheckedThumbColor = Color.Transparent,
-                                            disabledUncheckedTrackColor = Color.Transparent,
-                                            disabledUncheckedBorderColor = Color.Transparent,
-                                            disabledUncheckedIconColor = Color.Transparent,
-                                        )
-                                    )
-                                    Spacer(modifier = Modifier.size(8.dp))
-                                    Text(
-                                        text = if (gateStatus) "Gate Open" else "Gate Closed",
-                                        color = TextColor,
-                                        fontSize = 22.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
+                            Row{
+                                VerticalDivider(
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .padding(start = 8.dp, end = 8.dp)
+                                        .clip(RoundedCornerShape(30)),
+                                    color = AccentColor,
+                                    thickness = 5.dp
+                                )
                                 Text(
-                                    text = "Last opened by Macle at 10:46 AM",
+                                    text = "Quick Actions",
                                     color = TextColor,
-                                    fontSize = 16.sp,
+                                    fontSize = 22.sp,
                                     fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.01 * screenHeight))
@@ -441,7 +493,12 @@ fun HomePage(navController: NavHostController) {
                             ) {
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(SecondaryColor)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
@@ -450,7 +507,7 @@ fun HomePage(navController: NavHostController) {
                                         .weight(1f)
                                         .clickable {
                                             navController.navigate("member") {
-                                                popUpTo("member") {
+                                                popUpTo("home") {
                                                     inclusive = true
                                                 }
                                             }
@@ -479,7 +536,12 @@ fun HomePage(navController: NavHostController) {
                                 Spacer(modifier = Modifier.size(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(SecondaryColor)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
@@ -487,11 +549,11 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-//                                            navController.navigate("member") {
-//                                                popUpTo("member") {
-//                                                    inclusive = true
-//                                                }
-//                                            }
+                                            navController.navigate("projects") {
+                                                popUpTo("home") {
+                                                    inclusive = true
+                                                }
+                                            }
                                         }
                                 ){
                                     Column(
@@ -525,7 +587,12 @@ fun HomePage(navController: NavHostController) {
                             ) {
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(SecondaryColor)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
@@ -533,8 +600,8 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("logs") {
-                                                popUpTo("member") {
+                                            navController.navigate("security") {
+                                                popUpTo("home") {
                                                     inclusive = true
                                                 }
                                             }
@@ -563,7 +630,12 @@ fun HomePage(navController: NavHostController) {
                                 Spacer(modifier = Modifier.size(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(20.dp))
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(SecondaryColor)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
@@ -571,11 +643,11 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-//                                            navController.navigate("member") {
-//                                                popUpTo("member") {
-//                                                    inclusive = true
-//                                                }
-//                                            }
+                                            navController.navigate("resources") {
+                                                popUpTo("home") {
+                                                    inclusive = true
+                                                }
+                                            }
                                         }
                                 ){
                                     Column(
@@ -585,7 +657,7 @@ fun HomePage(navController: NavHostController) {
                                     ){
                                         Icon(
                                             painter = painterResource(R.drawable.res_d),
-                                            contentDescription = "projects",
+                                            contentDescription = "resources",
                                             modifier = Modifier.size(44.dp),
                                             tint = AccentColor
                                         )
@@ -603,6 +675,7 @@ fun HomePage(navController: NavHostController) {
                         }
                     }
 
+
                     // Bottom Navigation
                     Row(
                         modifier = Modifier
@@ -619,8 +692,7 @@ fun HomePage(navController: NavHostController) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = {
-                            },
+                            onClick = {},
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .size(55.dp)
@@ -635,11 +707,7 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
-                                navController.navigate("member"){
-                                    popUpTo("member"){
-                                        inclusive = true
-                                    }
-                                }
+                                navController.navigate("member")
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -655,11 +723,7 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
-                                navController.navigate("logs"){
-                                    popUpTo("logs"){
-                                        inclusive = true
-                                    }
-                                }
+                                navController.navigate("security")
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -675,6 +739,7 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
+                                navController.navigate("projects")
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -690,11 +755,7 @@ fun HomePage(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(12.dp))
                         IconButton(
                             onClick = {
-                                navController.navigate("profile"){
-                                    popUpTo("profile"){
-                                        inclusive = true
-                                    }
-                                }
+                                navController.navigate("resources")
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -702,7 +763,7 @@ fun HomePage(navController: NavHostController) {
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.res),
-                                contentDescription = "account",
+                                contentDescription = "resources",
                                 Modifier.size(36.dp),
                                 tint = Black
                             )

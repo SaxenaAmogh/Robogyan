@@ -12,13 +12,13 @@ import androidx.navigation.compose.composable
 fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "splash",
+        startDestination = "home",
     ){
         composable("splash"){
             SplashScreen(navController)
         }
-        composable("logs"){
-            LogPage(navController)
+        composable("login"){
+            LoginPage(navController)
         }
         composable("home"){
             HomePage(navController)
@@ -26,8 +26,14 @@ fun AppNavigation(navController: NavHostController) {
         composable("member"){
             MemberPage(navController)
         }
-        composable("login"){
-            LoginPage(navController)
+        composable("security"){
+            SecurityPage(navController)
+        }
+        composable("projects"){
+            ProjectPage(navController)
+        }
+        composable("resources"){
+            ResourcesPage(navController)
         }
         composable("profile"){
             ProfilePage(navController)

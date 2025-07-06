@@ -29,6 +29,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -73,6 +75,7 @@ import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.CharcoalBlack
 import com.example.robogyan.ui.theme.Cyan
+import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
@@ -96,6 +99,7 @@ fun MemberPage(navController: NavController) {
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var searchItem by remember { mutableStateOf("") }
+    var currentMember by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
 
     val view = LocalView.current
@@ -153,46 +157,77 @@ fun MemberPage(navController: NavController) {
                             }
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
-                        item{
-                            OutlinedTextField(
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = AccentColor,
-                                    unfocusedBorderColor = Color(0xFFECECEC),
-                                    cursorColor = AccentColor,
-                                    containerColor = SecondaryColor,
-                                ),
+                        item {
+                            Row(
                                 modifier = Modifier
-                                    .padding(
-                                        start = 0.005 * screenWidth,
-                                        end = 0.005 * screenWidth,
-                                    )
-                                    .fillMaxWidth(),
-                                shape = RoundedCornerShape(35),
-                                leadingIcon = {
-                                    Icon(
-                                        modifier = Modifier.size(22.dp),
-                                        painter = painterResource(id = R.drawable.search),
-                                        contentDescription = "search",
-                                        tint = AccentColor
-                                    )
-                                },
-                                keyboardActions = KeyboardActions(
-                                    onDone = {
-                                        focusManager.clearFocus()
+                                    .fillMaxWidth()
+                                    .background(
+                                        shape = RoundedCornerShape(22.dp),
+                                        color = Color(0xFF232325)
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ){
+                                Button(
+                                    onClick = {
+                                        currentMember = true
+                                    },
+                                    modifier = Modifier
+                                        .padding(
+                                            vertical = 8.dp,
+                                            horizontal = 8.dp
+                                        )
+                                        .weight(1f)
+                                        .height(0.05 * screenHeight),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = if (currentMember) {
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = AccentColor
+                                        )
+                                    } else {
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = Color.Transparent
+                                        )
                                     }
-                                ),
-                                singleLine = true,
-                                value = searchItem,
-                                onValueChange = { searchItem = it },
-                                placeholder = {
+                                ) {
                                     Text(
-                                        color = TextColor,
-                                        text = "Search for a member",
+                                        text = "Current Members",
+                                        color = if (currentMember) Color.Black else Color.White,
+                                        fontSize = 16.sp,
                                         fontFamily = latoFontFamily,
                                     )
                                 }
-                            )
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                                Button(
+                                    onClick = {
+                                        currentMember = false
+                                    },
+                                    modifier = Modifier
+                                        .padding(
+                                            vertical = 8.dp,
+                                            horizontal = 8.dp
+                                        )
+                                        .weight(1f)
+                                        .height(0.05 * screenHeight),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = if (!currentMember) {
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = AccentColor
+                                        )
+                                    } else {
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = Color.Transparent
+                                        )
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Alumni",
+                                        color = if (!currentMember) Color.Black else Color.White,
+                                        fontSize = 16.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item{
                             if (members.isEmpty()){
@@ -275,7 +310,7 @@ fun MemberPage(navController: NavController) {
                                     Spacer(modifier = Modifier.size(0.02 * screenHeight))
                                 }
                             }
-                            Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.07 * screenHeight))
+                            Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.13 * screenHeight))
                         }
                     }
                     Box(
@@ -525,108 +560,154 @@ fun MemberPage(navController: NavController) {
                         }
                     }
 
-                    // Bottom Navigation
-                    Row(
-                        modifier = Modifier
-                            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .padding(
-                            )
-                            .background(
-                                shape = RoundedCornerShape(40),
-                                color = AccentColor
-                            ),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = {
-                                navController.navigate("home") {
-                                    popUpTo("home") {
-                                        inclusive = true
+                    // Bottom Navigation & Search
+                    if (!showSheet){
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ){
+                            OutlinedTextField(
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = PrimaryColor,
+                                    unfocusedBorderColor = GunmetalGray,
+                                    cursorColor = AccentColor,
+                                    containerColor = SecondaryColor,
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(35),
+                                leadingIcon = {
+                                    Icon(
+                                        modifier = Modifier.size(22.dp),
+                                        painter = painterResource(id = R.drawable.search),
+                                        contentDescription = "search",
+                                        tint = AccentColor
+                                    )
+                                },
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
                                     }
+                                ),
+                                singleLine = true,
+                                value = searchItem,
+                                onValueChange = { searchItem = it },
+                                placeholder = {
+                                    Text(
+                                        color = TextColor,
+                                        text = "Search for a member",
+                                        fontFamily = latoFontFamily,
+                                    )
                                 }
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.home),
-                                contentDescription = "home",
-                                Modifier.size(32.dp),
-                                tint = Black
                             )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.member_d),
-                                contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                                navController.navigate("logs"){
-                                    popUpTo("logs"){
-                                        inclusive = true
-                                    }
+                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Row(
+                                modifier = Modifier
+                                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
+                                    .fillMaxWidth()
+                                    .padding(
+                                    )
+                                    .background(
+                                        shape = RoundedCornerShape(40),
+                                        color = AccentColor
+                                    ),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate("home") {
+                                            popUpTo("home") {
+                                                inclusive = true
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .size(55.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.home),
+                                        contentDescription = "home",
+                                        Modifier.size(32.dp),
+                                        tint = Black
+                                    )
                                 }
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.security),
-                                contentDescription = "explore",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.projects),
-                                contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(12.dp))
-                        IconButton(
-                            onClick = {
-                                navController.navigate("profile"){
-                                    popUpTo("profile"){
-                                        inclusive = true
-                                    }
+                                Spacer(modifier = Modifier.size(12.dp))
+                                IconButton(
+                                    onClick = {},
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .size(55.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.member_d),
+                                        contentDescription = "cart_na",
+                                        Modifier.size(32.dp),
+                                        tint = Black
+                                    )
                                 }
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.res),
-                                contentDescription = "account",
-                                Modifier.size(32.dp),
-                                tint = Black
-                            )
+                                Spacer(modifier = Modifier.size(12.dp))
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate("security"){
+                                            popUpTo("member"){
+                                                inclusive = true
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .size(55.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.security),
+                                        contentDescription = "explore",
+                                        Modifier.size(32.dp),
+                                        tint = Black
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(12.dp))
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate("projects"){
+                                            popUpTo("member"){
+                                                inclusive = true
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .size(55.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.projects),
+                                        contentDescription = "cart_na",
+                                        Modifier.size(32.dp),
+                                        tint = Black
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(12.dp))
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate("resources"){
+                                            popUpTo("member"){
+                                                inclusive = true
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .size(55.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.res),
+                                        contentDescription = "resources",
+                                        Modifier.size(32.dp),
+                                        tint = Black
+                                    )
+                                }
+                            }
                         }
                     }
                 }
