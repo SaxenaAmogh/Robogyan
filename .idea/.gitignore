@@ -13,3 +13,4 @@ gradle.xml
 kotlinc.xml
 runConfigurations.xml
 AndroidProjectSystem.xml
+deviceManager.xml

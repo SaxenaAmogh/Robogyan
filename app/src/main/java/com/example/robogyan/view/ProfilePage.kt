@@ -1,8 +1,13 @@
 package com.example.robogyan.view
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +26,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,109 +36,554 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
-import com.example.robogyan.ui.theme.CharcoalBlack
+import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.GunmetalGray
+import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.SecondaryColor
+import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfilePage(navController: NavController){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
+    val focusManager = LocalFocusManager.current
+
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
+    if (windowInsetsController != null) {
+        windowInsetsController.isAppearanceLightStatusBars = true
+    }
 
     Scaffold(
-        content = { innerPadding ->
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CharcoalBlack)
+                    .background(BackgroundColor)
             ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTapGestures {
+                                focusManager.clearFocus()
+                            }
+                        }
                 ) {
                     LazyColumn(
                         modifier = Modifier
-//                            .padding(
-//                                horizontal = 0.035 * screenWidth
-//                            )
                             .fillMaxSize()
-                            .align(Alignment.TopCenter)
-                    ) {
-                        item{
+                    ){
+                        item {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color(0xFFE8E8E8)),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ){
+                                    .clip(
+                                        RoundedCornerShape(
+                                            bottomStart = 50.dp,
+                                            bottomEnd = 50.dp
+                                        )
+                                    )
+                                    .background(AccentColor)
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+                                        .padding(horizontal = 0.035 * screenWidth)
+                                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
                                 ) {
-                                    Icon(
-                                        Icons.Default.ArrowBack,
-                                        contentDescription = "Back",
-                                        tint = Color.Black,
+                                    Box(
                                         modifier = Modifier
-                                            .padding(start = 10.dp)
                                             .align(Alignment.CenterStart)
-                                            .clickable {
-                                                navController.popBackStack()
-                                            }
-                                    )
+                                            .border(
+                                                width = 2.dp,
+                                                color = Color.Black,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                    ) {
+                                        Icon(
+                                            Icons.AutoMirrored.TwoTone.KeyboardArrowLeft,
+                                            contentDescription = "Arrow Icon",
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .size(32.dp)
+                                                .align(Alignment.CenterStart)
+                                                .clickable {
+                                                    navController.popBackStack()
+                                                },
+                                            tint = Color.Black
+                                        )
+                                    }
                                     Text(
-                                        text = "Profile",
-                                        fontSize = 20.sp,
+                                        text = "User Profile",
                                         color = Color.Black,
-                                        fontFamily = latoFontFamily,
-                                        modifier = Modifier
-                                            .padding(10.dp)
-                                            .align(Alignment.Center)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Image(
-                                    painter = painterResource(id = R.drawable.me),
-                                    contentDescription = "Profile",
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(
-                                            50
-                                        ))
-                                        .size(0.35 * screenWidth),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ){
-                                    Text(
-                                        text = "Amogh Saxena",
                                         fontSize = 20.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black
-                                    )
-                                    Text(
-                                        text = "Software Lead",
-                                        fontSize = 16.sp,
-                                        color = Color.Gray,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold
+                                        modifier = Modifier
+                                            .align(Alignment.Center)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(0.03 * screenHeight))
+                                Spacer(modifier = Modifier.height(0.04 * screenHeight))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.me),
+                                        contentDescription = "Profile",
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(30.dp))
+                                            .size(150.dp)
+                                            .border(
+                                                width = 2.dp,
+                                                color = Color.Black,
+                                                shape = RoundedCornerShape(30.dp)
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.size(0.05 * screenWidth))
+                                    Column{
+                                        Text(
+                                            text = "Amogh Saxena",
+                                            color = Color.Black,
+                                            fontSize = 24.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier
+                                        )
+                                        Text(
+                                            text = "Software Lead",
+                                            color = GunmetalGray,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                        Text(
+                                            text = "2024-2025",
+                                            color = Color.Gray,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(0.05 * screenHeight))
+                            }
+                            Spacer(modifier = Modifier.height(0.04 * screenHeight))
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 0.035 * screenWidth)
+                            )  {
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .weight(1f)
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                        .clickable {
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.member_d),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(38.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Edit Members",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .weight(1f)
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                        .clickable {
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.update),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(38.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Add New Update",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(0.01 * screenHeight))
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 0.035 * screenWidth)
+                            )  {
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .weight(1f)
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                        .clickable {
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.open),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(38.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Open Lab",
+                                            color = PrimaryColor,
+                                            fontSize = 16.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .weight(1f)
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                        .clickable {
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.component),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(38.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Edit Assets",
+                                            color = PrimaryColor,
+                                            fontSize = 16.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(0.02 * screenWidth))
+                                Column(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .weight(1f)
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.02 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                        .clickable {
+                                        }
+                                ){
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Icon(
+                                            painter = painterResource(R.drawable.projects_d),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(38.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Add Project",
+                                            color = PrimaryColor,
+                                            fontSize = 16.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(0.04 * screenHeight))
+                        }
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .padding(horizontal = 0.035 * screenWidth)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .border(
+                                        width = 0.5.dp,
+                                        color = Color(0xFF2D2D2D),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .background(SecondaryColor)
+                                    .padding(
+                                        horizontal = 0.02 * screenWidth,
+                                        vertical = 0.03 * screenWidth
+                                    )
+                                    .clickable {
+                                    }
+                            ){
+                                Spacer(modifier = Modifier.height(0.01 * screenHeight))
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 0.025 * screenWidth)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.edit),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(34.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Edit Profile",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                        contentDescription = "Arrow Icon",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {},
+                                        tint = SecondaryText
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(0.012 * screenHeight))
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 0.025 * screenWidth)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.password),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(34.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Change Password",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                        contentDescription = "Arrow Icon",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {},
+                                        tint = SecondaryText
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(0.012 * screenHeight))
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 0.025 * screenWidth)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.res_d),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(34.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Add Resources",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                        contentDescription = "Arrow Icon",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {},
+                                        tint = SecondaryText
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(0.012 * screenHeight))
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 0.025 * screenWidth)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.review),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(34.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Send Feedback",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                        contentDescription = "Arrow Icon",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {},
+                                        tint = SecondaryText
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(0.012 * screenHeight))
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 0.025 * screenWidth)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Icon(
+                                            painter = painterResource(R.drawable.logout),
+                                            contentDescription = "members",
+                                            modifier = Modifier.size(34.dp),
+                                            tint = AccentColor
+                                        )
+                                        Spacer(modifier = Modifier.size(10.dp))
+                                        Text(
+                                            text = "Logout",
+                                            color = PrimaryColor,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                    }
+                                    Icon(
+                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                        contentDescription = "Arrow Icon",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clickable {},
+                                        tint = SecondaryText
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(0.01 * screenHeight))
                             }
                         }
                     }

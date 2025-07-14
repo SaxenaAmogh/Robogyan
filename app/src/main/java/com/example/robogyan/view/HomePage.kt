@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,10 +36,8 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,13 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
@@ -73,35 +66,30 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
-import com.example.robogyan.viewmodel.GateLogsViewModel
-import com.example.robogyan.viewmodel.MemberViewModel
 import kotlinx.coroutines.delay
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun convertToIST(utcDateTime: String): Pair<String, String> {
-    return try {
-        // Parse the UTC time
-        val utcFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX")
-            .withZone(ZoneId.of("UTC"))
-        val instant = Instant.from(utcFormatter.parse(utcDateTime))
-
-        // Convert to IST
-        val istZone = ZoneId.of("Asia/Kolkata")
-        val istFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            .withZone(istZone)
-        val istDateTime = istFormatter.format(instant)
-
-        // Split Date and Time
-        val (date, time) = istDateTime.split(" ")
-        date to time
-    } catch (e: Exception) {
-        e.printStackTrace()
-        "Invalid Date" to "Invalid Time"
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//fun convertToIST(utcDateTime: String): Pair<String, String> {
+//    return try {
+//        // Parse the UTC time
+//        val utcFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX")
+//            .withZone(ZoneId.of("UTC"))
+//        val instant = Instant.from(utcFormatter.parse(utcDateTime))
+//
+//        // Convert to IST
+//        val istZone = ZoneId.of("Asia/Kolkata")
+//        val istFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+//            .withZone(istZone)
+//        val istDateTime = istFormatter.format(instant)
+//
+//        // Split Date and Time
+//        val (date, time) = istDateTime.split(" ")
+//        date to time
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        "Invalid Date" to "Invalid Time"
+//    }
+//}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -111,19 +99,17 @@ fun HomePage(navController: NavHostController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val context = LocalView.current.context
 
     var door by remember { mutableStateOf(false) }
-    val memberViewModel: MemberViewModel = viewModel()
-    val members by memberViewModel.members.observeAsState(emptyList())
-    val gateLogViewModel: GateLogsViewModel = viewModel()
-    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
-    val count = members.size
-    var gateStatus by remember { mutableStateOf(true) }
+//    val memberViewModel: MemberViewModel = viewModel()
+//    val members by memberViewModel.members.observeAsState(emptyList())
+//    val gateLogViewModel: GateLogsViewModel = viewModel()
+//    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
+//    val count = members.size
+    val gateStatus by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
 
     val pagerState = rememberPagerState(pageCount = {8})
-    val coroutineScope = rememberCoroutineScope()
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -155,7 +141,7 @@ fun HomePage(navController: NavHostController) {
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
                         .padding(
-                            horizontal = 0.04 * screenWidth
+                            horizontal = 0.035 * screenWidth
                         )
                 ){
                     LazyColumn(
@@ -171,7 +157,7 @@ fun HomePage(navController: NavHostController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ){
                                 Icon(
-                                    painter = painterResource(R.drawable.notification),
+                                    painter = painterResource(R.drawable.update),
                                     contentDescription = "notification",
                                     Modifier.size(32.dp),
                                     tint = AccentColor
@@ -186,7 +172,11 @@ fun HomePage(navController: NavHostController) {
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
-                                    Modifier.size(32.dp),
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate("profile")
+                                        }
+                                        .size(32.dp),
                                     tint = AccentColor
                                 )
                             }
@@ -393,7 +383,7 @@ fun HomePage(navController: NavHostController) {
                                             }
                                         }
                                 ){
-                                    Column(){
+                                    Column{
                                         Text(
                                             text = " Hackathon",
                                             color = Color.White,
@@ -440,7 +430,7 @@ fun HomePage(navController: NavHostController) {
                                             }
                                         }
                                 ){
-                                    Column(){
+                                    Column{
                                         Text(
                                             text = " Workshop",
                                             color = Color.White,
@@ -506,11 +496,7 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("member") {
-                                                popUpTo("home") {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.navigate("member")
                                         }
                                 ){
                                     Column(
@@ -549,11 +535,7 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("projects") {
-                                                popUpTo("home") {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.navigate("projects")
                                         }
                                 ){
                                     Column(
@@ -600,11 +582,7 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("security") {
-                                                popUpTo("home") {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.navigate("security")
                                         }
                                 ){
                                     Column(
@@ -643,11 +621,7 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("resources") {
-                                                popUpTo("home") {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.navigate("resources")
                                         }
                                 ){
                                     Column(

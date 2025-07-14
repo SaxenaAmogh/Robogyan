@@ -1,8 +1,6 @@
 package com.example.robogyan.view
 
 import android.app.Activity
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,17 +21,12 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -43,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -73,13 +65,10 @@ import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
-import com.example.robogyan.ui.theme.CharcoalBlack
-import com.example.robogyan.ui.theme.Cyan
 import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
-import com.example.robogyan.ui.theme.ThemeBlue
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.MemberViewModel
 
@@ -136,7 +125,7 @@ fun MemberPage(navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ){
                                 Icon(
-                                    painter = painterResource(R.drawable.notification),
+                                    painter = painterResource(R.drawable.update),
                                     contentDescription = "notification",
                                     Modifier.size(32.dp),
                                     tint = AccentColor
@@ -151,7 +140,11 @@ fun MemberPage(navController: NavController) {
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
-                                    Modifier.size(32.dp),
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate("profile")
+                                        }
+                                        .size(32.dp),
                                     tint = AccentColor
                                 )
                             }

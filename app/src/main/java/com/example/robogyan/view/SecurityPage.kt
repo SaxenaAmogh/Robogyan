@@ -6,6 +6,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
@@ -67,7 +70,6 @@ import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.GateLogsViewModel
-import com.example.robogyan.viewmodel.MemberViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -79,10 +81,10 @@ fun SecurityPage(navController: NavController) {
     val screenHeight = configuration.screenHeightDp.dp
     val focusManager = LocalFocusManager.current
 
-    var searchItem by remember { mutableStateOf("") }
-    var haveAccess by remember { mutableStateOf(true) }
-    val memberViewModel: MemberViewModel = viewModel()
-    val members by memberViewModel.members.observeAsState(emptyList())
+//    var searchItem by remember { mutableStateOf("") }
+    val haveAccess by remember { mutableStateOf(true) }
+//    val memberViewModel: MemberViewModel = viewModel()
+//    val members by memberViewModel.members.observeAsState(emptyList())
     val gateLogViewModel: GateLogsViewModel = viewModel()
     val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
     var gateStatus by remember { mutableStateOf(true) }
@@ -123,7 +125,7 @@ fun SecurityPage(navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ){
                                 Icon(
-                                    painter = painterResource(R.drawable.notification),
+                                    painter = painterResource(R.drawable.update),
                                     contentDescription = "notification",
                                     Modifier.size(32.dp),
                                     tint = AccentColor
@@ -138,7 +140,11 @@ fun SecurityPage(navController: NavController) {
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
-                                    Modifier.size(32.dp),
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate("profile")
+                                        }
+                                        .size(32.dp),
                                     tint = AccentColor
                                 )
                             }
@@ -316,7 +322,7 @@ fun SecurityPage(navController: NavController) {
                             Spacer(modifier = Modifier.size(0.01 * screenHeight))
                             FloatingActionButton(
                                 onClick = {
-
+                                    navController.navigate("addasset")
                                 },
                                 containerColor = SecondaryColor,
                                 contentColor = Black,
@@ -352,6 +358,11 @@ fun SecurityPage(navController: NavController) {
                                     )
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(SecondaryColor)
+                                    .pointerInput(Unit) {
+                                    detectTapGestures(onTap = {
+                                        navController.navigate("assetview")
+                                    })
+                                }
                             ) {
                                 Row(
                                     modifier = Modifier

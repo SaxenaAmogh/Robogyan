@@ -3,7 +3,6 @@ package com.example.robogyan.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,11 +26,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -45,7 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,13 +55,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -81,7 +76,6 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -95,10 +89,10 @@ fun ResourcesPage(navController: NavController) {
     val context = LocalView.current.context
 
     var searchItem by remember { mutableStateOf("") }
-    var selectedOption by remember { mutableIntStateOf(0) }
+//    var selectedOption by remember { mutableIntStateOf(0) }
     var type by remember { mutableStateOf("Videos") }
     var expanded by remember { mutableStateOf(false) }
-    var resourceType = listOf("Videos", "Articles", "RG Docs", "Others")
+    val resourceType = listOf("Videos", "Articles", "RG Docs", "Others")
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -106,14 +100,6 @@ fun ResourcesPage(navController: NavController) {
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
-
-    val title = listOf(
-        "RCB Designing",
-        "RC plane (THE ROBOGYAN)",
-        "ADR - THE ROBOGYAN (1)",
-        "ESP32 101",
-        "Android Dev Roadmap 2025"
-    )
 
 
     @Composable
@@ -147,6 +133,13 @@ fun ResourcesPage(navController: NavController) {
             "This video introduces the ADR project by Robogyan, highlighting its features and capabilities.",
             "This video that covers the basics of using the ESP32 microcontroller for IoT projects, including setup and programming.",
             "Android Dev Roadmap 2025 is a video that outlines the future trends and technologies in Android development, providing insights for developers."
+        )
+        val title = listOf(
+            "RCB Designing",
+            "RC plane (THE ROBOGYAN)",
+            "ADR - THE ROBOGYAN (1)",
+            "ESP32 101",
+            "Android Dev Roadmap 2025"
         )
 
         Column(
@@ -311,7 +304,7 @@ fun ResourcesPage(navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.notification),
+                                    painter = painterResource(R.drawable.update),
                                     contentDescription = "notification",
                                     Modifier.size(32.dp),
                                     tint = AccentColor
@@ -326,7 +319,11 @@ fun ResourcesPage(navController: NavController) {
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
-                                    Modifier.size(32.dp),
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate("profile")
+                                        }
+                                        .size(32.dp),
                                     tint = AccentColor
                                 )
                             }
