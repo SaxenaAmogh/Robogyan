@@ -1,21 +1,24 @@
 package com.example.robogyan.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.model.Member
 import com.example.robogyan.repository.MemberRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MemberViewModel : ViewModel() {
-    private val memberRepository = MemberRepository()
 
-    private val _members = MutableLiveData<List<Member>>()
-    val members: LiveData<List<Member>> get() = _members
+    val supabase = SupabaseClientProvider.client
+    private val repository: MemberRepository = MemberRepository(supabase)
+    private val _members = MutableStateFlow<List<Member>>(emptyList())
+    val members: StateFlow<List<Member>> = _members
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
         fetchMembers()
@@ -23,15 +26,14 @@ class MemberViewModel : ViewModel() {
 
     private fun fetchMembers() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val response = memberRepository.getMembers()
-                if (response.isSuccessful && response.body() != null) {
-                    _members.postValue(response.body()!!.items)
-                } else {
-                    _error.postValue("Error: ${response.code()}")
-                }
+                _members.value = repository.getAllMembers()
+                Log.e("MemberSuccess", "H: ${_members.value.size} members fetched successfully")
             } catch (e: Exception) {
-                _error.postValue(e.message ?: "Unknown Error")
+                Log.e("MemberVM", "Error: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }

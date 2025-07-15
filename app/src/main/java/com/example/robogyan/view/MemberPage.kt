@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -62,6 +63,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
+import com.example.robogyan.model.Member
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
@@ -80,10 +82,24 @@ fun MemberPage(navController: NavController) {
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
 
-    val memberViewModel: MemberViewModel = viewModel()
-    val members by memberViewModel.members.observeAsState(emptyList())
-    val count = members.size
-    var id by remember { mutableIntStateOf(0)}
+    val viewModel: MemberViewModel = viewModel()
+    val members by viewModel.members.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    var member by remember { mutableStateOf(Member(
+        id = "",
+        name = "",
+        email = "",
+        mobile = 0L,
+        image = "",
+        current_pos = "",
+        pos_period = "",
+        enrollment = "",
+        lab_access = false,
+        batch = "",
+        clearance = "",
+        past_pos = emptyList(),
+        is_alumni = false
+    )) }
 
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -223,7 +239,7 @@ fun MemberPage(navController: NavController) {
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item{
-                            if (members.isEmpty()){
+                            if (isLoading){
                                 CircularProgressIndicator(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -232,8 +248,28 @@ fun MemberPage(navController: NavController) {
                                 )
                             }
                             else {
-                                repeat(count) {
-//                                    Log.d("ImageData", "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}")
+                                val filteredMembers = members
+                                    .filter { memberx ->
+                                        if (currentMember) {
+                                            !memberx.is_alumni && (
+                                                    memberx.name.contains(searchItem, ignoreCase = true) ||
+                                                            memberx.enrollment.contains(searchItem, ignoreCase = true)
+                                                    )
+                                        } else {
+                                            memberx.is_alumni && (
+                                                    memberx.name.contains(searchItem, ignoreCase = true) ||
+                                                            memberx.enrollment.contains(searchItem, ignoreCase = true)
+                                                    )
+                                        }
+                                    }
+                                    .sortedWith(compareBy { m ->
+                                        when {
+                                            currentMember && m.current_pos.equals("Software Lead", ignoreCase = true) -> 0
+                                            currentMember && m.current_pos.equals("Hardware Lead", ignoreCase = true) -> 1
+                                            else -> 2
+                                        }
+                                    })
+                                filteredMembers.forEach() {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -248,7 +284,7 @@ fun MemberPage(navController: NavController) {
                                                 horizontal = 0.035 * screenWidth
                                             )
                                             .clickable {
-                                                id = it
+                                                member = it
                                                 showSheet = true
                                             }
                                     ) {
@@ -258,7 +294,7 @@ fun MemberPage(navController: NavController) {
                                             horizontalArrangement = Arrangement.Start
                                         ) {
                                             AsyncImage(
-                                                model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[it].id}/${members[it].image}",
+                                                model = it.image,
                                                 contentDescription = "Profile",
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(25.dp))
@@ -274,7 +310,7 @@ fun MemberPage(navController: NavController) {
                                                         .fillMaxWidth()
                                                 ) {
                                                     Text(
-                                                        text = members[it].name,
+                                                        text = it.name,
                                                         fontFamily = latoFontFamily,
                                                         color = AccentColor,
                                                         fontSize = 22.sp,
@@ -282,14 +318,14 @@ fun MemberPage(navController: NavController) {
                                                         modifier = Modifier
                                                     )
                                                     Text(
-                                                        text = members[it].pos,
+                                                        text = it.current_pos,
                                                         color = PrimaryColor,
                                                         fontFamily = latoFontFamily,
                                                         fontSize = 18.sp,
                                                         fontWeight = FontWeight.W500,
                                                     )
                                                     Text(
-                                                        text = members[it].batch,
+                                                        text = it.pos_period,
                                                         fontFamily = latoFontFamily,
                                                         color = Color.Gray,
                                                         fontSize = 16.sp,
@@ -353,7 +389,7 @@ fun MemberPage(navController: NavController) {
                                         horizontalArrangement = Arrangement.Center
                                     ) {
                                         AsyncImage(
-                                            model = "https://meets.pockethost.io/api/files/pbc_3572739349/${members[id].id}/${members[id].image}",
+                                            model = member.image,
                                             contentDescription = "Profile",
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(30.dp))
@@ -367,7 +403,7 @@ fun MemberPage(navController: NavController) {
                                         Spacer(modifier = Modifier.size(0.05 * screenWidth))
                                         Column{
                                             Text(
-                                                text = members[id].name,
+                                                text = member.name,
                                                 color = AccentColor,
                                                 fontSize = 22.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -375,14 +411,14 @@ fun MemberPage(navController: NavController) {
                                                 modifier = Modifier
                                             )
                                             Text(
-                                                text = members[id].pos,
+                                                text = member.current_pos,
                                                 color = PrimaryColor,
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.W500,
                                                 fontFamily = latoFontFamily,
                                             )
                                             Text(
-                                                text = members[id].batch,
+                                                text = member.pos_period,
                                                 color = Color.Gray,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.W500,
@@ -409,7 +445,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : ${members[id].email}",
+                                            text = " : ${member.email}",
                                             color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.W500,
@@ -435,7 +471,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : +91 ${members[id].mobileNum}",
+                                            text = " : +91 ${member.mobile}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -453,7 +489,7 @@ fun MemberPage(navController: NavController) {
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
-                                            text = "Enrll. No",
+                                            text = "Enrollment No",
                                             color = Color.Gray,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -461,7 +497,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : ${members[id].enrollment}",
+                                            text = " : ${member.enrollment}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -487,7 +523,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : ${if (members[id].labAccess) "Yes" else "No"}",
+                                            text = " : ${if (member.lab_access) "Yes" else "No"}",
                                             color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
@@ -505,7 +541,7 @@ fun MemberPage(navController: NavController) {
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
-                                            text = "Last Accessed",
+                                            text = "Btech Batch",
                                             color = Color.Gray,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -513,7 +549,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : --",
+                                            text = " : ${member.batch}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -531,7 +567,7 @@ fun MemberPage(navController: NavController) {
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
-                                            text = "Tech Stack",
+                                            text = "Clearance Lvl",
                                             color = Color.Gray,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -539,7 +575,33 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : ${members[id].techStack}",
+                                            text = " : ${member.clearance}",
+                                            color = PrimaryColor,
+                                            fontFamily = latoFontFamily,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.W500,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.size(0.005 * screenHeight))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                horizontal = 0.035 * screenWidth
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "Past Positions",
+                                            color = Color.Gray,
+                                            fontFamily = latoFontFamily,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.W500,
+                                            textDecoration = TextDecoration.Underline,
+                                        )
+                                        Text(
+                                            text = " : ${member.past_pos?.joinToString(", ") ?: "None"}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,

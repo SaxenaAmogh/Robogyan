@@ -1,25 +1,37 @@
 [versions]
 accompanistPager = "0.36.0"
 agp = "8.11.1"
+authKt = "3.2.1"
 coilCompose = "2.1.0"
 converterGson = "2.9.0"
-kotlin = "2.0.0"
+gotrueKt = "2.6.1"
+kotlin = "2.2.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesAndroid = "1.9.0"
 kotlinxCoroutinesCore = "1.6.4"
+kotlinxSerializationJson = "1.9.0"
+ktorClientAndroid = "3.2.2"
 ktorClientCio = "2.0.0"
+ktorClientCioVersion = "2.3.5"
+ktorClientContentNegotiation = "3.2.2"
 ktorClientCore = "2.0.0"
+ktorClientCoreVersion = "2.3.5"
 ktorClientLogging = "2.0.0"
+ktorClientLoggingVersion = "2.3.5"
 ktorClientSerialization = "2.0.0"
+ktorKtorClientCore = "3.2.2"
+ktorSerializationKotlinxJson = "3.2.2"
+ktorUtils = "3.2.2"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
 composeBom = "2024.04.01"
 lifecycleRuntimeKtxVersion = "2.6.1"
 navigationRuntimeAndroid = "2.9.0-alpha05"
 navigationCompose = "2.8.6"
+postgrestKt = "3.2.1"
 retrofit = "2.9.0"
 firebaseCrashlyticsBuildtools = "3.0.3"
 runtimeLivedata = "1.7.8"
@@ -29,8 +41,10 @@ accompanist-pager = { module = "com.google.accompanist:accompanist-pager", versi
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx-v261 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
+auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "authKt" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+gotrue-kt = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "gotrueKt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -48,13 +62,25 @@ androidx-navigation-runtime-android = { group = "androidx.navigation", name = "n
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
+ktor-client-cio-v235 = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCioVersion" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-core-v235 = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCoreVersion" }
+ktor-client-core-v322 = { module = "io.ktor:ktor-client-core", version.ref = "ktorKtorClientCore" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
+ktor-client-logging-v235 = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLoggingVersion" }
 ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorClientSerialization" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtils" }
+postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "postgrestKt" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "authKt" }
+supabase-kt = { module = "io.github.jan-tennert.supabase:supabase-kt", version.ref = "authKt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

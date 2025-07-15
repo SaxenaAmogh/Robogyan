@@ -1,20 +1,22 @@
 package com.example.robogyan.model
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Member(
     val id: String,
     val name: String,
-    val pos: String,
-    val uid: String,
-    val batch: String,
+    val enrollment: String,
     val email: String,
-    val mobileNum: Long,
-    val enrollment: Long,
-    val techStack: String,
-    val labAccess: Boolean,
+    val mobile: Long,
+    val batch: String,
+    val current_pos: String,
+    val pos_period: String,
+    val past_pos: List<String>? = null,
+    val is_alumni: Boolean,
+    val lab_access: Boolean = false,
     val clearance: String,
     val image: String,
-    val created: String,
-    val updated: String
+    val created: String = "",
 )
 
 data class MemberResponse(

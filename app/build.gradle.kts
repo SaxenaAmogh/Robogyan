@@ -1,12 +1,23 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("apikeys.properties")
+    if (localFile.exists()) {
+        load(localFile.inputStream())
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
     namespace = "com.example.robogyan"
     compileSdk = 35
+    android.buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "com.example.robogyan"
@@ -16,6 +27,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKey = localProperties.getProperty("SUPABASE_ANON_KEY") ?: ""
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: ""
+
+        buildConfigField(
+            type = "String",
+            name = "SUPABASE_ANON_KEY",
+            value = apiKey
+        )
+        buildConfigField(
+            type = "String",
+            name = "SUPABASE_URL",
+            value = supabaseUrl
+        )
     }
 
     buildTypes {
@@ -44,6 +69,22 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.postgrest.kt)
+    implementation(libs.storage.kt)
+    implementation(libs.auth.kt)
+    implementation(libs.gotrue.kt)
+    implementation(libs.supabase.kt)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.core.v322)
+    implementation(libs.ktor.utils)
+    implementation(libs.ktor.client.core.v235)
+    implementation(libs.ktor.client.cio.v235)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging.v235)
 
     implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
