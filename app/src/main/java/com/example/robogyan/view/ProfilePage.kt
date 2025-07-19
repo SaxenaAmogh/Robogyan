@@ -32,12 +32,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -47,16 +51,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.AuthViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -66,13 +71,15 @@ fun ProfilePage(navController: NavController){
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
     val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
     if (windowInsetsController != null) {
-        windowInsetsController.isAppearanceLightStatusBars = true
+        windowInsetsController.isAppearanceLightStatusBars = false
     }
+    val authViewModel: AuthViewModel = viewModel()
 
     Scaffold(
         content = {
@@ -95,7 +102,7 @@ fun ProfilePage(navController: NavController){
                             .fillMaxSize()
                     ){
                         item {
-                            Column(
+                            Box(
                                 modifier = Modifier
                                     .clip(
                                         RoundedCornerShape(
@@ -103,8 +110,17 @@ fun ProfilePage(navController: NavController){
                                             bottomEnd = 50.dp
                                         )
                                     )
-                                    .background(AccentColor)
+                                    .background(BackgroundColor)
                             ) {
+                                Image(
+                                    painter = painterResource(R.drawable.me),
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .alpha(0.65f)
+                                        .fillMaxWidth()
+                                        .height(0.38 * screenHeight)
+                                )
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -115,8 +131,8 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .align(Alignment.CenterStart)
                                             .border(
-                                                width = 2.dp,
-                                                color = Color.Black,
+                                                width = 3.dp,
+                                                color = AccentColor,
                                                 shape = RoundedCornerShape(12.dp)
                                             )
                                     ) {
@@ -125,68 +141,55 @@ fun ProfilePage(navController: NavController){
                                             contentDescription = "Arrow Icon",
                                             modifier = Modifier
                                                 .padding(8.dp)
-                                                .size(32.dp)
+                                                .size(34.dp)
                                                 .align(Alignment.CenterStart)
                                                 .clickable {
                                                     navController.popBackStack()
                                                 },
-                                            tint = Color.Black
+                                            tint = AccentColor
                                         )
                                     }
-                                    Text(
-                                        text = "User Profile",
-                                        color = Color.Black,
-                                        fontSize = 20.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .align(Alignment.Center)
-                                    )
+//                                    Text(
+//                                        text = "User Profile",
+//                                        color = Color.Black,
+//                                        fontSize = 20.sp,
+//                                        fontFamily = latoFontFamily,
+//                                        fontWeight = FontWeight.Bold,
+//                                        modifier = Modifier
+//                                            .align(Alignment.Center)
+//                                    )
                                 }
                                 Spacer(modifier = Modifier.height(0.04 * screenHeight))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.me),
-                                        contentDescription = "Profile",
+                                Column(
+                                    modifier = Modifier
+                                        .padding(bottom = 20.dp)
+                                        .fillMaxWidth()
+                                        .align(Alignment.BottomCenter),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ){
+                                    Text(
+                                        text = "Amogh Saxena",
+                                        color = Color.White,
+                                        fontSize = 30.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = latoFontFamily,
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(30.dp))
-                                            .size(150.dp)
-                                            .border(
-                                                width = 2.dp,
-                                                color = Color.Black,
-                                                shape = RoundedCornerShape(30.dp)
-                                            )
                                     )
-                                    Spacer(modifier = Modifier.size(0.05 * screenWidth))
-                                    Column{
-                                        Text(
-                                            text = "Amogh Saxena",
-                                            color = Color.Black,
-                                            fontSize = 24.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            fontFamily = latoFontFamily,
-                                            modifier = Modifier
-                                        )
-                                        Text(
-                                            text = "Software Lead",
-                                            color = GunmetalGray,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            fontFamily = latoFontFamily,
-                                        )
-                                        Text(
-                                            text = "2024-2025",
-                                            color = Color.Gray,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            fontFamily = latoFontFamily,
-                                            modifier = Modifier
-                                        )
-                                    }
+                                    Text(
+                                        text = "Software Lead",
+                                        color = Color.White,
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                    Text(
+                                        text = "2024-2025",
+                                        color = Color(0xFF9F9F9F),
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = latoFontFamily,
+                                        modifier = Modifier
+                                    )
                                 }
                                 Spacer(modifier = Modifier.height(0.05 * screenHeight))
                             }
@@ -409,8 +412,6 @@ fun ProfilePage(navController: NavController){
                                         horizontal = 0.02 * screenWidth,
                                         vertical = 0.03 * screenWidth
                                     )
-                                    .clickable {
-                                    }
                             ){
                                 Spacer(modifier = Modifier.height(0.01 * screenHeight))
                                 Row(
@@ -557,6 +558,12 @@ fun ProfilePage(navController: NavController){
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(
+                                        modifier = Modifier
+                                            .clickable {
+                                                authViewModel.logout()
+                                                navController.navigate("login")
+                                                navController.popBackStack()
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Spacer(modifier = Modifier.width(4.dp))

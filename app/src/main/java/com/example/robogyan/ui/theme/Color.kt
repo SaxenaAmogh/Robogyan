@@ -11,7 +11,7 @@ val SecondaryText = Color(0xFF858585) // Light gray
 val BackgroundColor = Color(0xFF000000)  // Black
 val PrimaryColor = Color(0xFFF5F7FA)     // Light grayish blue
 val SecondaryColor = Color(0xFF0f0f0f)   // Dark gray
-val AccentColor = Color(0xFFFFEBAF)      // Neon green 0xFF00FF88 or 0xFFffebaf
+val AccentColor = Color(0xFF59A7EC)      // Neon green 0xFF00FF88 or 0xFFffebaf
 val GunmetalGray = Color(0xFF3D3D3D)
 
 

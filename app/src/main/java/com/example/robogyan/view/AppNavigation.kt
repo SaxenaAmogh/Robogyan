@@ -15,7 +15,7 @@ import com.example.robogyan.view.secpages.ProjectViewPage
 fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = "splash",
     ){
         //start pages
         composable("splash"){
@@ -23,6 +23,9 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable("login"){
             LoginPage(navController)
+        }
+        composable("start"){
+            StartPage(navController)
         }
 
         //main pages

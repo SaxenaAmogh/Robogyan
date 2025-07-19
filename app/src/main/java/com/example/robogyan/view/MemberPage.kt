@@ -89,7 +89,7 @@ fun MemberPage(navController: NavController) {
         id = "",
         name = "",
         email = "",
-        mobile = 0L,
+        mobile = "0L",
         image = "",
         current_pos = "",
         pos_period = "",
@@ -236,6 +236,41 @@ fun MemberPage(navController: NavController) {
                                     )
                                 }
                             }
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
+                            OutlinedTextField(
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = PrimaryColor,
+                                    unfocusedBorderColor = GunmetalGray,
+                                    cursorColor = AccentColor,
+                                    containerColor = SecondaryColor,
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(35),
+                                leadingIcon = {
+                                    Icon(
+                                        modifier = Modifier.size(22.dp),
+                                        painter = painterResource(id = R.drawable.search),
+                                        contentDescription = "search",
+                                        tint = AccentColor
+                                    )
+                                },
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                    }
+                                ),
+                                singleLine = true,
+                                value = searchItem,
+                                onValueChange = { searchItem = it },
+                                placeholder = {
+                                    Text(
+                                        color = TextColor,
+                                        text = "Search for a member",
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
+                            )
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item{
@@ -621,50 +656,21 @@ fun MemberPage(navController: NavController) {
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                         ){
-                            OutlinedTextField(
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = PrimaryColor,
-                                    unfocusedBorderColor = GunmetalGray,
-                                    cursorColor = AccentColor,
-                                    containerColor = SecondaryColor,
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                shape = RoundedCornerShape(35),
-                                leadingIcon = {
-                                    Icon(
-                                        modifier = Modifier.size(22.dp),
-                                        painter = painterResource(id = R.drawable.search),
-                                        contentDescription = "search",
-                                        tint = AccentColor
-                                    )
-                                },
-                                keyboardActions = KeyboardActions(
-                                    onDone = {
-                                        focusManager.clearFocus()
-                                    }
-                                ),
-                                singleLine = true,
-                                value = searchItem,
-                                onValueChange = { searchItem = it },
-                                placeholder = {
-                                    Text(
-                                        color = TextColor,
-                                        text = "Search for a member",
-                                        fontFamily = latoFontFamily,
-                                    )
-                                }
-                            )
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
                             Row(
                                 modifier = Modifier
                                     .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
                                     .fillMaxWidth()
                                     .padding(
+                                        horizontal = 0.04 * screenWidth
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = PrimaryColor,
+                                        shape = RoundedCornerShape(50.dp)
                                     )
                                     .background(
-                                        shape = RoundedCornerShape(40),
-                                        color = AccentColor
+                                        shape = RoundedCornerShape(50.dp),
+                                        color = SecondaryColor
                                     ),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
@@ -685,7 +691,7 @@ fun MemberPage(navController: NavController) {
                                         painter = painterResource(R.drawable.home),
                                         contentDescription = "home",
                                         Modifier.size(32.dp),
-                                        tint = Black
+                                        tint = AccentColor
                                     )
                                 }
                                 Spacer(modifier = Modifier.size(12.dp))
@@ -699,7 +705,7 @@ fun MemberPage(navController: NavController) {
                                         painter = painterResource(R.drawable.member_d),
                                         contentDescription = "cart_na",
                                         Modifier.size(32.dp),
-                                        tint = Black
+                                        tint = AccentColor
                                     )
                                 }
                                 Spacer(modifier = Modifier.size(12.dp))
@@ -719,7 +725,7 @@ fun MemberPage(navController: NavController) {
                                         painter = painterResource(R.drawable.security),
                                         contentDescription = "explore",
                                         Modifier.size(32.dp),
-                                        tint = Black
+                                        tint = AccentColor
                                     )
                                 }
                                 Spacer(modifier = Modifier.size(12.dp))
@@ -739,7 +745,7 @@ fun MemberPage(navController: NavController) {
                                         painter = painterResource(R.drawable.projects),
                                         contentDescription = "cart_na",
                                         Modifier.size(32.dp),
-                                        tint = Black
+                                        tint = AccentColor
                                     )
                                 }
                                 Spacer(modifier = Modifier.size(12.dp))
@@ -759,7 +765,7 @@ fun MemberPage(navController: NavController) {
                                         painter = painterResource(R.drawable.res),
                                         contentDescription = "resources",
                                         Modifier.size(32.dp),
-                                        tint = Black
+                                        tint = AccentColor
                                     )
                                 }
                             }

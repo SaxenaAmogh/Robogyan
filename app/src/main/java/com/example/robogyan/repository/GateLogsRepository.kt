@@ -1,8 +1,7 @@
 package com.example.robogyan.repository
 
-import com.example.robogyan.api.RetrofitClient
+import com.example.robogyan.utils.RetrofitClient
 import com.example.robogyan.model.GateLogsResponse
-import com.example.robogyan.model.MemberResponse
 import retrofit2.Response
 
 class GateLogsRepository {

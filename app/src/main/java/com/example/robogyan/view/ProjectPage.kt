@@ -782,19 +782,26 @@ fun ProjectPage(navController: NavController){
                         )
                         Spacer(modifier = Modifier.size(0.01 * screenHeight))
                         // Bottom Navigation
+
                         Row(
                             modifier = Modifier
                                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
                                 .fillMaxWidth()
                                 .padding(
+                                    horizontal = 0.04 * screenWidth
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = PrimaryColor,
+                                    shape = RoundedCornerShape(50.dp)
                                 )
                                 .background(
-                                    shape = RoundedCornerShape(40),
-                                    color = AccentColor
+                                    shape = RoundedCornerShape(50.dp),
+                                    color = SecondaryColor
                                 ),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        )  {
                             IconButton(
                                 onClick = {
                                     navController.navigate("home") {
@@ -811,7 +818,7 @@ fun ProjectPage(navController: NavController){
                                     painter = painterResource(R.drawable.home),
                                     contentDescription = "home",
                                     Modifier.size(32.dp),
-                                    tint = Black
+                                    tint = AccentColor
                                 )
                             }
                             Spacer(modifier = Modifier.size(12.dp))
@@ -831,7 +838,7 @@ fun ProjectPage(navController: NavController){
                                     painter = painterResource(R.drawable.member),
                                     contentDescription = "cart_na",
                                     Modifier.size(32.dp),
-                                    tint = Black
+                                    tint = AccentColor
                                 )
                             }
                             Spacer(modifier = Modifier.size(12.dp))
@@ -851,7 +858,7 @@ fun ProjectPage(navController: NavController){
                                     painter = painterResource(R.drawable.security),
                                     contentDescription = "explore",
                                     Modifier.size(32.dp),
-                                    tint = Black
+                                    tint = AccentColor
                                 )
                             }
                             Spacer(modifier = Modifier.size(12.dp))
@@ -865,7 +872,7 @@ fun ProjectPage(navController: NavController){
                                     painter = painterResource(R.drawable.projects_d),
                                     contentDescription = "cart_na",
                                     Modifier.size(32.dp),
-                                    tint = Black
+                                    tint = AccentColor
                                 )
                             }
                             Spacer(modifier = Modifier.size(12.dp))
@@ -885,7 +892,7 @@ fun ProjectPage(navController: NavController){
                                     painter = painterResource(R.drawable.res),
                                     contentDescription = "resources",
                                     Modifier.size(32.dp),
-                                    tint = Black
+                                    tint = AccentColor
                                 )
                             }
                         }

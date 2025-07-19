@@ -7,7 +7,7 @@ data class Member(
     val name: String,
     val enrollment: String,
     val email: String,
-    val mobile: Long,
+    val mobile: String,
     val batch: String,
     val current_pos: String,
     val pos_period: String,
@@ -17,12 +17,4 @@ data class Member(
     val clearance: String,
     val image: String,
     val created: String = "",
-)
-
-data class MemberResponse(
-    val page: Int,
-    val perPage: Int,
-    val totalPages: Int,
-    val totalItems: Int,
-    val items: List<Member>
 )

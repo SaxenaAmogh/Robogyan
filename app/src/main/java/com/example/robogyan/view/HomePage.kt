@@ -60,7 +60,6 @@ import coil.compose.AsyncImage
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
@@ -301,7 +300,7 @@ fun HomePage(navController: NavHostController) {
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(25.dp))
                                     .border(
-                                        width = 1.2.dp,
+                                        width = 2.dp,
                                         color = AccentColor,
                                         shape = RoundedCornerShape(25.dp)
                                     )
@@ -657,10 +656,16 @@ fun HomePage(navController: NavHostController) {
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .padding(
+                                horizontal = 0.04 * screenWidth
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = PrimaryColor,
+                                shape = RoundedCornerShape(50.dp)
                             )
                             .background(
-                                shape = RoundedCornerShape(40),
-                                color = AccentColor
+                                shape = RoundedCornerShape(50.dp),
+                                color = SecondaryColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
@@ -675,7 +680,7 @@ fun HomePage(navController: NavHostController) {
                                 painter = painterResource(R.drawable.home_d),
                                 contentDescription = "home",
                                 Modifier.size(32.dp),
-                                tint = Black
+                                tint = AccentColor
                             )
                         }
                         Spacer(modifier = Modifier.size(12.dp))
@@ -691,7 +696,7 @@ fun HomePage(navController: NavHostController) {
                                 painter = painterResource(R.drawable.member),
                                 contentDescription = "cart_na",
                                 Modifier.size(32.dp),
-                                tint = Black
+                                tint = AccentColor
                             )
                         }
                         Spacer(modifier = Modifier.size(12.dp))
@@ -707,7 +712,7 @@ fun HomePage(navController: NavHostController) {
                                 painter = painterResource(R.drawable.security),
                                 contentDescription = "explore",
                                 Modifier.size(32.dp),
-                                tint = Black
+                                tint = AccentColor
                             )
                         }
                         Spacer(modifier = Modifier.size(12.dp))
@@ -723,7 +728,7 @@ fun HomePage(navController: NavHostController) {
                                 painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
                                 Modifier.size(32.dp),
-                                tint = Black
+                                tint = AccentColor
                             )
                         }
                         Spacer(modifier = Modifier.size(12.dp))
@@ -739,7 +744,7 @@ fun HomePage(navController: NavHostController) {
                                 painter = painterResource(R.drawable.res),
                                 contentDescription = "resources",
                                 Modifier.size(36.dp),
-                                tint = Black
+                                tint = AccentColor
                             )
                         }
                     }

@@ -148,6 +148,14 @@ fun StartPage(navController: NavController) {
                         ){
                             FloatingActionButton(
                                 onClick = {
+                                    animate = true
+                                    coroutineScope.launch {
+                                        scale = 10f
+                                        delay(1000)
+                                        navController.navigate("login") {
+                                            popUpTo("start") { inclusive = true }
+                                        }
+                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth().size(if (animate) 0.dp else 60.dp),
                                 containerColor =AccentColor,
@@ -163,14 +171,6 @@ fun StartPage(navController: NavController) {
                             Spacer(modifier = Modifier.height(10.dp))
                             FloatingActionButton(
                                 onClick = {
-                                    animate = true
-                                    coroutineScope.launch {
-                                        scale = 10f
-                                        delay(1000)
-                                        navController.navigate("login") {
-                                            popUpTo("start") { inclusive = true }
-                                        }
-                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth().size(if (animate) 0.dp else 60.dp),
                                 containerColor = Color(0xFFe9e5da),
