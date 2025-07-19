@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -64,7 +65,11 @@ import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
+import com.example.robogyan.ui.theme.PeachOne
+import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
@@ -118,34 +123,29 @@ fun SecurityPage(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         item {
-                            Row(
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
                             ){
-                                Icon(
-                                    painter = painterResource(R.drawable.update),
-                                    contentDescription = "notification",
-                                    Modifier.size(32.dp),
-                                    tint = AccentColor
-                                )
                                 Text(
                                     text = "Security & Assets",
-                                    color = TextColor,
-                                    fontSize = 20.sp,
+                                    color = Color.White,
+                                    fontSize = 25.sp,
                                     fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 0.035 * screenWidth)
                                 )
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
                                     modifier = Modifier
+                                        .padding(end = 0.035 * screenWidth)
+                                        .align(Alignment.CenterEnd)
                                         .clickable {
                                             navController.navigate("profile")
                                         }
                                         .size(32.dp),
-                                    tint = AccentColor
+                                    tint = Color.White
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
@@ -191,7 +191,7 @@ fun SecurityPage(navController: NavController) {
                                             colors = SwitchColors(
                                                 checkedThumbColor = Color.Black,
                                                 uncheckedThumbColor = Color(0xFFB2B2B2),
-                                                checkedTrackColor = AccentColor,
+                                                checkedTrackColor = PurpleOne,
                                                 uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
                                                 checkedBorderColor = Color.Transparent,
                                                 checkedIconColor = Color.Transparent,
@@ -237,7 +237,7 @@ fun SecurityPage(navController: NavController) {
                                 Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                 Text(
                                     text = "Last opened by Macle at 10:46 AM",
-                                    color = TextColor,
+                                    color = PrimaryText,
                                     fontSize = 18.sp,
                                     fontFamily = latoFontFamily,
                                 )
@@ -274,7 +274,7 @@ fun SecurityPage(navController: NavController) {
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .size(20.dp),
-                                        color = AccentColor
+                                        color = PrimaryText
                                     )
                                 }else {
                                     repeat(5) {
@@ -288,7 +288,7 @@ fun SecurityPage(navController: NavController) {
                                         ) {
                                             Text(
                                                 text = "Amogh Saxena",
-                                                color = TextColor,
+                                                color = PrimaryColor,
                                                 fontSize = 16.sp,
                                                 fontFamily = latoFontFamily,
                                             )
@@ -303,7 +303,7 @@ fun SecurityPage(navController: NavController) {
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.size(0.035 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.03 * screenHeight))
                         }
                         item {
                             HorizontalDivider(
@@ -311,20 +311,20 @@ fun SecurityPage(navController: NavController) {
                                     .fillMaxWidth(),
                                 color = Color(0xFF2D2D2D)
                             )
-                            Spacer(modifier = Modifier.size(0.035 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
                             Text(
                                 text = "Assets Inventory",
                                 color = TextColor,
-                                fontSize = 24.sp,
+                                fontSize = 26.sp,
                                 fontFamily = latoFontFamily,
                                 fontWeight = FontWeight.Bold,
                             )
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
                             FloatingActionButton(
                                 onClick = {
                                     navController.navigate("addasset")
                                 },
-                                containerColor = SecondaryColor,
+                                containerColor = PurpleOne,
                                 contentColor = Black,
                             ) {
                                 Row(
@@ -336,13 +336,13 @@ fun SecurityPage(navController: NavController) {
                                         Icons.Rounded.Add,
                                         contentDescription = "Add Asset",
                                         modifier = Modifier.size(24.dp),
-                                        tint = AccentColor
+                                        tint = Color.Black
                                     )
                                     Spacer(modifier = Modifier.size(4.dp))
                                     Text(
                                         text = "Add Component",
-                                        color = AccentColor,
-                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                        fontSize = 18.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -376,15 +376,15 @@ fun SecurityPage(navController: NavController) {
                                     Row {
                                         Text(
                                             text = "05",
-                                            color = AccentColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        Spacer(modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "LiPo Batteries",
-                                            color = PrimaryColor,
+                                            color = PrimaryText,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -392,7 +392,7 @@ fun SecurityPage(navController: NavController) {
                                     Icon(
                                         Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                         contentDescription = "View Details",
-                                        tint = AccentColor,
+                                        tint = PurpleOne,
                                         modifier = Modifier
                                             .size(28.dp),
                                     )
@@ -419,15 +419,15 @@ fun SecurityPage(navController: NavController) {
                                     Row {
                                         Text(
                                             text = "12",
-                                            color = AccentColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        Spacer(modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "ESP32 Boards",
-                                            color = PrimaryColor,
+                                            color = PrimaryText,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -435,7 +435,7 @@ fun SecurityPage(navController: NavController) {
                                     Icon(
                                         Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                         contentDescription = "View Details",
-                                        tint = AccentColor,
+                                        tint = PurpleOne,
                                         modifier = Modifier
                                             .size(28.dp),
                                     )
@@ -462,15 +462,15 @@ fun SecurityPage(navController: NavController) {
                                     Row {
                                         Text(
                                             text = "15",
-                                            color = AccentColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        Spacer(modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "Servo Motors",
-                                            color = PrimaryColor,
+                                            color = PrimaryText,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -478,7 +478,7 @@ fun SecurityPage(navController: NavController) {
                                     Icon(
                                         Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                         contentDescription = "View Details",
-                                        tint = AccentColor,
+                                        tint = PurpleOne,
                                         modifier = Modifier
                                             .size(28.dp),
                                     )
@@ -505,15 +505,15 @@ fun SecurityPage(navController: NavController) {
                                     Row {
                                         Text(
                                             text = "08",
-                                            color = AccentColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        Spacer(modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "Glue Gun Sticks",
-                                            color = PrimaryColor,
+                                            color = PrimaryText,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -521,7 +521,7 @@ fun SecurityPage(navController: NavController) {
                                     Icon(
                                         Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                         contentDescription = "View Details",
-                                        tint = AccentColor,
+                                        tint = PurpleOne,
                                         modifier = Modifier
                                             .size(28.dp),
                                     )
@@ -548,15 +548,15 @@ fun SecurityPage(navController: NavController) {
                                     Row {
                                         Text(
                                             text = "28",
-                                            color = AccentColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        Spacer(modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "Capacitors",
-                                            color = PrimaryColor,
+                                            color = PrimaryText,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -564,7 +564,7 @@ fun SecurityPage(navController: NavController) {
                                     Icon(
                                         Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                         contentDescription = "View Details",
-                                        tint = AccentColor,
+                                        tint = PurpleOne,
                                         modifier = Modifier
                                             .size(28.dp),
                                     )
@@ -580,16 +580,12 @@ fun SecurityPage(navController: NavController) {
                             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
+                            .height(0.07 * screenHeight)
                             .padding(
-                                horizontal = 0.04 * screenWidth
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = PrimaryColor,
-                                shape = RoundedCornerShape(50.dp)
+                                horizontal = 0.035 * screenWidth
                             )
                             .background(
-                                shape = RoundedCornerShape(50.dp),
+                                shape = RoundedCornerShape(40.dp),
                                 color = SecondaryColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -605,16 +601,16 @@ fun SecurityPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.home),
                                 contentDescription = "home",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("member"){
@@ -625,30 +621,34 @@ fun SecurityPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.member),
                                 contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {},
                             modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .clip(RoundedCornerShape(25.dp))
+                                .size(45.dp)
+                                .background(
+                                    color = Color(0xFFF5D867),
+                                    shape = RoundedCornerShape(50)
+                                )
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.security_d),
                                 contentDescription = "explore",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.Black
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("projects"){
@@ -659,16 +659,16 @@ fun SecurityPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("resources"){
@@ -679,13 +679,13 @@ fun SecurityPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.res),
                                 contentDescription = "resources",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(30.dp),
+                                tint = Color.White
                             )
                         }
                     }

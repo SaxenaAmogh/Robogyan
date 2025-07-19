@@ -64,7 +64,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
@@ -115,7 +118,7 @@ fun AssetViewPage(navController: NavController){
                                     .align(Alignment.CenterStart)
                                     .border(
                                         width = 0.7.dp,
-                                        color = AccentColor,
+                                        color = PurpleOne,
                                         shape = RoundedCornerShape(12.dp)
                                     )
                             ) {
@@ -129,13 +132,13 @@ fun AssetViewPage(navController: NavController){
                                         .clickable {
                                             navController.popBackStack()
                                         },
-                                    tint = AccentColor
+                                    tint = PurpleOne
                                 )
                             }
                             Text(
                                 text = "View Asset",
                                 color = TextColor,
-                                fontSize = 20.sp,
+                                fontSize = 24.sp,
                                 fontFamily = latoFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
@@ -174,7 +177,7 @@ fun AssetViewPage(navController: NavController){
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
                                         text = "Arduino Pro Mini",
-                                        color = AccentColor,
+                                        color = PurpleOne,
                                         fontSize = 28.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold,
@@ -236,7 +239,7 @@ fun AssetViewPage(navController: NavController){
                                                 )
                                                 Text(
                                                     text = "20 Units",
-                                                    color = TextColor,
+                                                    color = PrimaryText,
                                                     fontSize = 19.sp,
                                                     fontFamily = latoFontFamily,
                                                 )
@@ -251,7 +254,7 @@ fun AssetViewPage(navController: NavController){
                                                 )
                                                 Text(
                                                     text = "16 Units",
-                                                    color = TextColor,
+                                                    color = PurpleOne,
                                                     fontSize = 19.sp,
                                                     fontFamily = latoFontFamily,
                                                 )
@@ -382,7 +385,7 @@ fun AssetViewPage(navController: NavController){
                                                     .clickable {
                                                         showSheet = true
                                                     },
-                                                tint = AccentColor
+                                                tint = PinkOne
                                             )
                                         }
                                         if (it < 4) {
@@ -432,7 +435,7 @@ fun AssetViewPage(navController: NavController){
                                         .padding(10.dp)
                                         .width(50.dp)
                                         .height(5.dp)
-                                        .background(AccentColor, shape = RoundedCornerShape(50))
+                                        .background(PinkOne, shape = RoundedCornerShape(50))
                                 )
                                 Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                 Column(
@@ -457,7 +460,7 @@ fun AssetViewPage(navController: NavController){
                                                 .height(130.dp)
                                                 .border(
                                                     width = 1.dp,
-                                                    color = AccentColor,
+                                                    color = PinkOne,
                                                     shape = RoundedCornerShape(30.dp)
                                                 )
                                         )
@@ -465,7 +468,7 @@ fun AssetViewPage(navController: NavController){
                                         Column {
                                             Text(
                                                 text = "Amogh Saxena",
-                                                color = AccentColor,
+                                                color = PinkOne,
                                                 fontSize = 22.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 fontFamily = latoFontFamily,
@@ -625,7 +628,7 @@ fun AssetViewPage(navController: NavController){
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 0.035 * screenWidth),
-                                        containerColor = AccentColor,
+                                        containerColor = PrimaryText,
                                         elevation = FloatingActionButtonDefaults.elevation(
                                             defaultElevation = 0.dp,
                                             pressedElevation = 0.dp,

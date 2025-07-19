@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
@@ -68,7 +70,12 @@ import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.GunmetalGray
+import com.example.robogyan.ui.theme.NavBar
+import com.example.robogyan.ui.theme.PeachOne
+import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
@@ -128,40 +135,40 @@ fun MemberPage(navController: NavController) {
                         .padding(
                             horizontal = 0.035 * screenWidth
                         )
+                        .pointerInput(Unit){
+                            detectTapGestures {
+                                focusManager.clearFocus()
+                            }
+                        }
                 ) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                     ) {
                         item {
-                            Row(
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
                             ){
-                                Icon(
-                                    painter = painterResource(R.drawable.update),
-                                    contentDescription = "notification",
-                                    Modifier.size(32.dp),
-                                    tint = AccentColor
-                                )
                                 Text(
-                                    text = "Society Members",
-                                    color = TextColor,
-                                    fontSize = 20.sp,
+                                    text = "Members",
+                                    color = Color.White,
+                                    fontSize = 25.sp,
                                     fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 0.035 * screenWidth)
                                 )
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
                                     modifier = Modifier
+                                        .padding(end = 0.035 * screenWidth)
+                                        .align(Alignment.CenterEnd)
                                         .clickable {
                                             navController.navigate("profile")
                                         }
                                         .size(32.dp),
-                                    tint = AccentColor
+                                    tint = Color.White
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
@@ -191,7 +198,7 @@ fun MemberPage(navController: NavController) {
                                     shape = RoundedCornerShape(16.dp),
                                     colors = if (currentMember) {
                                         ButtonDefaults.buttonColors(
-                                            containerColor = AccentColor
+                                            containerColor = PurpleOne
                                         )
                                     } else {
                                         ButtonDefaults.buttonColors(
@@ -200,7 +207,7 @@ fun MemberPage(navController: NavController) {
                                     }
                                 ) {
                                     Text(
-                                        text = "Current Members",
+                                        text = "Current",
                                         color = if (currentMember) Color.Black else Color.White,
                                         fontSize = 16.sp,
                                         fontFamily = latoFontFamily,
@@ -220,7 +227,7 @@ fun MemberPage(navController: NavController) {
                                     shape = RoundedCornerShape(16.dp),
                                     colors = if (!currentMember) {
                                         ButtonDefaults.buttonColors(
-                                            containerColor = AccentColor
+                                            containerColor = PinkOne
                                         )
                                     } else {
                                         ButtonDefaults.buttonColors(
@@ -252,7 +259,7 @@ fun MemberPage(navController: NavController) {
                                         modifier = Modifier.size(22.dp),
                                         painter = painterResource(id = R.drawable.search),
                                         contentDescription = "search",
-                                        tint = AccentColor
+                                        tint = if (!currentMember) PinkOne else PurpleOne
                                     )
                                 },
                                 keyboardActions = KeyboardActions(
@@ -279,7 +286,7 @@ fun MemberPage(navController: NavController) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .size(50.dp),
-                                    color = AccentColor
+                                    color = if (!currentMember) PinkOne else PurpleOne
                                 )
                             }
                             else {
@@ -311,7 +318,7 @@ fun MemberPage(navController: NavController) {
                                             .clip(RoundedCornerShape(25.dp))
                                             .border(
                                                 width = 2.dp,
-                                                color = AccentColor,
+                                                color = if (it.is_alumni) PinkOne else PurpleOne,
                                                 shape = RoundedCornerShape(25.dp)
                                             )
                                             .padding(
@@ -347,7 +354,7 @@ fun MemberPage(navController: NavController) {
                                                     Text(
                                                         text = it.name,
                                                         fontFamily = latoFontFamily,
-                                                        color = AccentColor,
+                                                        color = PrimaryText,
                                                         fontSize = 22.sp,
                                                         fontWeight = FontWeight.Bold,
                                                         modifier = Modifier
@@ -407,7 +414,7 @@ fun MemberPage(navController: NavController) {
                                         .padding(10.dp)
                                         .width(50.dp)
                                         .height(5.dp)
-                                        .background(AccentColor, shape = RoundedCornerShape(50))
+                                        .background(if (member.is_alumni) PinkOne else PurpleOne, shape = RoundedCornerShape(50))
                                 )
                                 Column(
                                     modifier = Modifier
@@ -431,7 +438,7 @@ fun MemberPage(navController: NavController) {
                                                 .size(130.dp)
                                                 .border(
                                                     width = 1.dp,
-                                                    color = AccentColor,
+                                                    color = if (member.is_alumni) PinkOne else PurpleOne,
                                                     shape = RoundedCornerShape(30.dp)
                                                 )
                                         )
@@ -439,7 +446,7 @@ fun MemberPage(navController: NavController) {
                                         Column{
                                             Text(
                                                 text = member.name,
-                                                color = AccentColor,
+                                                color = PrimaryText,
                                                 fontSize = 22.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 fontFamily = latoFontFamily,
@@ -660,17 +667,13 @@ fun MemberPage(navController: NavController) {
                                 modifier = Modifier
                                     .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
                                     .fillMaxWidth()
+                                    .height(0.07 * screenHeight)
                                     .padding(
-                                        horizontal = 0.04 * screenWidth
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = PrimaryColor,
-                                        shape = RoundedCornerShape(50.dp)
+                                        horizontal = 0.035 * screenWidth
                                     )
                                     .background(
-                                        shape = RoundedCornerShape(50.dp),
-                                        color = SecondaryColor
+                                        shape = RoundedCornerShape(40.dp),
+                                        color = NavBar
                                     ),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
@@ -685,30 +688,34 @@ fun MemberPage(navController: NavController) {
                                     },
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(50))
-                                        .size(55.dp)
+                                        .size(45.dp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.home),
                                         contentDescription = "home",
-                                        Modifier.size(32.dp),
-                                        tint = AccentColor
+                                        Modifier.size(26.dp),
+                                        tint = Color.White
                                     )
                                 }
-                                Spacer(modifier = Modifier.size(12.dp))
+                                Spacer(modifier = Modifier.size(8.dp))
                                 IconButton(
                                     onClick = {},
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(50))
-                                        .size(55.dp)
+                                        .clip(RoundedCornerShape(25.dp))
+                                        .size(45.dp)
+                                        .background(
+                                            color = Color(0xFFF5D867),
+                                            shape = RoundedCornerShape(50)
+                                        )
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.member_d),
                                         contentDescription = "cart_na",
-                                        Modifier.size(32.dp),
-                                        tint = AccentColor
+                                        Modifier.size(24.dp),
+                                        tint = Color.Black
                                     )
                                 }
-                                Spacer(modifier = Modifier.size(12.dp))
+                                Spacer(modifier = Modifier.size(8.dp))
                                 IconButton(
                                     onClick = {
                                         navController.navigate("security"){
@@ -719,16 +726,16 @@ fun MemberPage(navController: NavController) {
                                     },
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(50))
-                                        .size(55.dp)
+                                        .size(45.dp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.security),
                                         contentDescription = "explore",
-                                        Modifier.size(32.dp),
-                                        tint = AccentColor
+                                        Modifier.size(26.dp),
+                                        tint = Color.White
                                     )
                                 }
-                                Spacer(modifier = Modifier.size(12.dp))
+                                Spacer(modifier = Modifier.size(8.dp))
                                 IconButton(
                                     onClick = {
                                         navController.navigate("projects"){
@@ -739,16 +746,16 @@ fun MemberPage(navController: NavController) {
                                     },
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(50))
-                                        .size(55.dp)
+                                        .size(45.dp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.projects),
                                         contentDescription = "cart_na",
-                                        Modifier.size(32.dp),
-                                        tint = AccentColor
+                                        Modifier.size(26.dp),
+                                        tint = Color.White
                                     )
                                 }
-                                Spacer(modifier = Modifier.size(12.dp))
+                                Spacer(modifier = Modifier.size(8.dp))
                                 IconButton(
                                     onClick = {
                                         navController.navigate("resources"){
@@ -759,13 +766,13 @@ fun MemberPage(navController: NavController) {
                                     },
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(50))
-                                        .size(55.dp)
+                                        .size(45.dp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.res),
                                         contentDescription = "resources",
-                                        Modifier.size(32.dp),
-                                        tint = AccentColor
+                                        Modifier.size(30.dp),
+                                        tint = Color.White
                                     )
                                 }
                             }

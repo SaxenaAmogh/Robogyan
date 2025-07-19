@@ -48,6 +48,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
 import kotlinx.coroutines.delay
@@ -114,7 +116,7 @@ fun StartPage(navController: NavController) {
                             Text(
                                 text = "Welcome to Robogyan",
                                 fontFamily = latoFontFamily,
-                                color = AccentColor,
+                                color = PrimaryText,
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -158,7 +160,7 @@ fun StartPage(navController: NavController) {
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().size(if (animate) 0.dp else 60.dp),
-                                containerColor =AccentColor,
+                                containerColor = PurpleOne,
                             ) {
                                 Text(
                                     text = "Continue as Member",

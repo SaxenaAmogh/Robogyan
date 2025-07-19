@@ -2,6 +2,7 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,13 +59,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
+import com.example.robogyan.viewmodel.UserViewModel
+import io.github.jan.supabase.auth.auth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -79,7 +87,30 @@ fun ProfilePage(navController: NavController){
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
-    val authViewModel: AuthViewModel = viewModel()
+//    val authViewModel: AuthViewModel = viewModel()
+//    val userViewModel: UserViewModel = viewModel()
+//    val currentUserId = remember { SupabaseClientProvider.client.auth.currentUserOrNull()?.id ?: "" }
+//    val authState by authViewModel.authState.collectAsState()
+//    val userData by userViewModel.getMemberData(currentUserId).collectAsState(initial = null)
+
+//    LaunchedEffect(authState) {
+//        when (authState) {
+//            is AuthState.Idle -> {
+//                // User is logged out, navigate back to login screen
+//                // You'll need NavController here, as per our previous discussion
+//                // val navController = (LocalContext.current as Activity).findNavController(R.id.nav_host_fragment_container)
+////                navController.navigate("login") { popUpTo("home") { inclusive = true } }
+//                Log.d("@@logout", "User logged out, navigate to login.")
+//            }
+//            is AuthState.Error -> {
+//                println("Logout Error: ${(authState as AuthState.Error).message}")
+//            }
+//            AuthState.LoggedIn, AuthState.Loading -> {
+//                Log.d("@@Login", userData.toString())
+//            }
+//        }
+//    }
+
 
     Scaffold(
         content = {
@@ -560,7 +591,7 @@ fun ProfilePage(navController: NavController){
                                     Row(
                                         modifier = Modifier
                                             .clickable {
-                                                authViewModel.logout()
+//                                                authViewModel.logout()
                                                 navController.navigate("login")
                                                 navController.popBackStack()
                                             },

@@ -67,7 +67,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
-import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.GunmetalGray
@@ -176,7 +176,7 @@ fun ResourcesPage(navController: NavController) {
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp,
                     maxLines = 1,
-                    color = AccentColor,
+                    color = PrimaryText,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.size(4.dp))
@@ -262,7 +262,7 @@ fun ResourcesPage(navController: NavController) {
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp,
                     maxLines = 2,
-                    color = AccentColor,
+                    color = PrimaryText,
                     overflow = TextOverflow.Ellipsis
                 )
             }
@@ -307,7 +307,7 @@ fun ResourcesPage(navController: NavController) {
                                     painter = painterResource(R.drawable.update),
                                     contentDescription = "notification",
                                     Modifier.size(32.dp),
-                                    tint = AccentColor
+                                    tint = PrimaryText
                                 )
                                 Text(
                                     text = "Resources & Docs",
@@ -324,7 +324,7 @@ fun ResourcesPage(navController: NavController) {
                                             navController.navigate("profile")
                                         }
                                         .size(32.dp),
-                                    tint = AccentColor
+                                    tint = PrimaryText
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
@@ -341,7 +341,7 @@ fun ResourcesPage(navController: NavController) {
                                         colors = TextFieldDefaults.outlinedTextFieldColors(
                                             focusedBorderColor = PrimaryColor,
                                             unfocusedBorderColor = GunmetalGray,
-                                            cursorColor = AccentColor,
+                                            cursorColor = PrimaryText,
                                             containerColor = SecondaryColor,
                                         ),
                                         modifier = Modifier
@@ -352,7 +352,7 @@ fun ResourcesPage(navController: NavController) {
                                                 modifier = Modifier.size(22.dp),
                                                 painter = painterResource(id = R.drawable.search),
                                                 contentDescription = "search",
-                                                tint = AccentColor
+                                                tint = PrimaryText
                                             )
                                         },
                                         keyboardActions = KeyboardActions(
@@ -399,7 +399,7 @@ fun ResourcesPage(navController: NavController) {
                                                 },
                                                 shape = RoundedCornerShape(35),
                                                 colors = OutlinedTextFieldDefaults.colors(
-                                                    focusedBorderColor = AccentColor,
+                                                    focusedBorderColor = PrimaryText,
                                                     unfocusedBorderColor = GunmetalGray,
                                                     unfocusedTextColor = Color(0xFFFFFFFF),
                                                     focusedTextColor = Color(0xFFFFFFFF),
@@ -470,21 +470,17 @@ fun ResourcesPage(navController: NavController) {
                             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
+                            .height(0.07 * screenHeight)
                             .padding(
-                                horizontal = 0.04 * screenWidth
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = PrimaryColor,
-                                shape = RoundedCornerShape(50.dp)
+                                horizontal = 0.035 * screenWidth
                             )
                             .background(
-                                shape = RoundedCornerShape(50.dp),
+                                shape = RoundedCornerShape(40.dp),
                                 color = SecondaryColor
                             ),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
-                    ){
+                    ) {
                         IconButton(
                             onClick = {
                                 navController.navigate("home") {
@@ -495,16 +491,16 @@ fun ResourcesPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.home),
                                 contentDescription = "home",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("member") {
@@ -515,16 +511,16 @@ fun ResourcesPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.member),
                                 contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("security") {
@@ -535,16 +531,16 @@ fun ResourcesPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.security),
                                 contentDescription = "explore",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {
                                 navController.navigate("projects") {
@@ -555,27 +551,31 @@ fun ResourcesPage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .size(45.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.projects),
                                 contentDescription = "cart_na",
-                                Modifier.size(32.dp),
-                                tint = AccentColor
+                                Modifier.size(26.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(8.dp))
                         IconButton(
                             onClick = {},
                             modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .size(55.dp)
+                                .clip(RoundedCornerShape(25.dp))
+                                .size(45.dp)
+                                .background(
+                                    color = Color(0xFFF5D867),
+                                    shape = RoundedCornerShape(25.dp)
+                                )
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.res_d),
                                 contentDescription = "account",
-                                Modifier.size(36.dp),
-                                tint = AccentColor
+                                Modifier.size(30.dp),
+                                tint = Color.Black
                             )
                         }
                     }

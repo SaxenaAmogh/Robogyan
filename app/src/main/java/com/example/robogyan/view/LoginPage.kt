@@ -86,8 +86,6 @@ fun LoginPage(navController: NavController) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMsg by remember { mutableStateOf<String?>(null) }
 
     val authViewModel: AuthViewModel = viewModel()
     val onLoginSuccess : () -> Unit = {

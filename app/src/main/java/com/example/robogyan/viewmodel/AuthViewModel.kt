@@ -23,10 +23,6 @@ sealed class AuthState { // Renamed from LoginState to AuthState for broader sco
     data class Error(val message: String) : AuthState()
 }
 
-/**
- * ViewModel responsible for handling user authentication with Supabase.
- * It exposes a StateFlow to observe the authentication status from the UI.
- */
 class AuthViewModel : ViewModel() {
 
     // MutableStateFlow to hold the current authentication state, private to prevent external modification.
@@ -64,10 +60,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Initiates the logout process for the current user.
-     * This function runs in a coroutine within the ViewModel's scope.
-     */
     fun logout() {
         viewModelScope.launch {
             _authState.value = com.example.robogyan.viewmodel.AuthState.Loading // Indicate that a process is ongoing

@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.kapt")
     kotlin("plugin.serialization") version "1.9.10"
 }
 
@@ -85,6 +86,12 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging.v235)
+
+    // Room Database
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler.v261)
+    implementation(libs.androidx.room.ktx)
 
     implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

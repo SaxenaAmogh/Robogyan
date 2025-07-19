@@ -48,8 +48,10 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
@@ -95,7 +97,7 @@ fun ProjectViewPage(navController: NavController){
                                 .align(Alignment.CenterStart)
                                 .border(
                                     width = 0.7.dp,
-                                    color = AccentColor,
+                                    color = PinkOne,
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         ) {
@@ -109,7 +111,7 @@ fun ProjectViewPage(navController: NavController){
                                     .clickable {
                                         navController.popBackStack()
                                     },
-                                tint = AccentColor
+                                tint = PinkOne
                             )
                         }
                         Text(
@@ -149,7 +151,7 @@ fun ProjectViewPage(navController: NavController){
                                 ){
                                     Text(
                                         text = "Project Reboot",
-                                        color = AccentColor,
+                                        color = PinkOne,
                                         fontSize = 32.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold,
@@ -212,7 +214,7 @@ fun ProjectViewPage(navController: NavController){
                                             )
                                             Text(
                                                 text = "Amogh Saxena",
-                                                color = TextColor,
+                                                color = PrimaryText,
                                                 fontSize = 18.sp,
                                                 fontFamily = latoFontFamily,
                                             )
@@ -230,7 +232,7 @@ fun ProjectViewPage(navController: NavController){
                                             )
                                             Text(
                                                 text = "Software",
-                                                color = TextColor,
+                                                color = PrimaryText,
                                                 fontSize = 19.sp,
                                                 fontFamily = latoFontFamily,
                                             )
@@ -253,7 +255,7 @@ fun ProjectViewPage(navController: NavController){
                                             )
                                             Text(
                                                 text = "27-06-2025",
-                                                color = TextColor,
+                                                color = PurpleOne,
                                                 fontSize = 19.sp,
                                                 fontFamily = latoFontFamily,
                                             )
@@ -271,7 +273,7 @@ fun ProjectViewPage(navController: NavController){
                                             )
                                             Text(
                                                 text = "TBD",
-                                                color = TextColor,
+                                                color = PurpleOne,
                                                 fontSize = 19.sp,
                                                 fontFamily = latoFontFamily,
                                             )
@@ -291,7 +293,7 @@ fun ProjectViewPage(navController: NavController){
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = "0.00 INR",
-                                            color = TextColor,
+                                            color = PinkOne,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -394,7 +396,7 @@ fun ProjectViewPage(navController: NavController){
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 0.035 * screenWidth),
-                                containerColor = AccentColor,
+                                containerColor = PinkOne,
                                 elevation = FloatingActionButtonDefaults.elevation(
                                     defaultElevation = 0.dp,
                                     pressedElevation = 0.dp,

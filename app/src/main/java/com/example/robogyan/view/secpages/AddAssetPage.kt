@@ -53,8 +53,10 @@ import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.PinkOne
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 
@@ -111,7 +113,7 @@ fun AddAssetPage(navController: NavController) {
                                 .align(Alignment.CenterStart)
                                 .border(
                                     width = 0.7.dp,
-                                    color = AccentColor,
+                                    color = PinkOne,
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         ) {
@@ -125,20 +127,20 @@ fun AddAssetPage(navController: NavController) {
                                     .clickable {
                                         navController.popBackStack()
                                     },
-                                tint = AccentColor
+                                tint = PinkOne
                             )
                         }
                         Text(
                             text = "Add Component",
                             color = TextColor,
-                            fontSize = 20.sp,
+                            fontSize = 24.sp,
                             fontFamily = latoFontFamily,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
                                 .align(Alignment.Center)
                         )
                     }
-                    Spacer(modifier = Modifier.height(0.01 * screenHeight))
+                    Spacer(modifier = Modifier.height(0.022 * screenHeight))
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -147,7 +149,7 @@ fun AddAssetPage(navController: NavController) {
                         Text(
                             text = "Component Name *",
                             fontFamily = latoFontFamily,
-                            color = AccentColor,
+                            color = PurpleOne,
                             fontSize = 16.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -169,7 +171,7 @@ fun AddAssetPage(navController: NavController) {
                             onValueChange = { name = it },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = AccentColor,
+                                focusedBorderColor = PurpleOne,
                                 unfocusedBorderColor = Color(0x66ABABAB),
                                 focusedTextColor = Color(0xFFFFFFFF),
                                 unfocusedTextColor = Color(0xFFFFFFFF),
@@ -181,7 +183,7 @@ fun AddAssetPage(navController: NavController) {
                         Text(
                             text = "Component Type *",
                             fontFamily = latoFontFamily,
-                            color = AccentColor,
+                            color = PurpleOne,
                             fontSize = 16.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -203,7 +205,7 @@ fun AddAssetPage(navController: NavController) {
                             onValueChange = { type = it },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = AccentColor,
+                                focusedBorderColor = PurpleOne,
                                 unfocusedBorderColor = Color(0x66ABABAB),
                                 focusedTextColor = Color(0xFFFFFFFF),
                                 unfocusedTextColor = Color(0xFFFFFFFF),
@@ -215,7 +217,7 @@ fun AddAssetPage(navController: NavController) {
                         Text(
                             text = "Component Desctiption *",
                             fontFamily = latoFontFamily,
-                            color = AccentColor,
+                            color = PurpleOne,
                             fontSize = 16.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -237,7 +239,7 @@ fun AddAssetPage(navController: NavController) {
                             onValueChange = { description = it },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = AccentColor,
+                                focusedBorderColor = PurpleOne,
                                 unfocusedBorderColor = Color(0x66ABABAB),
                                 focusedTextColor = Color(0xFFFFFFFF),
                                 unfocusedTextColor = Color(0xFFFFFFFF),
@@ -257,7 +259,7 @@ fun AddAssetPage(navController: NavController) {
                                 Text(
                                     text = "Quantity *",
                                     fontFamily = latoFontFamily,
-                                    color = AccentColor,
+                                    color = PurpleOne,
                                     fontSize = 16.sp,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -282,7 +284,7 @@ fun AddAssetPage(navController: NavController) {
                                     onValueChange = { quantity = it },
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = AccentColor,
+                                        focusedBorderColor = PurpleOne,
                                         unfocusedBorderColor = Color(0x66ABABAB),
                                         focusedTextColor = Color(0xFFFFFFFF),
                                         unfocusedTextColor = Color(0xFFFFFFFF),
@@ -299,7 +301,7 @@ fun AddAssetPage(navController: NavController) {
                                 Text(
                                     text = "Availabe *",
                                     fontFamily = latoFontFamily,
-                                    color = AccentColor,
+                                    color = PurpleOne,
                                     fontSize = 16.sp,
                                     modifier = Modifier
                                         .padding(start = 8.dp)
@@ -322,7 +324,7 @@ fun AddAssetPage(navController: NavController) {
                                     onValueChange = { availableQuantity = it },
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = AccentColor,
+                                        focusedBorderColor = PurpleOne,
                                         unfocusedBorderColor = Color(0x66ABABAB),
                                         focusedTextColor = Color(0xFFFFFFFF),
                                         unfocusedTextColor = Color(0xFFFFFFFF),
@@ -336,7 +338,7 @@ fun AddAssetPage(navController: NavController) {
                         Text(
                             text = "Notes *",
                             fontFamily = latoFontFamily,
-                            color = AccentColor,
+                            color = PurpleOne,
                             fontSize = 16.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -358,7 +360,7 @@ fun AddAssetPage(navController: NavController) {
                             onValueChange = { notes = it },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = AccentColor,
+                                focusedBorderColor = PurpleOne,
                                 unfocusedBorderColor = Color(0x66ABABAB),
                                 focusedTextColor = Color(0xFFFFFFFF),
                                 unfocusedTextColor = Color(0xFFFFFFFF),
@@ -371,7 +373,7 @@ fun AddAssetPage(navController: NavController) {
                             onClick = {},
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            containerColor = AccentColor,
+                            containerColor = PurpleOne,
                             elevation = FloatingActionButtonDefaults.elevation(
                                 defaultElevation = 0.dp,
                                 pressedElevation = 0.dp,
