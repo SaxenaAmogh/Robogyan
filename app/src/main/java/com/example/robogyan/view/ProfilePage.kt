@@ -60,11 +60,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.SupabaseClientProvider
-import com.example.robogyan.ui.theme.AccentColor
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
+import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
@@ -163,7 +167,7 @@ fun ProfilePage(navController: NavController){
                                             .align(Alignment.CenterStart)
                                             .border(
                                                 width = 3.dp,
-                                                color = AccentColor,
+                                                color = PurpleOne,
                                                 shape = RoundedCornerShape(12.dp)
                                             )
                                     ) {
@@ -177,7 +181,7 @@ fun ProfilePage(navController: NavController){
                                                 .clickable {
                                                     navController.popBackStack()
                                                 },
-                                            tint = AccentColor
+                                            tint = PurpleOne
                                         )
                                     }
 //                                    Text(
@@ -233,14 +237,9 @@ fun ProfilePage(navController: NavController){
                             )  {
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .border(
-                                            width = 0.5.dp,
-                                            color = Color(0xFF2D2D2D),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .clip(RoundedCornerShape(20))
                                         .weight(1f)
-                                        .background(SecondaryColor)
+                                        .background(PurpleOne)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.03 * screenWidth
@@ -257,28 +256,24 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.member_d),
                                             contentDescription = "members",
                                             modifier = Modifier.size(38.dp),
-                                            tint = AccentColor
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Edit Members",
-                                            color = PrimaryColor,
+                                            color = Color.Black,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
                                 Spacer(modifier = Modifier.width(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .border(
-                                            width = 0.5.dp,
-                                            color = Color(0xFF2D2D2D),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .clip(RoundedCornerShape(20))
                                         .weight(1f)
-                                        .background(SecondaryColor)
+                                        .background(PrimaryText)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.03 * screenWidth
@@ -295,14 +290,15 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.update),
                                             contentDescription = "members",
                                             modifier = Modifier.size(38.dp),
-                                            tint = AccentColor
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Add New Update",
-                                            color = PrimaryColor,
+                                            color = Color.Black,
                                             fontSize = 18.sp,
                                             fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
@@ -314,14 +310,9 @@ fun ProfilePage(navController: NavController){
                             )  {
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .border(
-                                            width = 0.5.dp,
-                                            color = Color(0xFF2D2D2D),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .clip(RoundedCornerShape(20))
                                         .weight(1f)
-                                        .background(SecondaryColor)
+                                        .background(PinkOne)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.03 * screenWidth
@@ -338,12 +329,12 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.open),
                                             contentDescription = "members",
                                             modifier = Modifier.size(38.dp),
-                                            tint = AccentColor
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Open Lab",
-                                            color = PrimaryColor,
+                                            color = Color.Black,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -352,14 +343,9 @@ fun ProfilePage(navController: NavController){
                                 Spacer(modifier = Modifier.width(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .border(
-                                            width = 0.5.dp,
-                                            color = Color(0xFF2D2D2D),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .clip(RoundedCornerShape(20))
                                         .weight(1f)
-                                        .background(SecondaryColor)
+                                        .background(YellowOne)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.03 * screenWidth
@@ -376,12 +362,12 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.component),
                                             contentDescription = "members",
                                             modifier = Modifier.size(38.dp),
-                                            tint = AccentColor
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Edit Assets",
-                                            color = PrimaryColor,
+                                            color = Color.Black,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -390,14 +376,9 @@ fun ProfilePage(navController: NavController){
                                 Spacer(modifier = Modifier.width(0.02 * screenWidth))
                                 Column(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .border(
-                                            width = 0.5.dp,
-                                            color = Color(0xFF2D2D2D),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .clip(RoundedCornerShape(20))
                                         .weight(1f)
-                                        .background(SecondaryColor)
+                                        .background(PinkOne)
                                         .padding(
                                             horizontal = 0.02 * screenWidth,
                                             vertical = 0.03 * screenWidth
@@ -414,29 +395,29 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.projects_d),
                                             contentDescription = "members",
                                             modifier = Modifier.size(38.dp),
-                                            tint = AccentColor
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Add Project",
-                                            color = PrimaryColor,
+                                            color = Color.Black,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
                                         )
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.height(0.04 * screenHeight))
+                            Spacer(modifier = Modifier.height(0.03 * screenHeight))
                         }
                         item {
                             Column(
                                 modifier = Modifier
                                     .padding(horizontal = 0.035 * screenWidth)
-                                    .clip(RoundedCornerShape(16.dp))
+                                    .clip(RoundedCornerShape(20.dp))
                                     .border(
                                         width = 0.5.dp,
                                         color = Color(0xFF2D2D2D),
-                                        shape = RoundedCornerShape(16.dp)
+                                        shape = RoundedCornerShape(20.dp)
                                     )
                                     .background(SecondaryColor)
                                     .padding(
@@ -459,7 +440,7 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.edit),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
-                                            tint = AccentColor
+                                            tint = PurpleOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
@@ -475,7 +456,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clickable {},
-                                        tint = SecondaryText
+                                        tint = PurpleOne
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.012 * screenHeight))
@@ -493,7 +474,7 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.password),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
-                                            tint = AccentColor
+                                            tint = PinkOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
@@ -509,7 +490,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clickable {},
-                                        tint = SecondaryText
+                                        tint = PinkOne
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.012 * screenHeight))
@@ -527,7 +508,7 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.res_d),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
-                                            tint = AccentColor
+                                            tint = YellowOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
@@ -543,7 +524,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clickable {},
-                                        tint = SecondaryText
+                                        tint = YellowOne
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.012 * screenHeight))
@@ -561,7 +542,7 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.review),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
-                                            tint = AccentColor
+                                            tint = PinkOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
@@ -577,7 +558,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clickable {},
-                                        tint = SecondaryText
+                                        tint = PinkOne
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.012 * screenHeight))
@@ -602,7 +583,7 @@ fun ProfilePage(navController: NavController){
                                             painter = painterResource(R.drawable.logout),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
-                                            tint = AccentColor
+                                            tint = PurpleOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
@@ -618,7 +599,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clickable {},
-                                        tint = SecondaryText
+                                        tint = PurpleOne
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.01 * screenHeight))
