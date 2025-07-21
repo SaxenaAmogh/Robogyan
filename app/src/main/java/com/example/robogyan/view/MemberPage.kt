@@ -95,10 +95,10 @@ import kotlinx.coroutines.flow.Flow
 fun MemberPage(navController: NavController) {
 
     val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val context = LocalContext.current
 
 //    val viewModel: MemberViewModel = viewModel()
 //    val members by viewModel.members.collectAsState()
@@ -121,7 +121,6 @@ fun MemberPage(navController: NavController) {
     val allMemberFlow: Flow<List<AllMembers>> =
         AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
     val members by allMemberFlow.collectAsState(initial = emptyList())
-
 
     Log.e("@@Memb", "MemberPage: $members")
     var showSheet by remember { mutableStateOf(false) }

@@ -2,6 +2,7 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -59,6 +61,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.GunmetalGray
@@ -68,12 +71,15 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import io.github.jan.supabase.auth.auth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProjectPage(navController: NavController){
 
+    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
@@ -135,10 +141,14 @@ fun ProjectPage(navController: NavController){
                                         .padding(end = 0.035 * screenWidth)
                                         .align(Alignment.CenterEnd)
                                         .clickable {
-                                            navController.navigate("profile")
+                                            if (isloggedin) {
+                                                navController.navigate("profile")
+                                            }else {
+                                                Toast.makeText(context, "Login to view Profile", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                         .size(32.dp),
-                                    tint = Color.White
+                                    tint = if(isloggedin) Color.White else GunmetalGray
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
@@ -182,6 +192,18 @@ fun ProjectPage(navController: NavController){
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
                         }
                         item {
+                            if (!isloggedin){
+                                Text(
+                                    text = "To view full details, login first.",
+                                    color = PrimaryText,
+                                    fontSize = 20.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                            }
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(),
@@ -219,7 +241,7 @@ fun ProjectPage(navController: NavController){
                                             )
                                             Spacer(modifier = Modifier.size(10.dp))
                                             Text(
-                                                text = "5",
+                                                text = if(isloggedin) "5" else "?",
                                                 color = PrimaryColor,
                                                 fontSize = 30.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -377,7 +399,11 @@ fun ProjectPage(navController: NavController){
                                                 .fillMaxWidth()
                                                 .pointerInput(Unit) {
                                                     detectTapGestures(onTap = {
-                                                        navController.navigate("projectview")
+                                                        if(isloggedin) {
+                                                            navController.navigate("projectview")
+                                                        }else{
+                                                            Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                        }
                                                     })
                                                 },
                                             horizontalArrangement = Arrangement.SpaceBetween,

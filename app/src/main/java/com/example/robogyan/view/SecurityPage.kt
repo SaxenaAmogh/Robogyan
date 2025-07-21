@@ -3,6 +3,7 @@ package com.example.robogyan.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,10 +50,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,9 +65,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
+import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PeachOne
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
@@ -75,12 +80,15 @@ import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.GateLogsViewModel
+import io.github.jan.supabase.auth.auth
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SecurityPage(navController: NavController) {
 
+    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
@@ -142,435 +150,454 @@ fun SecurityPage(navController: NavController) {
                                         .padding(end = 0.035 * screenWidth)
                                         .align(Alignment.CenterEnd)
                                         .clickable {
-                                            navController.navigate("profile")
+                                            if (isloggedin) {
+                                                navController.navigate("profile")
+                                            }else {
+                                                Toast.makeText(context, "Login to view Profile", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                         .size(32.dp),
-                                    tint = Color.White
+                                    tint = if(isloggedin) Color.White else GunmetalGray
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
-                        item {
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .border(
-                                        width = 0.5.dp,
-                                        color = Color(0xFF2D2D2D),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .background(SecondaryColor)
-                                    .padding(
-                                        horizontal = 0.05 * screenWidth,
-                                        vertical = 0.03 * screenWidth
-                                    ),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Row(
+                        if (isloggedin){
+                            item {
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Column(
                                     modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.05 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        ),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        Text(
+                                            text = "Close Lab",
+                                            color = TextColor,
+                                            fontSize = 24.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        if (haveAccess){
+                                            Switch(
+                                                checked = gateStatus,
+                                                onCheckedChange = {
+                                                    focusManager.clearFocus()
+                                                    gateStatus = it
+                                                },
+                                                colors = SwitchColors(
+                                                    checkedThumbColor = Color.Black,
+                                                    uncheckedThumbColor = Color(0xFFB2B2B2),
+                                                    checkedTrackColor = PurpleOne,
+                                                    uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
+                                                    checkedBorderColor = Color.Transparent,
+                                                    checkedIconColor = Color.Transparent,
+                                                    uncheckedBorderColor = Color.Transparent,
+                                                    uncheckedIconColor = Color.Transparent,
+                                                    disabledCheckedThumbColor = Color.Transparent,
+                                                    disabledCheckedTrackColor = Color.Transparent,
+                                                    disabledCheckedBorderColor = Color.Transparent,
+                                                    disabledCheckedIconColor = Color.Transparent,
+                                                    disabledUncheckedThumbColor = Color.Transparent,
+                                                    disabledUncheckedTrackColor = Color.Transparent,
+                                                    disabledUncheckedBorderColor = Color.Transparent,
+                                                    disabledUncheckedIconColor = Color.Transparent,
+                                                )
+                                            )
+                                        }else{
+                                            Switch(
+                                                checked = gateStatus,
+                                                onCheckedChange = {
+                                                    focusManager.clearFocus()
+                                                },
+                                                colors = SwitchColors(
+                                                    checkedThumbColor = Color.Black,
+                                                    uncheckedThumbColor = Color(0xFFB2B2B2),
+                                                    checkedTrackColor = Color.Gray,
+                                                    uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
+                                                    checkedBorderColor = Color.Transparent,
+                                                    checkedIconColor = Color.Transparent,
+                                                    uncheckedBorderColor = Color.Transparent,
+                                                    uncheckedIconColor = Color.Transparent,
+                                                    disabledCheckedThumbColor = Color.Transparent,
+                                                    disabledCheckedTrackColor = Color.Transparent,
+                                                    disabledCheckedBorderColor = Color.Transparent,
+                                                    disabledCheckedIconColor = Color.Transparent,
+                                                    disabledUncheckedThumbColor = Color.Transparent,
+                                                    disabledUncheckedTrackColor = Color.Transparent,
+                                                    disabledUncheckedBorderColor = Color.Transparent,
+                                                    disabledUncheckedIconColor = Color.Transparent,
+                                                )
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                     Text(
-                                        text = "Close Lab",
+                                        text = "Last opened by Macle at 10:46 AM",
+                                        color = PrimaryText,
+                                        fontSize = 18.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                            }
+                            //Logs data
+                            item{
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = Color(0xFF2D2D2D),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .background(SecondaryColor)
+                                        .padding(
+                                            horizontal = 0.05 * screenWidth,
+                                            vertical = 0.03 * screenWidth
+                                        )
+                                ){
+                                    Text(
+                                        text = "Lab Access Logs",
                                         color = TextColor,
-                                        fontSize = 24.sp,
+                                        fontSize = 20.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    if (haveAccess){
-                                        Switch(
-                                            checked = gateStatus,
-                                            onCheckedChange = {
-                                                focusManager.clearFocus()
-                                                gateStatus = it
-                                            },
-                                            colors = SwitchColors(
-                                                checkedThumbColor = Color.Black,
-                                                uncheckedThumbColor = Color(0xFFB2B2B2),
-                                                checkedTrackColor = PurpleOne,
-                                                uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
-                                                checkedBorderColor = Color.Transparent,
-                                                checkedIconColor = Color.Transparent,
-                                                uncheckedBorderColor = Color.Transparent,
-                                                uncheckedIconColor = Color.Transparent,
-                                                disabledCheckedThumbColor = Color.Transparent,
-                                                disabledCheckedTrackColor = Color.Transparent,
-                                                disabledCheckedBorderColor = Color.Transparent,
-                                                disabledCheckedIconColor = Color.Transparent,
-                                                disabledUncheckedThumbColor = Color.Transparent,
-                                                disabledUncheckedTrackColor = Color.Transparent,
-                                                disabledUncheckedBorderColor = Color.Transparent,
-                                                disabledUncheckedIconColor = Color.Transparent,
-                                            )
+                                    Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                    if(gateLogs.isEmpty()){
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .size(20.dp),
+                                            color = PrimaryText
                                         )
-                                    }else{
-                                        Switch(
-                                            checked = gateStatus,
-                                            onCheckedChange = {
-                                                focusManager.clearFocus()
-                                            },
-                                            colors = SwitchColors(
-                                                checkedThumbColor = Color.Black,
-                                                uncheckedThumbColor = Color(0xFFB2B2B2),
-                                                checkedTrackColor = Color.Gray,
-                                                uncheckedTrackColor = Color(0xFFB2B2B2).copy(alpha = 0.5f),
-                                                checkedBorderColor = Color.Transparent,
-                                                checkedIconColor = Color.Transparent,
-                                                uncheckedBorderColor = Color.Transparent,
-                                                uncheckedIconColor = Color.Transparent,
-                                                disabledCheckedThumbColor = Color.Transparent,
-                                                disabledCheckedTrackColor = Color.Transparent,
-                                                disabledCheckedBorderColor = Color.Transparent,
-                                                disabledCheckedIconColor = Color.Transparent,
-                                                disabledUncheckedThumbColor = Color.Transparent,
-                                                disabledUncheckedTrackColor = Color.Transparent,
-                                                disabledUncheckedBorderColor = Color.Transparent,
-                                                disabledUncheckedIconColor = Color.Transparent,
-                                            )
+                                    }else {
+                                        repeat(5) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        horizontal = 16.dp
+                                                    ),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Text(
+                                                    text = "Amogh Saxena",
+                                                    color = PrimaryColor,
+                                                    fontSize = 16.sp,
+                                                    fontFamily = latoFontFamily,
+                                                )
+                                                Text(
+                                                    text = "11:30 AM",
+                                                    color = SecondaryText,
+                                                    fontSize = 15.sp,
+                                                    fontFamily = latoFontFamily,
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.size(6.dp))
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.size(0.03 * screenHeight))
+                            }
+                            item {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    color = Color(0xFF2D2D2D)
+                                )
+                                Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                                Text(
+                                    text = "Assets Inventory",
+                                    color = TextColor,
+                                    fontSize = 26.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
+                                FloatingActionButton(
+                                    onClick = {
+                                        navController.navigate("addasset")
+                                    },
+                                    containerColor = PurpleOne,
+                                    contentColor = Black,
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ){
+                                        Icon(
+                                            Icons.Rounded.Add,
+                                            contentDescription = "Add Asset",
+                                            modifier = Modifier.size(24.dp),
+                                            tint = Color.Black
+                                        )
+                                        Spacer(modifier = Modifier.size(4.dp))
+                                        Text(
+                                            text = "Add Component",
+                                            color = Color.Black,
+                                            fontSize = 18.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                Text(
-                                    text = "Last opened by Macle at 10:46 AM",
-                                    color = PrimaryText,
-                                    fontSize = 18.sp,
-                                    fontFamily = latoFontFamily,
-                                )
+                                Spacer(modifier = Modifier.size(0.02 * screenHeight))
                             }
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                        }
-                        //Logs data
-                        item{
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .border(
-                                        width = 0.5.dp,
-                                        color = Color(0xFF2D2D2D),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .background(SecondaryColor)
-                                    .padding(
-                                        horizontal = 0.05 * screenWidth,
-                                        vertical = 0.03 * screenWidth
-                                    )
-                            ){
-                                Text(
-                                    text = "Lab Access Logs",
-                                    color = TextColor,
-                                    fontSize = 20.sp,
-                                    fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                if(gateLogs.isEmpty()){
-                                    CircularProgressIndicator(
+                            item{
+                                Box(
+                                    modifier = Modifier
+                                        .padding(
+                                            horizontal = 10.dp
+                                        )
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(SecondaryColor)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onTap = {
+                                                navController.navigate("assetview")
+                                            })
+                                        }
+                                ) {
+                                    Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .size(20.dp),
-                                        color = PrimaryText
-                                    )
-                                }else {
-                                    repeat(5) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(
-                                                    horizontal = 16.dp
-                                                ),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
+                                            .padding(
+                                                12.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row {
                                             Text(
-                                                text = "Amogh Saxena",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
+                                                text = "05",
+                                                color = PinkOne,
+                                                fontSize = 18.sp,
                                                 fontFamily = latoFontFamily,
+                                                fontWeight = FontWeight.Bold,
                                             )
+                                            Spacer(modifier = Modifier.size(20.dp))
                                             Text(
-                                                text = "11:30 AM",
-                                                color = SecondaryText,
-                                                fontSize = 15.sp,
+                                                text = "LiPo Batteries",
+                                                color = PrimaryText,
+                                                fontSize = 18.sp,
                                                 fontFamily = latoFontFamily,
                                             )
                                         }
-                                        Spacer(modifier = Modifier.size(6.dp))
+                                        Icon(
+                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                            contentDescription = "View Details",
+                                            tint = PurpleOne,
+                                            modifier = Modifier
+                                                .size(28.dp),
+                                        )
                                     }
                                 }
-                            }
-                            Spacer(modifier = Modifier.size(0.03 * screenHeight))
-                        }
-                        item {
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                color = Color(0xFF2D2D2D)
-                            )
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
-                            Text(
-                                text = "Assets Inventory",
-                                color = TextColor,
-                                fontSize = 26.sp,
-                                fontFamily = latoFontFamily,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                            FloatingActionButton(
-                                onClick = {
-                                    navController.navigate("addasset")
-                                },
-                                containerColor = PurpleOne,
-                                contentColor = Black,
-                            ) {
-                                Row(
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Box(
                                     modifier = Modifier
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ){
-                                    Icon(
-                                        Icons.Rounded.Add,
-                                        contentDescription = "Add Asset",
-                                        modifier = Modifier.size(24.dp),
-                                        tint = Color.Black
-                                    )
-                                    Spacer(modifier = Modifier.size(4.dp))
-                                    Text(
-                                        text = "Add Component",
-                                        color = Color.Black,
-                                        fontSize = 18.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.size(0.02 * screenHeight))
-                        }
-                        item{
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        horizontal = 10.dp
-                                    )
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                                    .pointerInput(Unit) {
-                                    detectTapGestures(onTap = {
-                                        navController.navigate("assetview")
-                                    })
-                                }
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
                                         .padding(
-                                            12.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row {
-                                        Text(
-                                            text = "05",
-                                            color = PinkOne,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold,
+                                            horizontal = 10.dp
                                         )
-                                        Spacer(modifier = Modifier.size(20.dp))
-                                        Text(
-                                            text = "LiPo Batteries",
-                                            color = PrimaryText,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(SecondaryColor)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                12.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row {
+                                            Text(
+                                                text = "12",
+                                                color = PinkOne,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Spacer(modifier = Modifier.size(20.dp))
+                                            Text(
+                                                text = "ESP32 Boards",
+                                                color = PrimaryText,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                            )
+                                        }
+                                        Icon(
+                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                            contentDescription = "View Details",
+                                            tint = PurpleOne,
+                                            modifier = Modifier
+                                                .size(28.dp),
                                         )
                                     }
-                                    Icon(
-                                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                        contentDescription = "View Details",
-                                        tint = PurpleOne,
-                                        modifier = Modifier
-                                            .size(28.dp),
-                                    )
                                 }
-                            }
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        horizontal = 10.dp
-                                    )
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                            ) {
-                                Row(
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
                                         .padding(
-                                            12.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row {
-                                        Text(
-                                            text = "12",
-                                            color = PinkOne,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold,
+                                            horizontal = 10.dp
                                         )
-                                        Spacer(modifier = Modifier.size(20.dp))
-                                        Text(
-                                            text = "ESP32 Boards",
-                                            color = PrimaryText,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(SecondaryColor)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                12.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row {
+                                            Text(
+                                                text = "15",
+                                                color = PinkOne,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Spacer(modifier = Modifier.size(20.dp))
+                                            Text(
+                                                text = "Servo Motors",
+                                                color = PrimaryText,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                            )
+                                        }
+                                        Icon(
+                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                            contentDescription = "View Details",
+                                            tint = PurpleOne,
+                                            modifier = Modifier
+                                                .size(28.dp),
                                         )
                                     }
-                                    Icon(
-                                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                        contentDescription = "View Details",
-                                        tint = PurpleOne,
-                                        modifier = Modifier
-                                            .size(28.dp),
-                                    )
                                 }
-                            }
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        horizontal = 10.dp
-                                    )
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                            ) {
-                                Row(
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
                                         .padding(
-                                            12.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row {
-                                        Text(
-                                            text = "15",
-                                            color = PinkOne,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold,
+                                            horizontal = 10.dp
                                         )
-                                        Spacer(modifier = Modifier.size(20.dp))
-                                        Text(
-                                            text = "Servo Motors",
-                                            color = PrimaryText,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(SecondaryColor)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                12.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row {
+                                            Text(
+                                                text = "08",
+                                                color = PinkOne,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Spacer(modifier = Modifier.size(20.dp))
+                                            Text(
+                                                text = "Glue Gun Sticks",
+                                                color = PrimaryText,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                            )
+                                        }
+                                        Icon(
+                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                            contentDescription = "View Details",
+                                            tint = PurpleOne,
+                                            modifier = Modifier
+                                                .size(28.dp),
                                         )
                                     }
-                                    Icon(
-                                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                        contentDescription = "View Details",
-                                        tint = PurpleOne,
-                                        modifier = Modifier
-                                            .size(28.dp),
-                                    )
                                 }
-                            }
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        horizontal = 10.dp
-                                    )
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                            ) {
-                                Row(
+                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
                                         .padding(
-                                            12.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row {
-                                        Text(
-                                            text = "08",
-                                            color = PinkOne,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold,
+                                            horizontal = 10.dp
                                         )
-                                        Spacer(modifier = Modifier.size(20.dp))
-                                        Text(
-                                            text = "Glue Gun Sticks",
-                                            color = PrimaryText,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(SecondaryColor)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                12.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row {
+                                            Text(
+                                                text = "28",
+                                                color = PinkOne,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Spacer(modifier = Modifier.size(20.dp))
+                                            Text(
+                                                text = "Capacitors",
+                                                color = PrimaryText,
+                                                fontSize = 18.sp,
+                                                fontFamily = latoFontFamily,
+                                            )
+                                        }
+                                        Icon(
+                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                            contentDescription = "View Details",
+                                            tint = PurpleOne,
+                                            modifier = Modifier
+                                                .size(28.dp),
                                         )
                                     }
-                                    Icon(
-                                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                        contentDescription = "View Details",
-                                        tint = PurpleOne,
-                                        modifier = Modifier
-                                            .size(28.dp),
-                                    )
                                 }
+                                Spacer(modifier = Modifier.size(0.12 * screenHeight))
                             }
-                            Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        horizontal = 10.dp
-                                    )
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(SecondaryColor)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            12.dp
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row {
-                                        Text(
-                                            text = "28",
-                                            color = PinkOne,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                        Spacer(modifier = Modifier.size(20.dp))
-                                        Text(
-                                            text = "Capacitors",
-                                            color = PrimaryText,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                        )
-                                    }
-                                    Icon(
-                                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                        contentDescription = "View Details",
-                                        tint = PurpleOne,
-                                        modifier = Modifier
-                                            .size(28.dp),
-                                    )
-                                }
+                        }else{
+                            item {
+                                Spacer(modifier = Modifier.height(0.1 * screenHeight))
+                                Text(
+                                    text = "To view this page, login first...",
+                                    color = PrimaryText,
+                                    fontSize = 22.sp,
+                                    fontFamily = latoFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
                             }
-                            Spacer(modifier = Modifier.size(0.12 * screenHeight))
                         }
                     }
 

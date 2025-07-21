@@ -3,6 +3,7 @@ package com.example.robogyan.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -67,6 +69,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
@@ -76,17 +79,19 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import io.github.jan.supabase.auth.auth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ResourcesPage(navController: NavController) {
 
+    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val focusManager = LocalFocusManager.current
-    val context = LocalView.current.context
 
     var searchItem by remember { mutableStateOf("") }
 //    var selectedOption by remember { mutableIntStateOf(0) }
@@ -297,34 +302,33 @@ fun ResourcesPage(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         item {
-                            Row(
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.update),
-                                    contentDescription = "notification",
-                                    Modifier.size(32.dp),
-                                    tint = PrimaryText
-                                )
+                            ){
                                 Text(
-                                    text = "Resources & Docs",
-                                    color = TextColor,
-                                    fontSize = 20.sp,
+                                    text = "Resources",
+                                    color = Color.White,
+                                    fontSize = 25.sp,
                                     fontFamily = latoFontFamily,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 0.035 * screenWidth)
                                 )
                                 Icon(
                                     painter = painterResource(R.drawable.user),
                                     contentDescription = "account",
                                     modifier = Modifier
+                                        .padding(end = 0.035 * screenWidth)
+                                        .align(Alignment.CenterEnd)
                                         .clickable {
-                                            navController.navigate("profile")
+                                            if (isloggedin) {
+                                                navController.navigate("profile")
+                                            }else {
+                                                Toast.makeText(context, "Login to view Profile", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                         .size(32.dp),
-                                    tint = PrimaryText
+                                    tint = if(isloggedin) Color.White else GunmetalGray
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
