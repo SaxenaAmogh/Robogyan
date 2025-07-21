@@ -2,7 +2,6 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,10 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -58,22 +55,22 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.robogyan.R
 import com.example.robogyan.SupabaseClientProvider
-import com.example.robogyan.ui.theme.PurpleOne
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
-import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
-import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
-import com.example.robogyan.viewmodel.UserViewModel
 import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -91,30 +88,15 @@ fun ProfilePage(navController: NavController){
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
-//    val authViewModel: AuthViewModel = viewModel()
-//    val userViewModel: UserViewModel = viewModel()
-//    val currentUserId = remember { SupabaseClientProvider.client.auth.currentUserOrNull()?.id ?: "" }
+
+    val userId: String = SupabaseClientProvider.client.auth.currentUserOrNull()!!.id
+    val memberFlow: Flow<MemberData?> =
+        AppDatabase.getDatabase(context).memberDao().getMemberById(userId)
+
+    val member by memberFlow.collectAsState(initial = null)
+
+    val authViewModel: AuthViewModel = viewModel()
 //    val authState by authViewModel.authState.collectAsState()
-//    val userData by userViewModel.getMemberData(currentUserId).collectAsState(initial = null)
-
-//    LaunchedEffect(authState) {
-//        when (authState) {
-//            is AuthState.Idle -> {
-//                // User is logged out, navigate back to login screen
-//                // You'll need NavController here, as per our previous discussion
-//                // val navController = (LocalContext.current as Activity).findNavController(R.id.nav_host_fragment_container)
-////                navController.navigate("login") { popUpTo("home") { inclusive = true } }
-//                Log.d("@@logout", "User logged out, navigate to login.")
-//            }
-//            is AuthState.Error -> {
-//                println("Logout Error: ${(authState as AuthState.Error).message}")
-//            }
-//            AuthState.LoggedIn, AuthState.Loading -> {
-//                Log.d("@@Login", userData.toString())
-//            }
-//        }
-//    }
-
 
     Scaffold(
         content = {
@@ -147,8 +129,8 @@ fun ProfilePage(navController: NavController){
                                     )
                                     .background(BackgroundColor)
                             ) {
-                                Image(
-                                    painter = painterResource(R.drawable.me),
+                                AsyncImage(
+                                    model = member?.image,
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
@@ -184,15 +166,6 @@ fun ProfilePage(navController: NavController){
                                             tint = PurpleOne
                                         )
                                     }
-//                                    Text(
-//                                        text = "User Profile",
-//                                        color = Color.Black,
-//                                        fontSize = 20.sp,
-//                                        fontFamily = latoFontFamily,
-//                                        fontWeight = FontWeight.Bold,
-//                                        modifier = Modifier
-//                                            .align(Alignment.Center)
-//                                    )
                                 }
                                 Spacer(modifier = Modifier.height(0.04 * screenHeight))
                                 Column(
@@ -202,29 +175,31 @@ fun ProfilePage(navController: NavController){
                                         .align(Alignment.BottomCenter),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ){
-                                    Text(
-                                        text = "Amogh Saxena",
-                                        color = Color.White,
-                                        fontSize = 30.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily = latoFontFamily,
-                                        modifier = Modifier
-                                    )
-                                    Text(
-                                        text = "Software Lead",
-                                        color = Color.White,
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily = latoFontFamily,
-                                    )
-                                    Text(
-                                        text = "2024-2025",
-                                        color = Color(0xFF9F9F9F),
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily = latoFontFamily,
-                                        modifier = Modifier
-                                    )
+                                    member?.let { it1 ->
+                                        Text(
+                                            text = it1.name,
+                                            color = Color.White,
+                                            fontSize = 30.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier
+                                        )
+                                        Text(
+                                            text = it1.current_pos,
+                                            color = Color.White,
+                                            fontSize = 22.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                        )
+                                        Text(
+                                            text = it1.pos_period,
+                                            color = Color(0xFF9F9F9F),
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.height(0.05 * screenHeight))
                             }
@@ -572,9 +547,12 @@ fun ProfilePage(navController: NavController){
                                     Row(
                                         modifier = Modifier
                                             .clickable {
-//                                                authViewModel.logout()
-                                                navController.navigate("login")
-                                                navController.popBackStack()
+                                                authViewModel.logout()
+                                                context.deleteDatabase("robogyan_database")
+                                                navController.navigate("start") {
+                                                    popUpTo(0)
+                                                    launchSingleTop = true
+                                                }
                                             },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -582,7 +560,16 @@ fun ProfilePage(navController: NavController){
                                         Icon(
                                             painter = painterResource(R.drawable.logout),
                                             contentDescription = "members",
-                                            modifier = Modifier.size(34.dp),
+                                            modifier = Modifier
+                                                .size(34.dp)
+                                                .clickable {
+                                                    authViewModel.logout()
+                                                    context.deleteDatabase("robogyan_database")
+                                                    navController.navigate("start") {
+                                                        popUpTo(0) // Clears the entire backstack
+                                                        launchSingleTop = true
+                                                    }
+                                            },
                                             tint = PurpleOne
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
@@ -598,7 +585,14 @@ fun ProfilePage(navController: NavController){
                                         contentDescription = "Arrow Icon",
                                         modifier = Modifier
                                             .size(36.dp)
-                                            .clickable {},
+                                            .clickable {
+                                                authViewModel.logout()
+                                                context.deleteDatabase("robogyan_database")
+                                                navController.navigate("start") {
+                                                    popUpTo(0) // Clears the entire backstack
+                                                    launchSingleTop = true
+                                                }
+                                            },
                                         tint = PurpleOne
                                     )
                                 }

@@ -2,6 +2,7 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +37,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,15 +46,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.MemberViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -62,6 +70,7 @@ fun StartPage(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
+    val context = LocalContext.current
 
     var animate by remember { mutableStateOf(false)}
     val coroutineScope = rememberCoroutineScope()
@@ -78,6 +87,11 @@ fun StartPage(navController: NavController) {
         targetValue = scale,
         animationSpec = tween(durationMillis = 1000) // 1 second animation
     )
+
+    val memberViewModel: MemberViewModel = viewModel()
+    LaunchedEffect(Unit) {
+        AppDatabase.getDatabase(context)
+    }
 
     Scaffold(
         content = {
@@ -173,6 +187,11 @@ fun StartPage(navController: NavController) {
                             Spacer(modifier = Modifier.height(10.dp))
                             FloatingActionButton(
                                 onClick = {
+                                    Log.e("@@Start", "guest")
+                                    memberViewModel.fetchMembers()
+                                    navController.navigate("home") {
+                                        popUpTo("start") { inclusive = true }
+                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth().size(if (animate) 0.dp else 60.dp),
                                 containerColor = Color(0xFFe9e5da),

@@ -2,11 +2,10 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material3.CircularProgressIndicator
@@ -62,16 +60,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
-import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
-import com.example.robogyan.ui.theme.SecondaryText
-import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
+import com.example.robogyan.viewmodel.MemberViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UseOfNonLambdaOffsetOverload")
@@ -88,8 +86,9 @@ fun LoginPage(navController: NavController) {
     var password by remember { mutableStateOf("") }
 
     val authViewModel: AuthViewModel = viewModel()
+    val memberViewModel: MemberViewModel = viewModel()
     val onLoginSuccess : () -> Unit = {
-//        Toast.makeText(context, "Logged in!")
+        memberViewModel.fetchMembers()
     }
     val onNavigateToHome : () -> Unit = {
         navController.navigate("home"){
@@ -166,7 +165,7 @@ fun LoginPage(navController: NavController) {
                             Text(
                                 text = "Welcome Back!",
                                 fontFamily = latoFontFamily,
-                                color = AccentColor,
+                                color = PrimaryText,
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -174,7 +173,7 @@ fun LoginPage(navController: NavController) {
                             Column {
                                 Text(
                                     text = "Email Address",
-                                    color = AccentColor,
+                                    color = PrimaryText,
                                     fontSize = 16.sp,
                                     fontFamily = latoFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -184,7 +183,7 @@ fun LoginPage(navController: NavController) {
                                     colors = TextFieldDefaults.outlinedTextFieldColors(
                                         focusedBorderColor = PrimaryColor,
                                         unfocusedBorderColor = GunmetalGray,
-                                        cursorColor = AccentColor,
+                                        cursorColor = PurpleOne,
                                         containerColor = SecondaryColor,
                                     ),
                                     modifier = Modifier
@@ -195,7 +194,7 @@ fun LoginPage(navController: NavController) {
                                             Icons.Rounded.MailOutline,
                                             modifier = Modifier.size(28.dp),
                                             contentDescription = "search",
-                                            tint = AccentColor
+                                            tint = PurpleOne
                                         )
                                     },
                                     keyboardActions = KeyboardActions(
@@ -219,7 +218,7 @@ fun LoginPage(navController: NavController) {
                             Column {
                                 Text(
                                     text = "Password",
-                                    color = AccentColor,
+                                    color = PrimaryText,
                                     fontSize = 16.sp,
                                     fontFamily = latoFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -229,7 +228,7 @@ fun LoginPage(navController: NavController) {
                                     colors = TextFieldDefaults.outlinedTextFieldColors(
                                         focusedBorderColor = PrimaryColor,
                                         unfocusedBorderColor = GunmetalGray,
-                                        cursorColor = AccentColor,
+                                        cursorColor = PurpleOne,
                                         containerColor = SecondaryColor,
                                     ),
                                     modifier = Modifier
@@ -240,7 +239,7 @@ fun LoginPage(navController: NavController) {
                                             Icons.Rounded.Lock,
                                             modifier = Modifier.size(28.dp),
                                             contentDescription = "search",
-                                            tint = AccentColor
+                                            tint = PurpleOne
                                         )
                                     },
                                     keyboardActions = KeyboardActions(
@@ -263,10 +262,13 @@ fun LoginPage(navController: NavController) {
                             Spacer(modifier = Modifier.height(0.04 * screenHeight))
                             FloatingActionButton(
                                 onClick = {
+                                    if (email.isBlank() || password.isBlank()){
+                                        Toast.makeText(context, "Enter all values.", Toast.LENGTH_SHORT).show()
+                                    }
                                     authViewModel.loginWithEmailAndPassword(email, password)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                containerColor =AccentColor,
+                                containerColor =PurpleOne,
                             ) {
                                 if (authState is AuthState.Loading) {
                                     CircularProgressIndicator(color = PrimaryColor, modifier = Modifier.size(24.dp))
@@ -280,12 +282,10 @@ fun LoginPage(navController: NavController) {
                                     )
                                 }
                             }
-                            if (authState is AuthState.Error) {
-                                Text(
-                                    text = (authState as AuthState.Error).message,
-                                    color = PrimaryColor,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                )
+                            LaunchedEffect(authState) {
+                                if (authState is AuthState.Error) {
+                                    Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     }

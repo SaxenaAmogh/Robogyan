@@ -11,7 +11,6 @@ data class Member(
     val batch: String,
     val current_pos: String,
     val pos_period: String,
-    val past_pos: List<String>? = null,
     val is_alumni: Boolean,
     val lab_access: Boolean = false,
     val clearance: String,

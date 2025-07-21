@@ -1,6 +1,7 @@
 package com.example.robogyan.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -26,7 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.BackgroundColor
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.delay
 
 @SuppressLint("UseOfNonLambdaOffsetOverload")
@@ -42,9 +45,19 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         scale = 1f
         delay(1200)
-         navController.navigate("start") {
-             popUpTo("splash") { inclusive = true }
-         }
+        val isLoggedIn = SupabaseClientProvider.client.auth.currentUserOrNull() != null
+
+        if (isLoggedIn) {
+            Log.e("@@LOgin", isLoggedIn.toString())
+            navController.navigate("home") {
+                popUpTo("splash") { inclusive = true }
+            }
+        } else {
+            Log.e("@@LOginNO", isLoggedIn.toString())
+            navController.navigate("start") {
+                popUpTo("splash") { inclusive = true }
+            }
+        }
     }
 
     Scaffold(

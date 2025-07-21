@@ -4,16 +4,24 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.robogyan.data.local.dao.AllMembersDao
 import com.example.robogyan.data.local.dao.MemberDao
+import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.MemberData
 
-@Database(entities = [MemberData::class], version = 1, exportSchema = false)
+@Database(
+    entities = [MemberData::class, AllMembers::class],
+    version = 3,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     /**
      * Provides the DAO for MemberData operations.
      */
     abstract fun memberDao(): MemberDao
+    abstract fun allMembersDao(): AllMembersDao
 
     companion object {
         // @Volatile annotation ensures that INSTANCE is always up-to-date and visible to all threads.

@@ -1,6 +1,8 @@
 package com.example.robogyan.view
 
 import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -65,6 +68,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.AllMembers
+import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.model.Member
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
@@ -80,19 +87,23 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.MemberViewModel
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemberPage(navController: NavController) {
 
+    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
+    val context = LocalContext.current
 
-    val viewModel: MemberViewModel = viewModel()
-    val members by viewModel.members.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    var member by remember { mutableStateOf(Member(
+//    val viewModel: MemberViewModel = viewModel()
+//    val members by viewModel.members.collectAsState()
+//    val isLoading by viewModel.isLoading.collectAsState()
+    var member by remember { mutableStateOf(AllMembers(
         id = "",
         name = "",
         email = "",
@@ -104,10 +115,15 @@ fun MemberPage(navController: NavController) {
         lab_access = false,
         batch = "",
         clearance = "",
-        past_pos = emptyList(),
         is_alumni = false
     )) }
 
+    val allMemberFlow: Flow<List<AllMembers>> =
+        AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
+    val members by allMemberFlow.collectAsState(initial = emptyList())
+
+
+    Log.e("@@Memb", "MemberPage: $members")
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var searchItem by remember { mutableStateOf("") }
@@ -165,10 +181,14 @@ fun MemberPage(navController: NavController) {
                                         .padding(end = 0.035 * screenWidth)
                                         .align(Alignment.CenterEnd)
                                         .clickable {
-                                            navController.navigate("profile")
+                                            if (isloggedin) {
+                                                navController.navigate("profile")
+                                            }else {
+                                                Toast.makeText(context, "Login to view Profile", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                         .size(32.dp),
-                                    tint = Color.White
+                                    tint = if(isloggedin) Color.White else GunmetalGray
                                 )
                             }
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
@@ -281,7 +301,7 @@ fun MemberPage(navController: NavController) {
                             Spacer(modifier = Modifier.size(0.015 * screenHeight))
                         }
                         item{
-                            if (isLoading){
+                            if (members.isEmpty()){
                                 CircularProgressIndicator(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -292,25 +312,24 @@ fun MemberPage(navController: NavController) {
                             else {
                                 val filteredMembers = members
                                     .filter { memberx ->
+                                        val isAlumni = memberx.is_alumni == true
+
                                         if (currentMember) {
-                                            !memberx.is_alumni && (
-                                                    memberx.name.contains(searchItem, ignoreCase = true) ||
-                                                            memberx.enrollment.contains(searchItem, ignoreCase = true)
-                                                    )
+                                            // Show current members only (not alumni)
+                                            !isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
                                         } else {
-                                            memberx.is_alumni && (
-                                                    memberx.name.contains(searchItem, ignoreCase = true) ||
-                                                            memberx.enrollment.contains(searchItem, ignoreCase = true)
-                                                    )
+                                            // Show alumni only
+                                            isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
                                         }
                                     }
                                     .sortedWith(compareBy { m ->
                                         when {
-                                            currentMember && m.current_pos.equals("Software Lead", ignoreCase = true) -> 0
-                                            currentMember && m.current_pos.equals("Hardware Lead", ignoreCase = true) -> 1
+                                            currentMember && m.current_pos.equals("President", ignoreCase = true) -> 0
+                                            currentMember && m.current_pos.equals("Vice President", ignoreCase = true) -> 1
                                             else -> 2
                                         }
                                     })
+
                                 filteredMembers.forEach() {
                                     Column(
                                         modifier = Modifier
@@ -318,7 +337,7 @@ fun MemberPage(navController: NavController) {
                                             .clip(RoundedCornerShape(25.dp))
                                             .border(
                                                 width = 2.dp,
-                                                color = if (it.is_alumni) PinkOne else PurpleOne,
+                                                color = if (it.is_alumni == true) PinkOne else PurpleOne,
                                                 shape = RoundedCornerShape(25.dp)
                                             )
                                             .padding(
@@ -414,7 +433,7 @@ fun MemberPage(navController: NavController) {
                                         .padding(10.dp)
                                         .width(50.dp)
                                         .height(5.dp)
-                                        .background(if (member.is_alumni) PinkOne else PurpleOne, shape = RoundedCornerShape(50))
+                                        .background(if (member.is_alumni == true) PinkOne else PurpleOne, shape = RoundedCornerShape(50))
                                 )
                                 Column(
                                     modifier = Modifier
@@ -423,52 +442,21 @@ fun MemberPage(navController: NavController) {
                                             start = 0.035 * screenWidth,
                                             end = 0.035 * screenWidth,
                                             bottom = 0.02 * screenHeight
-                                        )
+                                        ),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        AsyncImage(
-                                            model = member.image,
-                                            contentDescription = "Profile",
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(30.dp))
-                                                .size(130.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = if (member.is_alumni) PinkOne else PurpleOne,
-                                                    shape = RoundedCornerShape(30.dp)
-                                                )
-                                        )
-                                        Spacer(modifier = Modifier.size(0.05 * screenWidth))
-                                        Column{
-                                            Text(
-                                                text = member.name,
-                                                color = PrimaryText,
-                                                fontSize = 22.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier
+                                    AsyncImage(
+                                        model = member.image,
+                                        contentDescription = "Profile",
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(30.dp))
+                                            .width(250.dp)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (member.is_alumni == true) PinkOne else PurpleOne,
+                                                shape = RoundedCornerShape(30.dp)
                                             )
-                                            Text(
-                                                text = member.current_pos,
-                                                color = PrimaryColor,
-                                                fontSize = 18.sp,
-                                                fontWeight = FontWeight.W500,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                            Text(
-                                                text = member.pos_period,
-                                                color = Color.Gray,
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.W500,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier
-                                            )
-                                        }
-                                    }
+                                    )
                                     Spacer(modifier = Modifier.size(0.015 * screenHeight))
                                     Row(
                                         modifier = Modifier
@@ -565,7 +553,7 @@ fun MemberPage(navController: NavController) {
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : ${if (member.lab_access) "Yes" else "No"}",
+                                            text = " : ${if (member.lab_access == true) "Yes" else "No"}",
                                             color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
@@ -618,32 +606,6 @@ fun MemberPage(navController: NavController) {
                                         )
                                         Text(
                                             text = " : ${member.clearance}",
-                                            color = PrimaryColor,
-                                            fontFamily = latoFontFamily,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.W500,
-                                            modifier = Modifier
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.size(0.005 * screenHeight))
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                horizontal = 0.035 * screenWidth
-                                            ),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            text = "Past Positions",
-                                            color = Color.Gray,
-                                            fontFamily = latoFontFamily,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.W500,
-                                            textDecoration = TextDecoration.Underline,
-                                        )
-                                        Text(
-                                            text = " : ${member.past_pos?.joinToString(", ") ?: "None"}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,

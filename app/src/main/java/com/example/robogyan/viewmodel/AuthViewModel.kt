@@ -1,12 +1,18 @@
 package com.example.robogyan.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.MemberData
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.postgrest.from
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +29,7 @@ sealed class AuthState { // Renamed from LoginState to AuthState for broader sco
     data class Error(val message: String) : AuthState()
 }
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // MutableStateFlow to hold the current authentication state, private to prevent external modification.
     private val _authState = MutableStateFlow<AuthState>(com.example.robogyan.viewmodel.AuthState.Idle)
@@ -49,13 +55,19 @@ class AuthViewModel : ViewModel() {
                     this.password = password
                 }
                 _authState.value = com.example.robogyan.viewmodel.AuthState.LoggedIn
+                fetchData()
             } catch (e: RestException) {
-                // Catch specific Supabase REST API exceptions (e.g., wrong credentials).
-                // Extract the error message or provide a default.
-                _authState.value = com.example.robogyan.viewmodel.AuthState.Error(e.message ?: "Authentication failed: Unknown Supabase error")
+                val cleanMessage = when {
+                    "invalid login credentials" in e.message.orEmpty().lowercase() ->
+                        "Incorrect email or password"
+                    "network" in e.message.orEmpty().lowercase() ->
+                        "Check your internet connection"
+                    else ->
+                        "Authentication failed. Please try again"
+                }
+                _authState.value = com.example.robogyan.viewmodel.AuthState.Error(cleanMessage)
             } catch (e: Exception) {
-                // Catch any other unexpected exceptions during the process.
-                _authState.value = com.example.robogyan.viewmodel.AuthState.Error("An unexpected error occurred: ${e.localizedMessage ?: "Unknown error"}")
+                _authState.value = com.example.robogyan.viewmodel.AuthState.Error("Unexpected error: ${e.localizedMessage ?: "Unknown error"}")
             }
         }
     }
@@ -66,6 +78,9 @@ class AuthViewModel : ViewModel() {
             try {
                 // Call the Supabase client's signOut function to terminate the user's session.
                 SupabaseClientProvider.client.auth.signOut()
+                CoroutineScope(Dispatchers.IO).launch {
+                    AppDatabase.getDatabase(getApplication()).memberDao().deleteAllMembers()
+                }
                 // If logout is successful, reset the state to Idle (meaning no user is logged in).
                 _authState.value = com.example.robogyan.viewmodel.AuthState.Idle
             } catch (e: RestException) {
@@ -75,6 +90,22 @@ class AuthViewModel : ViewModel() {
                 // Catch any other unexpected exceptions during the logout process.
                 _authState.value = com.example.robogyan.viewmodel.AuthState.Error("An unexpected error occurred during logout: ${e.localizedMessage ?: "Unknown error"}")
             }
+        }
+    }
+
+    suspend fun fetchData(){
+        val user = SupabaseClientProvider.client.auth.retrieveUserForCurrentSession(updateSession = true)
+        val memberData = SupabaseClientProvider.client
+            .from("members")
+            .select {
+                filter {
+                    eq("id", user.id)
+                }
+            }
+            .decodeSingle<MemberData>()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.getDatabase(getApplication()).memberDao().insertMember(memberData)
         }
     }
 
