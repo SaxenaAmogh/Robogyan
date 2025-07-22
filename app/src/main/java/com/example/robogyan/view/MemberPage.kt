@@ -72,7 +72,6 @@ import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.MemberData
-import com.example.robogyan.model.Member
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
@@ -86,6 +85,7 @@ import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.utils.SharedPrefManager
 import com.example.robogyan.viewmodel.MemberViewModel
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.Flow
@@ -94,8 +94,8 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun MemberPage(navController: NavController) {
 
-    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
     val context = LocalContext.current
+    val isloggedin = SharedPrefManager.isLoggedIn(context)
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
@@ -122,7 +122,6 @@ fun MemberPage(navController: NavController) {
         AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
     val members by allMemberFlow.collectAsState(initial = emptyList())
 
-    Log.e("@@Memb", "MemberPage: $members")
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var searchItem by remember { mutableStateOf("") }

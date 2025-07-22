@@ -68,6 +68,7 @@ import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.utils.SharedPrefManager
 import com.example.robogyan.viewmodel.AuthViewModel
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.Flow
@@ -92,7 +93,6 @@ fun ProfilePage(navController: NavController){
     val userId: String = SupabaseClientProvider.client.auth.currentUserOrNull()!!.id
     val memberFlow: Flow<MemberData?> =
         AppDatabase.getDatabase(context).memberDao().getMemberById(userId)
-
     val member by memberFlow.collectAsState(initial = null)
 
     val authViewModel: AuthViewModel = viewModel()
@@ -548,6 +548,7 @@ fun ProfilePage(navController: NavController){
                                         modifier = Modifier
                                             .clickable {
                                                 authViewModel.logout()
+                                                SharedPrefManager.clear(context)
                                                 context.deleteDatabase("robogyan_database")
                                                 navController.navigate("start") {
                                                     popUpTo(0)
@@ -564,6 +565,7 @@ fun ProfilePage(navController: NavController){
                                                 .size(34.dp)
                                                 .clickable {
                                                     authViewModel.logout()
+                                                    SharedPrefManager.clear(context)
                                                     context.deleteDatabase("robogyan_database")
                                                     navController.navigate("start") {
                                                         popUpTo(0) // Clears the entire backstack
@@ -587,6 +589,7 @@ fun ProfilePage(navController: NavController){
                                             .size(36.dp)
                                             .clickable {
                                                 authViewModel.logout()
+                                                SharedPrefManager.clear(context)
                                                 context.deleteDatabase("robogyan_database")
                                                 navController.navigate("start") {
                                                     popUpTo(0) // Clears the entire backstack

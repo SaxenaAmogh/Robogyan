@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -29,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.ui.theme.BackgroundColor
+import com.example.robogyan.utils.SharedPrefManager
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.delay
 
@@ -36,6 +38,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
 
+    val context = LocalContext.current
     var scale by remember { mutableFloatStateOf(0.3f) } // Start at 50% scale
     val animatedScale: Float by animateFloatAsState(
         targetValue = scale,
@@ -45,7 +48,7 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         scale = 1f
         delay(1200)
-        val isLoggedIn = SupabaseClientProvider.client.auth.currentUserOrNull() != null
+        val isLoggedIn = SharedPrefManager.isLoggedIn(context)
 
         if (isLoggedIn) {
             Log.e("@@LOgin", isLoggedIn.toString())

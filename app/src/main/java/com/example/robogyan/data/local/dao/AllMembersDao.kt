@@ -7,7 +7,6 @@ import androidx.room.Query
 import com.example.robogyan.data.local.entities.AllMembers
 import kotlinx.coroutines.flow.Flow
 
-
 @Dao
 interface AllMembersDao {
 

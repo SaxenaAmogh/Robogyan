@@ -71,6 +71,7 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.utils.SharedPrefManager
 import io.github.jan.supabase.auth.auth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,8 +79,8 @@ import io.github.jan.supabase.auth.auth
 @Composable
 fun ProjectPage(navController: NavController){
 
-    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
     val context = LocalContext.current
+    val isloggedin = SharedPrefManager.isLoggedIn(context)
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp

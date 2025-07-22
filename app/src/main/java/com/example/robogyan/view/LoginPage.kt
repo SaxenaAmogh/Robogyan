@@ -69,6 +69,7 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
+import com.example.robogyan.viewmodel.InventoryViewModel
 import com.example.robogyan.viewmodel.MemberViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,13 +83,23 @@ fun LoginPage(navController: NavController) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
+    if (windowInsetsController != null) {
+        windowInsetsController.isAppearanceLightStatusBars = false
+    }
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val authViewModel: AuthViewModel = viewModel()
     val memberViewModel: MemberViewModel = viewModel()
+    val inventoryViewModel: InventoryViewModel = viewModel()
+
     val onLoginSuccess : () -> Unit = {
         memberViewModel.fetchMembers()
+        inventoryViewModel.fetchAssets()
     }
     val onNavigateToHome : () -> Unit = {
         navController.navigate("home"){
@@ -98,13 +109,6 @@ fun LoginPage(navController: NavController) {
         }
     }
     val authState by authViewModel.authState.collectAsState()
-
-    val view = LocalView.current
-    val window = (view.context as? Activity)?.window
-    val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
-    if (windowInsetsController != null) {
-        windowInsetsController.isAppearanceLightStatusBars = false
-    }
 
     LaunchedEffect(authState) {
         when (authState) {

@@ -4,8 +4,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.robogyan.view.secpages.AddAssetPage
 import com.example.robogyan.view.secpages.AssetViewPage
 import com.example.robogyan.view.secpages.ProjectViewPage
@@ -49,8 +51,12 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         //secondary pages
-        composable("assetview"){
-            AssetViewPage(navController)
+        composable(
+            route = "assetview/{assetId}",
+            arguments = listOf(navArgument("assetId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val assetId = backStackEntry.arguments?.getInt("assetId") ?: 0
+            AssetViewPage(navController, assetId)
         }
         composable("addasset"){
             AddAssetPage(navController)

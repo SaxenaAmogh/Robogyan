@@ -3,7 +3,6 @@ package com.example.robogyan.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
@@ -13,18 +12,13 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MemberViewModel(application: Application) : AndroidViewModel(application) {
 
     private val supabase = SupabaseClientProvider.client
-
     private val _members = MutableStateFlow<List<AllMembers>>(emptyList())
-    val members: StateFlow<List<AllMembers>> = _members
-
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
 
     fun fetchMembers() {
         viewModelScope.launch {
@@ -68,7 +62,6 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
 
             } catch (e: Exception) {
                 Log.e("@@Error", "fetchMembers: $e")
-                // Optionally log or handle the error
                 e.printStackTrace()
                 _members.value = emptyList()
             } finally {

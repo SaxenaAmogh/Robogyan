@@ -26,21 +26,28 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,6 +73,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.AllMembers
+import com.example.robogyan.data.local.entities.Inventory
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.Black
@@ -79,27 +89,27 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
-import com.example.robogyan.viewmodel.GateLogsViewModel
+import com.example.robogyan.utils.SharedPrefManager
+import com.example.robogyan.viewmodel.InventoryViewModel
 import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SecurityPage(navController: NavController) {
 
-    val isloggedin = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
     val context = LocalContext.current
+    val isloggedin = SharedPrefManager.isLoggedIn(context)
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val focusManager = LocalFocusManager.current
 
-//    var searchItem by remember { mutableStateOf("") }
+    var searchItem by remember { mutableStateOf("") }
     val haveAccess by remember { mutableStateOf(true) }
-//    val memberViewModel: MemberViewModel = viewModel()
-//    val members by memberViewModel.members.observeAsState(emptyList())
-    val gateLogViewModel: GateLogsViewModel = viewModel()
-    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
     var gateStatus by remember { mutableStateOf(true) }
 
     val view = LocalView.current
@@ -107,6 +117,16 @@ fun SecurityPage(navController: NavController) {
     val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, view) }
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
+    }
+
+    val inventoryViewModel: InventoryViewModel = viewModel()
+    val assetData by inventoryViewModel.inventoryFlow.collectAsState()
+    var showAssets by remember { mutableStateOf(false) }
+    var assetId by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        delay(400)
+        showAssets = true
     }
 
     Scaffold(
@@ -123,6 +143,11 @@ fun SecurityPage(navController: NavController) {
                         .padding(
                             horizontal = 0.035 * screenWidth
                         )
+                        .pointerInput(Unit){
+                            detectTapGestures {
+                                focusManager.clearFocus()
+                            }
+                        }
                 ) {
                     LazyColumn(
                         modifier = Modifier
@@ -282,39 +307,15 @@ fun SecurityPage(navController: NavController) {
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                    if(gateLogs.isEmpty()){
-                                        CircularProgressIndicator(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .size(20.dp),
-                                            color = PrimaryText
-                                        )
-                                    }else {
-                                        repeat(5) {
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(
-                                                        horizontal = 16.dp
-                                                    ),
-                                                horizontalArrangement = Arrangement.SpaceBetween
-                                            ) {
-                                                Text(
-                                                    text = "Amogh Saxena",
-                                                    color = PrimaryColor,
-                                                    fontSize = 16.sp,
-                                                    fontFamily = latoFontFamily,
-                                                )
-                                                Text(
-                                                    text = "11:30 AM",
-                                                    color = SecondaryText,
-                                                    fontSize = 15.sp,
-                                                    fontFamily = latoFontFamily,
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.size(6.dp))
-                                        }
-                                    }
+                                    Text(
+                                        text = "No logs currently available.",
+                                        color = PrimaryText,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = latoFontFamily,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    )
                                 }
                                 Spacer(modifier = Modifier.size(0.03 * screenHeight))
                             }
@@ -364,224 +365,131 @@ fun SecurityPage(navController: NavController) {
                                 Spacer(modifier = Modifier.size(0.02 * screenHeight))
                             }
                             item{
-                                Box(
+                                OutlinedTextField(
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        focusedBorderColor = PrimaryColor,
+                                        unfocusedBorderColor = GunmetalGray,
+                                        cursorColor = AccentColor,
+                                        containerColor = SecondaryColor,
+                                    ),
                                     modifier = Modifier
-                                        .padding(
-                                            horizontal = 10.dp
-                                        )
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SecondaryColor)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(onTap = {
-                                                navController.navigate("assetview")
-                                            })
-                                        }
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                12.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row {
-                                            Text(
-                                                text = "05",
-                                                color = PinkOne,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Spacer(modifier = Modifier.size(20.dp))
-                                            Text(
-                                                text = "LiPo Batteries",
-                                                color = PrimaryText,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
+                                        .fillMaxWidth(),
+                                    shape = RoundedCornerShape(35),
+                                    leadingIcon = {
                                         Icon(
-                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                            contentDescription = "View Details",
-                                            tint = PurpleOne,
-                                            modifier = Modifier
-                                                .size(28.dp),
+                                            modifier = Modifier.size(22.dp),
+                                            painter = painterResource(id = R.drawable.search),
+                                            contentDescription = "search",
+                                            tint = PurpleOne
+                                        )
+                                    },
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            focusManager.clearFocus()
+                                        }
+                                    ),
+                                    singleLine = true,
+                                    value = searchItem,
+                                    onValueChange = { searchItem = it },
+                                    placeholder = {
+                                        Text(
+                                            color = TextColor,
+                                            text = "Search for a member",
+                                            fontFamily = latoFontFamily,
                                         )
                                     }
-                                }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                Box(
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 10.dp
-                                        )
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SecondaryColor)
-                                ) {
-                                    Row(
+                                )
+                                Spacer(modifier = Modifier.size(0.015 * screenHeight))
+                                if (showAssets){
+                                    val filteredAssetData = assetData
+                                        .filter { asset ->
+                                            asset.name.contains(searchItem, ignoreCase = true)
+                                        }
+
+                                    filteredAssetData.forEach{
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 10.dp
+                                                )
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(SecondaryColor)
+                                                .clickable(
+                                                    onClick ={
+                                                        assetId = it.id
+                                                        navController.navigate("assetview/$assetId")
+                                                    }
+                                                )
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        12.dp
+                                                    )
+                                                    .clickable(
+                                                        onClick ={
+                                                            assetId = it.id
+                                                            navController.navigate("assetview/$assetId")
+                                                        }
+                                                    ),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .weight(0.9f)
+                                                        .clickable(
+                                                            onClick ={
+                                                                assetId = it.id
+                                                                navController.navigate("assetview/$assetId")
+                                                            }
+                                                        )
+                                                ) {
+                                                    Text(
+                                                        text = it.available.toString(),
+                                                        color = PinkOne,
+                                                        fontSize = 18.sp,
+                                                        fontFamily = latoFontFamily,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier
+                                                            .weight(0.1f)
+                                                    )
+                                                    Spacer(modifier = Modifier.size(20.dp))
+                                                    Text(
+                                                        text = it.name,
+                                                        color = PrimaryText,
+                                                        fontSize = 18.sp,
+                                                        fontFamily = latoFontFamily,
+                                                        modifier = Modifier
+                                                            .weight(0.8f)
+                                                    )
+                                                }
+                                                Icon(
+                                                    Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                                    contentDescription = "View Details",
+                                                    tint = PurpleOne,
+                                                    modifier = Modifier
+                                                        .size(28.dp)
+                                                        .weight(0.1f)
+                                                        .clickable(
+                                                            onClick ={
+                                                                assetId = it.id
+                                                                navController.navigate("assetview/$assetId")
+                                                            }
+                                                        ),
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                    }
+                                }else{
+                                    CircularProgressIndicator(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(
-                                                12.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row {
-                                            Text(
-                                                text = "12",
-                                                color = PinkOne,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Spacer(modifier = Modifier.size(20.dp))
-                                            Text(
-                                                text = "ESP32 Boards",
-                                                color = PrimaryText,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Icon(
-                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                            contentDescription = "View Details",
-                                            tint = PurpleOne,
-                                            modifier = Modifier
-                                                .size(28.dp),
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                Box(
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 10.dp
-                                        )
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SecondaryColor)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                12.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row {
-                                            Text(
-                                                text = "15",
-                                                color = PinkOne,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Spacer(modifier = Modifier.size(20.dp))
-                                            Text(
-                                                text = "Servo Motors",
-                                                color = PrimaryText,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Icon(
-                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                            contentDescription = "View Details",
-                                            tint = PurpleOne,
-                                            modifier = Modifier
-                                                .size(28.dp),
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                Box(
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 10.dp
-                                        )
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SecondaryColor)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                12.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row {
-                                            Text(
-                                                text = "08",
-                                                color = PinkOne,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Spacer(modifier = Modifier.size(20.dp))
-                                            Text(
-                                                text = "Glue Gun Sticks",
-                                                color = PrimaryText,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Icon(
-                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                            contentDescription = "View Details",
-                                            tint = PurpleOne,
-                                            modifier = Modifier
-                                                .size(28.dp),
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.size(0.01 * screenHeight))
-                                Box(
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 10.dp
-                                        )
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(SecondaryColor)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(
-                                                12.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row {
-                                            Text(
-                                                text = "28",
-                                                color = PinkOne,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Spacer(modifier = Modifier.size(20.dp))
-                                            Text(
-                                                text = "Capacitors",
-                                                color = PrimaryText,
-                                                fontSize = 18.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Icon(
-                                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                            contentDescription = "View Details",
-                                            tint = PurpleOne,
-                                            modifier = Modifier
-                                                .size(28.dp),
-                                        )
-                                    }
+                                            .size(50.dp),
+                                        color = PurpleOne
+                                    )
                                 }
                                 Spacer(modifier = Modifier.size(0.12 * screenHeight))
                             }

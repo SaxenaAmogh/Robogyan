@@ -39,7 +39,7 @@ fun RobogyanTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),  // Default dark mode
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else DarkColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

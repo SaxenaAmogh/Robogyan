@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.MemberData
+import com.example.robogyan.utils.SharedPrefManager
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -56,6 +57,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 _authState.value = com.example.robogyan.viewmodel.AuthState.LoggedIn
                 fetchData()
+                val isLoggedIn = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
+                SharedPrefManager.setLoggedIn(getApplication(), isLoggedIn)
             } catch (e: RestException) {
                 val cleanMessage = when {
                     "invalid login credentials" in e.message.orEmpty().lowercase() ->

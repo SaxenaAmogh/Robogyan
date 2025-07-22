@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
-
 @Entity(tableName = "all_members_table")
 @Serializable
 data class AllMembers(

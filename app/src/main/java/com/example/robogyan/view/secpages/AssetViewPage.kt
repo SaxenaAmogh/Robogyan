@@ -37,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,7 +63,14 @@ import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.Inventory
+import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PinkOne
@@ -72,16 +81,20 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.utils.homepageImages
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssetViewPage(navController: NavController){
+fun AssetViewPage(navController: NavController, assetId: Int){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -89,6 +102,9 @@ fun AssetViewPage(navController: NavController){
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
+    val assetFlow: Flow<Inventory?> =
+        AppDatabase.getDatabase(context).inventoryDao().getAssetById(assetId)
+    val asset by assetFlow.collectAsState(initial = null)
 
     Scaffold(
         content = {innerPadding ->
@@ -165,99 +181,121 @@ fun AssetViewPage(navController: NavController){
                                         .background(SecondaryColor),
                                 ) {
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    Image(
-                                        painter = painterResource(id = R.drawable.arduniomini),
-                                        contentDescription = "Asset Image",
-                                        modifier = Modifier
-                                            .padding(horizontal = 12.dp)
-                                            .clip(RoundedCornerShape(12))
-                                            .height(0.22 * screenHeight),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Text(
-                                        text = "Arduino Pro Mini",
-                                        color = PurpleOne,
-                                        fontSize = 28.sp,
-                                        fontFamily = latoFontFamily,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        textAlign = TextAlign.Center
-                                    )
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                    ) {
-                                        Column(
+
+                                    if (asset?.image != null){
+                                        val request = ImageRequest.Builder(context)
+                                            .data(asset?.image)
+                                            .diskCachePolicy(CachePolicy.DISABLED) // or ENABLED for caching
+                                            .build()
+                                        AsyncImage(
+                                            model = request,
+                                            contentDescription = "Asset Image",
+                                            error = painterResource(R.drawable.unav),
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(horizontal = 12.dp)
+                                                .clip(RoundedCornerShape(12))
+                                                .height(0.22 * screenHeight),
+                                        )
+                                    }else{
+                                        Icon(
+                                            painter = painterResource(R.drawable.unav),
+                                            contentDescription = "Asset Image",
+                                            tint = PrimaryText,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(horizontal = 12.dp)
+                                                .clip(RoundedCornerShape(12))
+                                                .size(0.15 * screenHeight),
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(18.dp))
+                                    asset?.let {
+                                        Text(
+                                            text = it.name,
+                                            color = PurpleOne,
+                                            fontSize = 28.sp,
+                                            fontFamily = latoFontFamily,
+                                            fontWeight = FontWeight.Bold,
                                             modifier = Modifier
                                                 .fillMaxWidth(),
-                                        ) {
-                                            Text(
-                                                text = "Type: ",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                            Text(
-                                                text = "Microcontroller; 30 Pin",
-                                                color = TextColor,
-                                                fontSize = 19.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                            textAlign = TextAlign.Center
+                                        )
                                         Column(
                                             modifier = Modifier
-                                                .fillMaxWidth(),
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp)
                                         ) {
-                                            Text(
-                                                text = "Description: ",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                            Text(
-                                                text = "Microcontroller board based on the ATmega328P. A six pin header can be connected to an FTDI cable.",
-                                                color = TextColor,
-                                                fontSize = 19.sp,
-                                                fontFamily = latoFontFamily,
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Row(
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-                                            Column {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(),
+                                            ) {
                                                 Text(
-                                                    text = "Quantity: ",
+                                                    text = "Type: ",
                                                     color = SecondaryText,
                                                     fontSize = 16.sp,
                                                     fontFamily = latoFontFamily,
-                                                    modifier = Modifier
                                                 )
                                                 Text(
-                                                    text = "20 Units",
-                                                    color = PrimaryText,
+                                                    text = it.type,
+                                                    color = TextColor,
                                                     fontSize = 19.sp,
                                                     fontFamily = latoFontFamily,
                                                 )
                                             }
-                                            Spacer(modifier = Modifier.width(80.dp))
-                                            Column {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(),
+                                            ) {
                                                 Text(
-                                                    text = "Available: ",
+                                                    text = "Description: ",
                                                     color = SecondaryText,
                                                     fontSize = 16.sp,
                                                     fontFamily = latoFontFamily,
                                                 )
                                                 Text(
-                                                    text = "16 Units",
-                                                    color = PurpleOne,
+                                                    text = it.description,
+                                                    color = TextColor,
                                                     fontSize = 19.sp,
                                                     fontFamily = latoFontFamily,
                                                 )
+                                            }
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Row(
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                            ) {
+                                                Column {
+                                                    Text(
+                                                        text = "Quantity: ",
+                                                        color = SecondaryText,
+                                                        fontSize = 16.sp,
+                                                        fontFamily = latoFontFamily,
+                                                        modifier = Modifier
+                                                    )
+                                                    Text(
+                                                        text = "${it.quantity.toString()} Units",
+                                                        color = PrimaryText,
+                                                        fontSize = 19.sp,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(80.dp))
+                                                Column {
+                                                    Text(
+                                                        text = "Available: ",
+                                                        color = SecondaryText,
+                                                        fontSize = 16.sp,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                    Text(
+                                                        text = "${it.available.toString()} Units",
+                                                        color = PurpleOne,
+                                                        fontSize = 19.sp,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -326,78 +364,86 @@ fun AssetViewPage(navController: NavController){
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     Spacer(modifier = Modifier.size(6.dp))
-                                    repeat(5) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .pointerInput(Unit) {
-                                                    detectTapGestures(onTap = {
-                                                        showSheet = true
-                                                    })
-                                                }
-                                                .padding(horizontal = 8.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-//                                            val originalText = "Website Redesign"
-//                                            val displayText = if (originalText.length > 16) {
-//                                                originalText.take(16) + "..."
-//                                            } else {
-//                                                originalText
-//                                            }
-                                            Text(
-                                                text = "${it + 1}",
-                                                color = PrimaryColor,
-                                                textAlign = TextAlign.Center,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.15f)
-                                            )
-                                            Text(
-                                                text = "Amogh Saxena",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.weight(0.48f)
-                                            )
-                                            Text(
-                                                text = "2",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                textAlign = TextAlign.Center,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.25f)
-                                            )
-                                            Text(
-                                                text = "Personal",
-                                                textAlign = TextAlign.Center,
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.3f)
-                                            )
-                                            Icon(
-                                                Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
-                                                contentDescription = "Arrow Icon",
-                                                modifier = Modifier
-                                                    .size(28.dp)
-                                                    .clickable {
-                                                        showSheet = true
-                                                    },
-                                                tint = PinkOne
-                                            )
-                                        }
-                                        if (it < 4) {
-                                            Spacer(modifier = Modifier.size(6.dp))
-                                            HorizontalDivider(
-                                                color = Color(0xFF2D2D2D),
-                                                thickness = 1.dp,
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
-                                            Spacer(modifier = Modifier.size(6.dp))
-                                        }
-                                    }
+                                    Text(
+                                        text = "No data available currently.",
+                                        color = PurpleOne,
+                                        fontSize = 16.sp,
+                                        fontFamily = latoFontFamily,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center
+                                    )
+//                                    repeat(5) {
+//                                        Row(
+//                                            modifier = Modifier
+//                                                .fillMaxWidth()
+//                                                .pointerInput(Unit) {
+//                                                    detectTapGestures(onTap = {
+//                                                        showSheet = true
+//                                                    })
+//                                                }
+//                                                .padding(horizontal = 8.dp),
+//                                            horizontalArrangement = Arrangement.SpaceBetween,
+//                                        ) {
+////                                            val originalText = "Website Redesign"
+////                                            val displayText = if (originalText.length > 16) {
+////                                                originalText.take(16) + "..."
+////                                            } else {
+////                                                originalText
+////                                            }
+//                                            Text(
+//                                                text = "${it + 1}",
+//                                                color = PrimaryColor,
+//                                                textAlign = TextAlign.Center,
+//                                                fontSize = 16.sp,
+//                                                fontFamily = latoFontFamily,
+//                                                modifier = Modifier.weight(0.15f)
+//                                            )
+//                                            Text(
+//                                                text = "Amogh Saxena",
+//                                                color = PrimaryColor,
+//                                                fontSize = 16.sp,
+//                                                fontFamily = latoFontFamily,
+//                                                maxLines = 1,
+//                                                overflow = TextOverflow.Ellipsis,
+//                                                modifier = Modifier.weight(0.48f)
+//                                            )
+//                                            Text(
+//                                                text = "2",
+//                                                color = PrimaryColor,
+//                                                fontSize = 16.sp,
+//                                                textAlign = TextAlign.Center,
+//                                                fontFamily = latoFontFamily,
+//                                                modifier = Modifier.weight(0.25f)
+//                                            )
+//                                            Text(
+//                                                text = "Personal",
+//                                                textAlign = TextAlign.Center,
+//                                                color = PrimaryColor,
+//                                                fontSize = 16.sp,
+//                                                fontFamily = latoFontFamily,
+//                                                modifier = Modifier.weight(0.3f)
+//                                            )
+//                                            Icon(
+//                                                Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+//                                                contentDescription = "Arrow Icon",
+//                                                modifier = Modifier
+//                                                    .size(28.dp)
+//                                                    .clickable {
+//                                                        showSheet = true
+//                                                    },
+//                                                tint = PinkOne
+//                                            )
+//                                        }
+//                                        if (it < 4) {
+//                                            Spacer(modifier = Modifier.size(6.dp))
+//                                            HorizontalDivider(
+//                                                color = Color(0xFF2D2D2D),
+//                                                thickness = 1.dp,
+//                                                modifier = Modifier.fillMaxWidth()
+//                                            )
+//                                            Spacer(modifier = Modifier.size(6.dp))
+//                                        }
+//                                    }
                                     Spacer(modifier = Modifier.height(12.dp))
                                 }
                                 Spacer(modifier = Modifier.height(0.1 * screenHeight))
@@ -658,5 +704,5 @@ fun AssetViewPage(navController: NavController){
 @Preview(showBackground = true)
 @Composable
 fun AssetViewPagePreview() {
-    AssetViewPage(rememberNavController())
+    AssetViewPage(rememberNavController(), 0)
 }
