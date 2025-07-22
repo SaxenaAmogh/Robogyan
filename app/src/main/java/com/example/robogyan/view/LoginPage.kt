@@ -71,6 +71,7 @@ import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
 import com.example.robogyan.viewmodel.InventoryViewModel
 import com.example.robogyan.viewmodel.MemberViewModel
+import com.example.robogyan.viewmodel.ProjectsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UseOfNonLambdaOffsetOverload")
@@ -96,10 +97,12 @@ fun LoginPage(navController: NavController) {
     val authViewModel: AuthViewModel = viewModel()
     val memberViewModel: MemberViewModel = viewModel()
     val inventoryViewModel: InventoryViewModel = viewModel()
+    val projectViewModel: ProjectsViewModel = viewModel()
 
     val onLoginSuccess : () -> Unit = {
         memberViewModel.fetchMembers()
         inventoryViewModel.fetchAssets()
+        projectViewModel.fetchProjects()
     }
     val onNavigateToHome : () -> Unit = {
         navController.navigate("home"){

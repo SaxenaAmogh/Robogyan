@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -58,12 +57,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.example.robogyan.R
-import com.example.robogyan.ui.theme.AccentColor
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.NavBar
 import com.example.robogyan.ui.theme.PeachOne
 import com.example.robogyan.ui.theme.PinkOne
@@ -75,7 +70,6 @@ import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
-import com.example.robogyan.utils.homepageImages
 import kotlinx.coroutines.delay
 
 //@RequiresApi(Build.VERSION_CODES.O)
@@ -129,6 +123,17 @@ fun HomePage(navController: NavHostController) {
         windowInsetsController.isAppearanceLightStatusBars = true
     }
 
+    val images = listOf(
+        R.drawable.pic1,
+        R.drawable.pic2,
+        R.drawable.pic3,
+        R.drawable.pic4,
+        R.drawable.pic5,
+        R.drawable.pic6,
+        R.drawable.pic7,
+        R.drawable.pic8,
+    )
+
     Scaffold(
         content = {
             Column(
@@ -158,7 +163,7 @@ fun HomePage(navController: NavHostController) {
                                     LaunchedEffect(Unit) {
                                         while (true) {
                                             delay(1500)
-                                            val nextPage = (pagerState.currentPage + 1) % homepageImages.size
+                                            val nextPage = (pagerState.currentPage + 1) % images.size
                                             pagerState.animateScrollToPage(nextPage)
                                             if (pagerState.currentPage==8){
                                                 delay(1500)
@@ -166,7 +171,6 @@ fun HomePage(navController: NavHostController) {
                                             }
                                         }
                                     }
-
 
                                     HorizontalPager(
                                         state = pagerState,
@@ -180,14 +184,10 @@ fun HomePage(navController: NavHostController) {
                                                 )
                                             )
                                     ) { page ->
-                                        val request = ImageRequest.Builder(context)
-                                            .data(homepageImages[page])
-                                            .diskCachePolicy(CachePolicy.DISABLED) // or ENABLED for caching
-                                            .build()
                                         AsyncImage(
-                                            model = request,
+                                            model = images[page],
                                             contentDescription = "Image $page",
-                                            error = painterResource(R.drawable.hide),
+                                            error = painterResource(R.drawable.unav),
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier.fillMaxSize()
                                         )

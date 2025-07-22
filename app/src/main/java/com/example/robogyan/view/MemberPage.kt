@@ -353,7 +353,7 @@ fun MemberPage(navController: NavController) {
                                             horizontalArrangement = Arrangement.Start
                                         ) {
                                             AsyncImage(
-                                                model = it.image,
+                                                model = it.image,//it.image
                                                 contentDescription = "Profile",
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(25.dp))
@@ -444,7 +444,7 @@ fun MemberPage(navController: NavController) {
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     AsyncImage(
-                                        model = member.image,
+                                        model = member.image,//member.image
                                         contentDescription = "Profile",
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(30.dp))

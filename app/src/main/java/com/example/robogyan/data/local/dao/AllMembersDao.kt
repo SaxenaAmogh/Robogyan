@@ -19,7 +19,10 @@ interface AllMembersDao {
     @Query("DELETE FROM all_members_table")
     suspend fun deleteAllMembers()
 
-    @Query("SELECT COUNT(*) FROM members_table")
+    @Query("SELECT COUNT(*) FROM all_members_table")
     suspend fun getMemberCount(): Int
+
+    @Query("SELECT name FROM all_members_table WHERE id = :id")
+    suspend fun getNameById(id: String): String?
 
 }

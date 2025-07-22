@@ -61,8 +61,12 @@ fun AppNavigation(navController: NavHostController) {
         composable("addasset"){
             AddAssetPage(navController)
         }
-        composable("projectview"){
-            ProjectViewPage(navController)
+        composable(
+            route = "projectview/{projectId}",
+            arguments = listOf(navArgument("projectId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getInt("projectId") ?: 0
+            ProjectViewPage(navController, projectId)
         }
     }
 }

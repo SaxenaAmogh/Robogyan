@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,10 +59,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.R
 import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.GunmetalGray
@@ -72,7 +76,10 @@ import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.utils.SharedPrefManager
+import com.example.robogyan.viewmodel.InventoryViewModel
+import com.example.robogyan.viewmodel.ProjectsViewModel
 import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -87,7 +94,6 @@ fun ProjectPage(navController: NavController){
     val focusManager = LocalFocusManager.current
 
     var searchItem by remember { mutableStateOf("") }
-    var selectedOption by remember { mutableIntStateOf(0) }
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -95,6 +101,14 @@ fun ProjectPage(navController: NavController){
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
+
+    val projectViewModel: ProjectsViewModel = viewModel()
+    val projectsData by projectViewModel.projectsFlow.collectAsState()
+
+    val allMemberFlow: Flow<List<AllMembers>> =
+        AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
+    val members by allMemberFlow.collectAsState(initial = emptyList())
+    var count by remember { mutableIntStateOf(0) }
 
     Scaffold(
         content = {
@@ -368,7 +382,7 @@ fun ProjectPage(navController: NavController){
                                                 fontSize = 16.sp,
                                                 fontFamily = latoFontFamily,
                                                 fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.weight(0.45f)
+                                                modifier = Modifier.weight(0.37f)
                                             )
                                             Text(
                                                 text = "Head",
@@ -385,7 +399,7 @@ fun ProjectPage(navController: NavController){
                                                 textAlign = TextAlign.Center,
                                                 fontFamily = latoFontFamily,
                                                 fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.weight(0.3f)
+                                                modifier = Modifier.weight(0.27f)
                                             )
                                         }
                                         Spacer(modifier = Modifier.size(5.dp))
@@ -395,224 +409,108 @@ fun ProjectPage(navController: NavController){
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                         Spacer(modifier = Modifier.size(6.dp))
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .pointerInput(Unit) {
-                                                    detectTapGestures(onTap = {
-                                                        if(isloggedin) {
-                                                            navController.navigate("projectview")
-                                                        }else{
-                                                            Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                        projectsData.forEach{ it->
+                                            count += 1
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable(
+                                                        onClick = {
+                                                            if(isloggedin) {
+                                                                navController.navigate("projectview/${it.id}")
+                                                            }else{
+                                                                Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                            }
                                                         }
-                                                    })
-                                                },
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-//                                            val originalText = "Website Redesign"
-//                                            val displayText = if (originalText.length > 16) {
-//                                                originalText.take(16) + "..."
-//                                            } else {
-//                                                originalText
-//                                            }
-                                            Text(
-                                                text = "Website Redesign",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.weight(0.45f)
-                                            )
-                                            Text(
-                                                text = "Amogh",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.2f)
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(0.3f)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(Color(0xFF5C9DE5))
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                                contentAlignment = Alignment.Center
+                                                    ),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Text(
-                                                    text = "In Progress",
-                                                    color = Color(0xFFC9E3FF),
-                                                    fontSize = 15.sp,
+                                                    text = it.name,
+                                                    color = PrimaryColor,
+                                                    fontSize = 16.sp,
                                                     fontFamily = latoFontFamily,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier
+                                                        .clickable(
+                                                            onClick = {
+                                                                if(isloggedin) {
+                                                                    navController.navigate("projectview/${it.id}")
+                                                                }else{
+                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            }
+                                                        )
+                                                        .weight(0.37f)
                                                 )
+                                                for (member in members){
+                                                    if (member.id == it.project_head) {
+                                                        Text(
+                                                            text = member.name,
+                                                            color = SecondaryText,
+                                                            fontSize = 16.sp,
+                                                            fontFamily = latoFontFamily,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier
+                                                                .clickable(
+                                                                    onClick = {
+                                                                        if(isloggedin) {
+                                                                            navController.navigate("projectview/${it.id}")
+                                                                        }else{
+                                                                            Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                        }
+                                                                    }
+                                                                )
+                                                                .weight(0.2f)
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.size(4.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clickable(
+                                                            onClick = {
+                                                                if(isloggedin) {
+                                                                    navController.navigate("projectview/${it.id}")
+                                                                }else{
+                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            }
+                                                        )
+                                                        .weight(0.27f)
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .background(
+                                                            if (it.status == "In Progress") Color(0xFF5C9DE5)
+                                                            else if (it.status == "Completed") Color(0xFF009688)
+                                                            else if (it.status == "On Hold") Color(0xFF5D5D5D)
+                                                            else Color(0xFFC5453E)
+                                                        )
+                                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = it.status,
+                                                        color =
+                                                            if (it.status == "In Progress") Color(0xFFC9E3FF)
+                                                            else if (it.status == "Completed") Color(0xFFC2FFF6)
+                                                            else if (it.status == "On Hold") Color(0xFFCECECE)
+                                                            else Color(0xFFFFDFDE),
+                                                        fontSize = 15.sp,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                }
                                             }
-                                        }
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        HorizontalDivider(
-                                            color = Color(0xFF2D2D2D),
-                                            thickness = 1.dp,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-                                            Text(
-                                                text = "Farewell 2025",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.45f)
-                                            )
-                                            Text(
-                                                text = "Amogh",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.2f)
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(0.3f)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(Color(0xFF009688))
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "Complete",
-                                                    color = Color(0xFFC2FFF6),
-                                                    fontSize = 15.sp,
-                                                    fontFamily = latoFontFamily,
+                                            if (count < projectsData.size){
+                                                Spacer(modifier = Modifier.size(6.dp))
+                                                HorizontalDivider(
+                                                    color = Color(0xFF2D2D2D),
+                                                    thickness = 1.dp,
+                                                    modifier = Modifier.fillMaxWidth()
                                                 )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        HorizontalDivider(
-                                            color = Color(0xFF2D2D2D),
-                                            thickness = 1.dp,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-                                            Text(
-                                                text = "Farewell Reel",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.45f)
-                                            )
-                                            Text(
-                                                text = "Nikunj",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.2f)
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(0.3f)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(Color(0xFF5D5D5D))
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "On Hold",
-                                                    color = Color(0xFFCECECE),
-                                                    fontSize = 15.sp,
-                                                    fontFamily = latoFontFamily,
-                                                )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        HorizontalDivider(
-                                            color = Color(0xFF2D2D2D),
-                                            thickness = 1.dp,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-                                            Text(
-                                                text = "Techkriti 2025",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.45f)
-                                            )
-                                            Text(
-                                                text = "Macle",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.2f)
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(0.3f)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(Color(0xFF009688))
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "Complete",
-                                                    color = Color(0xFFC2FFF6),
-                                                    fontSize = 15.sp,
-                                                    fontFamily = latoFontFamily,
-                                                )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        HorizontalDivider(
-                                            color = Color(0xFF2D2D2D),
-                                            thickness = 1.dp,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                        Spacer(modifier = Modifier.size(6.dp))
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                        ) {
-                                            Text(
-                                                text = "Android Webinar",
-                                                color = PrimaryColor,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.45f)
-                                            )
-                                            Text(
-                                                text = "Dev",
-                                                color = SecondaryText,
-                                                fontSize = 16.sp,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier.weight(0.2f)
-                                            )
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(0.3f)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(Color(0xFFC5453E))
-                                                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "Abandoned",
-                                                    color = Color(0xFFFFDFDE),
-                                                    fontSize = 15.sp,
-                                                    fontFamily = latoFontFamily,
-                                                )
+                                                Spacer(modifier = Modifier.size(6.dp))
                                             }
                                         }
                                     }

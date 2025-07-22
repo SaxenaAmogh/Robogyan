@@ -7,13 +7,15 @@ import androidx.room.RoomDatabase
 import com.example.robogyan.data.local.dao.AllMembersDao
 import com.example.robogyan.data.local.dao.InventoryDao
 import com.example.robogyan.data.local.dao.MemberDao
+import com.example.robogyan.data.local.dao.ProjectsDao
 import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.Inventory
 import com.example.robogyan.data.local.entities.MemberData
+import com.example.robogyan.data.local.entities.Projects
 
 @Database(
-    entities = [MemberData::class, AllMembers::class, Inventory::class],
-    version = 4,
+    entities = [MemberData::class, AllMembers::class, Inventory::class, Projects::class],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -24,6 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun memberDao(): MemberDao
     abstract fun allMembersDao(): AllMembersDao
     abstract fun inventoryDao(): InventoryDao
+    abstract fun projectsDao(): ProjectsDao
 
     companion object {
         // @Volatile annotation ensures that INSTANCE is always up-to-date and visible to all threads.

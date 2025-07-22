@@ -130,7 +130,7 @@ fun ProfilePage(navController: NavController){
                                     .background(BackgroundColor)
                             ) {
                                 AsyncImage(
-                                    model = member?.image,
+                                    model = R.drawable.mee,//member?.image
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier

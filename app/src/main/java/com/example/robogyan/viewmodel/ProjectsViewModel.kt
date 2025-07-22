@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
-import com.example.robogyan.data.local.entities.Inventory
+import com.example.robogyan.data.local.entities.Projects
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
@@ -16,52 +16,53 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class InventoryViewModel(application: Application) : AndroidViewModel(application) {
+class ProjectsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val supabase = SupabaseClientProvider.client
-    private val _inventory = MutableStateFlow<List<Inventory>>(emptyList())
+    private val _projects = MutableStateFlow<List<Projects>>(emptyList())
     private val _isLoading = MutableStateFlow(false)
 
-    fun fetchAssets() {
+    fun fetchProjects() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val isLoggedIn = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
-                val tableName = "inventory"
+                val tableName = "projects"
 
                 if (isLoggedIn){
                     val result = supabase
                         .postgrest[tableName]
                         .select()
-                        .decodeList<Inventory>()
+                        .decodeList<Projects>()
 
-                    Log.e("@@Inventory", "Inventory: $result")
-                    _inventory.value = result
+                    Log.e("@@Projects", "Projects: $result")
+                    _projects.value = result
                     CoroutineScope(Dispatchers.IO).launch {
-                        val dao = AppDatabase.getDatabase(getApplication()).inventoryDao()
-                        val count = dao.getInventoryCount()
+                        val dao = AppDatabase.getDatabase(getApplication()).projectsDao()
+                        val count = dao.getProjectsCount()
 
                         if (count > 0) {
-                            dao.deleteInventory()
-                            dao.insertInventory(result)
+                            dao.deleteProjects()
+                            dao.insertProjects(result)
                         }else{
-                            dao.insertInventory(result)
+                            dao.insertProjects(result)
                         }
                     }
                 }else{
-                    Log.d("Fetch Inventory", "Task aborted for Guest User.")
+                    Log.d("Fetch Projects", "Task aborted for Guest User.")
                 }
 
             } catch (e: Exception) {
                 Log.e("@@Error", "fetchMembers: $e")
                 e.printStackTrace()
-                _inventory.value = emptyList()
+                _projects.value = emptyList()
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    private val dao = AppDatabase.getDatabase(application).inventoryDao()
-    val inventoryFlow = dao.getInventory().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    private val dao = AppDatabase.getDatabase(application).projectsDao()
+    val projectsFlow = dao.getProjects().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
 }
