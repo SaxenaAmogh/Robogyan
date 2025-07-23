@@ -62,6 +62,44 @@ class ProjectsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun addNewProject(
+        name: String,
+        project_head: String,
+        status: String,
+        github_link: String,
+        pdf_link: String,
+        category: String,
+        description: String,
+        start_date: String,
+        completion_date: String,
+        money_spent: String,
+        team: String,
+        components: String
+    ){
+        val project = Projects(
+            name = name,
+            project_head = project_head,
+            status = status,
+            github_link = github_link,
+            pdf_link = pdf_link,
+            category = category,
+            description = description,
+            start_date = start_date,
+            completion_date = completion_date,
+            is_archived = false,
+            money_spent = money_spent.toFloat(),
+            team = team,
+            components = components,
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = SupabaseClientProvider.client
+                .postgrest["projects"]
+                .insert(project)
+            Log.d("@@SupabaseInsert", "Project inserted: $result")
+        }
+
+    }
+
     private val dao = AppDatabase.getDatabase(application).projectsDao()
     val projectsFlow = dao.getProjects().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 

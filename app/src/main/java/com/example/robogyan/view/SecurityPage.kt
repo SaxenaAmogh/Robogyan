@@ -400,98 +400,98 @@ fun SecurityPage(navController: NavController) {
                                     }
                                 )
                                 Spacer(modifier = Modifier.size(0.015 * screenHeight))
-//                                if (showAssets){
-//                                    val filteredAssetData = assetData
-//                                        .filter { asset ->
-//                                            asset.name.contains(searchItem, ignoreCase = true)
-//                                        }
-//
-//                                    filteredAssetData.forEach{
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .padding(
-//                                                    horizontal = 10.dp
-//                                                )
-//                                                .clip(RoundedCornerShape(16.dp))
-//                                                .background(SecondaryColor)
-//                                                .clickable(
-//                                                    onClick ={
-//                                                        assetId = it.id
-//                                                        navController.navigate("assetview/$assetId")
-//                                                    }
-//                                                )
-//                                        ) {
-//                                            Row(
-//                                                modifier = Modifier
-//                                                    .fillMaxWidth()
-//                                                    .padding(
-//                                                        12.dp
-//                                                    )
-//                                                    .clickable(
-//                                                        onClick ={
-//                                                            assetId = it.id
-//                                                            navController.navigate("assetview/$assetId")
-//                                                        }
-//                                                    ),
-//                                                horizontalArrangement = Arrangement.SpaceBetween,
-//                                                verticalAlignment = Alignment.CenterVertically
-//                                            ) {
-//                                                Row(
-//                                                    modifier = Modifier
-//                                                        .weight(0.9f)
-//                                                        .clickable(
-//                                                            onClick ={
-//                                                                assetId = it.id
-//                                                                navController.navigate("assetview/$assetId")
-//                                                            }
-//                                                        )
-//                                                ) {
-//                                                    Text(
-//                                                        text = it.available.toString(),
-//                                                        color = PinkOne,
-//                                                        fontSize = 18.sp,
-//                                                        fontFamily = latoFontFamily,
-//                                                        fontWeight = FontWeight.Bold,
-//                                                        modifier = Modifier
-//                                                            .weight(0.1f)
-//                                                    )
-//                                                    Spacer(modifier = Modifier.size(20.dp))
-//                                                    Text(
-//                                                        text = it.name,
-//                                                        color = PrimaryText,
-//                                                        fontSize = 18.sp,
-//                                                        fontFamily = latoFontFamily,
-//                                                        modifier = Modifier
-//                                                            .weight(0.8f)
-//                                                    )
-//                                                }
-//                                                Icon(
-//                                                    Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-//                                                    contentDescription = "View Details",
-//                                                    tint = PurpleOne,
-//                                                    modifier = Modifier
-//                                                        .size(28.dp)
-//                                                        .weight(0.1f)
-//                                                        .clickable(
-//                                                            onClick ={
-//                                                                assetId = it.id
-//                                                                navController.navigate("assetview/$assetId")
-//                                                            }
-//                                                        ),
-//                                                )
-//                                            }
-//                                        }
-//                                        Spacer(modifier = Modifier.size(0.01 * screenHeight))
-//                                    }
-//                                }
-//                                else{
-//                                    CircularProgressIndicator(
-//                                        modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .size(50.dp),
-//                                        color = PurpleOne
-//                                    )
-//                                }
+                                if (showAssets){
+                                    val filteredAssetData = assetData
+                                        .filter { asset ->
+                                            asset.name.contains(searchItem, ignoreCase = true)
+                                        }
+
+                                    filteredAssetData.forEach{
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 10.dp
+                                                )
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(SecondaryColor)
+                                                .clickable(
+                                                    onClick ={
+                                                        assetId = it.id
+                                                        navController.navigate("assetview/$assetId")
+                                                    }
+                                                )
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        12.dp
+                                                    )
+                                                    .clickable(
+                                                        onClick ={
+                                                            assetId = it.id
+                                                            navController.navigate("assetview/$assetId")
+                                                        }
+                                                    ),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .weight(0.9f)
+                                                        .clickable(
+                                                            onClick ={
+                                                                assetId = it.id
+                                                                navController.navigate("assetview/$assetId")
+                                                            }
+                                                        )
+                                                ) {
+                                                    Text(
+                                                        text = it.available.toString(),
+                                                        color = PinkOne,
+                                                        fontSize = 18.sp,
+                                                        fontFamily = latoFontFamily,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier
+                                                            .weight(0.1f)
+                                                    )
+                                                    Spacer(modifier = Modifier.size(20.dp))
+                                                    Text(
+                                                        text = it.name,
+                                                        color = PrimaryText,
+                                                        fontSize = 18.sp,
+                                                        fontFamily = latoFontFamily,
+                                                        modifier = Modifier
+                                                            .weight(0.8f)
+                                                    )
+                                                }
+                                                Icon(
+                                                    Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                                    contentDescription = "View Details",
+                                                    tint = PurpleOne,
+                                                    modifier = Modifier
+                                                        .size(28.dp)
+                                                        .weight(0.1f)
+                                                        .clickable(
+                                                            onClick ={
+                                                                assetId = it.id
+                                                                navController.navigate("assetview/$assetId")
+                                                            }
+                                                        ),
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.size(0.01 * screenHeight))
+                                    }
+                                }
+                                else{
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .size(50.dp),
+                                        color = PurpleOne
+                                    )
+                                }
                                 Spacer(modifier = Modifier.size(0.12 * screenHeight))
                             }
                         }else{

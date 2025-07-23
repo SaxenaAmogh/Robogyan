@@ -58,6 +58,7 @@ import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.MemberViewModel
+import com.example.robogyan.viewmodel.ResourceViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -89,6 +90,7 @@ fun StartPage(navController: NavController) {
     )
 
     val memberViewModel: MemberViewModel = viewModel()
+    val resourcesViewModel: ResourceViewModel = viewModel()
 //    LaunchedEffect(Unit) {
 //        AppDatabase.getDatabase(context)
 //    }
@@ -189,6 +191,7 @@ fun StartPage(navController: NavController) {
                                 onClick = {
                                     Log.e("@@Start", "guest")
                                     memberViewModel.fetchMembers()
+                                    resourcesViewModel.fetchResources()
                                     navController.navigate("home") {
                                         popUpTo("start") { inclusive = true }
                                     }

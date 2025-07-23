@@ -34,6 +34,7 @@ import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -70,6 +72,7 @@ import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.UpdateViewModel
 import kotlinx.coroutines.delay
 
 //@RequiresApi(Build.VERSION_CODES.O)
@@ -117,6 +120,11 @@ fun HomePage(navController: NavHostController) {
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = true
     }
+
+    val updatesViewModel: UpdateViewModel = viewModel()
+    val labGate by updatesViewModel.labGate.collectAsState()
+    val updateA by updatesViewModel.updateA.collectAsState()
+    val updateB by updatesViewModel.updateB.collectAsState()
 
     val images = listOf(
         R.drawable.pic1,
@@ -263,24 +271,28 @@ fun HomePage(navController: NavHostController) {
                                     .clickable { door = !door }
                             ) {
                                 Spacer(modifier = Modifier.size(0.005 * screenHeight))
-                                Text(
-                                    text = "Lab is currently open",
-                                    color = TextColor,
-                                    fontSize = 18.sp,
-                                    fontFamily = latoFontFamily,
-                                )
+                                updateA?.let { it1 ->
+                                    Text(
+                                        text = it1,
+                                        color = TextColor,
+                                        fontSize = 18.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
                                 Spacer(modifier = Modifier.size(0.005 * screenHeight))
-                                Text(
-                                    text = "Society Meeting at 1:00 PM",
-                                    color = TextColor,
-                                    fontSize = 18.sp,
-                                    fontFamily = latoFontFamily,
-                                )
+                                updateB?.let { it1 ->
+                                    Text(
+                                        text = it1,
+                                        color = TextColor,
+                                        fontSize = 18.sp,
+                                        fontFamily = latoFontFamily,
+                                    )
+                                }
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ){
                                     Switch(
-                                        checked = gateStatus,
+                                        checked = labGate ?: false,
                                         onCheckedChange = {
                                             focusManager.clearFocus() // Hide the keyboard
                                         },
@@ -305,19 +317,13 @@ fun HomePage(navController: NavHostController) {
                                     )
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Text(
-                                        text = if (gateStatus) "Gate Open" else "Gate Closed",
+                                        text = if (labGate == true) "Gate Open" else "Gate Closed",
                                         color = TextColor,
                                         fontSize = 22.sp,
                                         fontFamily = latoFontFamily,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
-                                Text(
-                                    text = "Last opened by Macle at 10:46 AM",
-                                    color = TextColor,
-                                    fontSize = 16.sp,
-                                    fontFamily = latoFontFamily,
-                                )
                             }
                         }
                         item {

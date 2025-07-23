@@ -17,7 +17,7 @@ import com.example.robogyan.data.local.entities.Resources
 
 @Database(
     entities = [MemberData::class, AllMembers::class, Inventory::class, Projects::class, Resources::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

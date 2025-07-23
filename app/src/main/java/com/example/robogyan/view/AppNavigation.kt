@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.robogyan.view.secpages.AddAssetPage
+import com.example.robogyan.view.secpages.AddProjectPage
 import com.example.robogyan.view.secpages.AssetViewPage
 import com.example.robogyan.view.secpages.ProjectViewPage
 
@@ -67,6 +68,9 @@ fun AppNavigation(navController: NavHostController) {
         ) { backStackEntry ->
             val projectId = backStackEntry.arguments?.getInt("projectId") ?: 0
             ProjectViewPage(navController, projectId)
+        }
+        composable("addProject"){
+            AddProjectPage(navController)
         }
     }
 }

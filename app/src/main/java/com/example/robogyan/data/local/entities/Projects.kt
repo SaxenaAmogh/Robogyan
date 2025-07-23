@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Projects (
     @PrimaryKey
-    val id : Int,
+    val id : Int ?= null,
     val name : String,
     val project_head: String,
     val status : String,
@@ -23,6 +23,6 @@ data class Projects (
     val money_spent: Float,
     val team: String,
     val components: String?,
-    val created: String ?= "",
-    val updated: String ?= "",
+    val created: String ?= null,
+    val updated: String ?= null,
 )

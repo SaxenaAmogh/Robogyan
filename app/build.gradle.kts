@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.kapt")
     kotlin("plugin.serialization") version "1.9.10"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -71,6 +72,12 @@ android {
 
 dependencies {
 
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.database)
+
+    //supabase
     implementation(libs.postgrest.kt)
     implementation(libs.storage.kt)
     implementation(libs.auth.kt)
@@ -78,6 +85,7 @@ dependencies {
     implementation(libs.supabase.kt)
     implementation(libs.kotlinx.serialization.json)
 
+    //ktor
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.core.v322)
     implementation(libs.ktor.utils)

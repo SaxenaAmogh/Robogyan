@@ -2,6 +2,7 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,15 +26,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,10 +59,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.window.Dialog
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -70,6 +85,7 @@ import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.utils.SharedPrefManager
 import com.example.robogyan.viewmodel.AuthViewModel
+import com.example.robogyan.viewmodel.UpdateViewModel
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.Flow
 
@@ -96,7 +112,154 @@ fun ProfilePage(navController: NavController){
     val member by memberFlow.collectAsState(initial = null)
 
     val authViewModel: AuthViewModel = viewModel()
-//    val authState by authViewModel.authState.collectAsState()
+    val updatesViewModel: UpdateViewModel = viewModel()
+    val updateA by updatesViewModel.updateA.collectAsState()
+    val updateB by updatesViewModel.updateB.collectAsState()
+    var update by remember { mutableStateOf("UpdateA") }
+    var showDialog by remember { mutableStateOf(false) }
+    var final by remember { mutableStateOf("") }
+
+    var checkedA by remember { mutableStateOf(true) }
+    var checkedB by remember { mutableStateOf(false) }
+
+    @Composable
+    fun ChangeUpdateDialog(
+        onDismiss: () -> Unit,
+        onConfirm: () -> Unit
+    ) {
+        var placeholder by remember { mutableStateOf("") }
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                tonalElevation = 8.dp,
+                color = Color(0xFF151515),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color(0xFF1A1A1A),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Change Update",
+                        fontFamily = latoFontFamily,
+                        color = PrimaryText,
+                        fontSize = 18.sp,
+                        textDecoration = TextDecoration.Underline,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .weight(0.4f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(text = "Update A")
+                            RadioButton(
+                                selected = checkedA,
+                                onClick = {
+                                    update = "UpdateA"
+                                    checkedA = true
+                                    checkedB = false
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Color.Green,
+                                    unselectedColor = Color.Gray
+                                )
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .weight(0.4f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(text = "Update B")
+                            RadioButton(
+                                selected = checkedB,
+                                onClick = {
+                                    update = "UpdateB"
+                                    checkedA = false
+                                    checkedB = true
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Color.Green,
+                                    unselectedColor = Color.Gray
+                                )
+                            )
+                        }
+                    }
+                    if (update == "UpdateA"){
+                        placeholder = updateA.toString()
+                    }else{
+                        placeholder = updateB.toString()
+                    }
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(0.063 * screenHeight),
+                        shape = RoundedCornerShape(size = 16.dp),
+                        placeholder = {
+                            Text(
+                                placeholder,
+                                fontFamily = latoFontFamily,
+                                color = Color(0xFFB2B2B2),
+                            )
+                        },
+                        value = final,
+                        onValueChange = { final = it },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PurpleOne,
+                            unfocusedBorderColor = Color(0x66ABABAB),
+                            focusedTextColor = Color(0xFFFFFFFF),
+                            unfocusedTextColor = Color(0xFFFFFFFF),
+                            unfocusedContainerColor = Color(0x14ABABAB),
+                            focusedContainerColor = Color(0x14ABABAB)
+                        )
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        TextButton(onClick = onDismiss) {
+                            Text(
+                                "Cancel",
+                                color = Color(0xFFDE4251),
+                                fontFamily = latoFontFamily,
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TextButton(onClick = {
+                            // Now pass all values back to parent composable
+                            onConfirm()
+                            onDismiss()
+                        }) {
+                            Text(
+                                "Confirm",
+                                color = Color(0xFF4CAF50),
+                                fontFamily = latoFontFamily,
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         content = {
@@ -130,7 +293,7 @@ fun ProfilePage(navController: NavController){
                                     .background(BackgroundColor)
                             ) {
                                 AsyncImage(
-                                    model = R.drawable.mee,//member?.image
+                                    model = member?.image,//R.drawable.mee
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
@@ -223,7 +386,17 @@ fun ProfilePage(navController: NavController){
                                         }
                                 ){
                                     Column(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    if (member?.clearance == "President" || member?.clearance == "Vice President"){
+//                                                        navController.navigate("addProject")
+                                                    }else{
+                                                        Toast.makeText(context, "Only President or Vice President can add project.", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            )
+                                            .fillMaxWidth(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
@@ -257,7 +430,17 @@ fun ProfilePage(navController: NavController){
                                         }
                                 ){
                                     Column(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    if (member?.clearance == "President" || member?.clearance == "Vice President" || member?.clearance == "Lead"){
+                                                        showDialog = true
+                                                    }else{
+                                                        Toast.makeText(context, "Only Core Team can add updates.", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            )
+                                            .fillMaxWidth(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
@@ -296,7 +479,17 @@ fun ProfilePage(navController: NavController){
                                         }
                                 ){
                                     Column(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    if (member?.clearance == "President" || member?.clearance == "Vice President"){
+//                                                        navController.navigate("addProject")
+                                                    }else{
+                                                        Toast.makeText(context, "Only President or Vice President can add project.", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            )
+                                            .fillMaxWidth(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
@@ -329,7 +522,17 @@ fun ProfilePage(navController: NavController){
                                         }
                                 ){
                                     Column(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    if (member?.clearance == "President" || member?.clearance == "Vice President"){
+//                                                        navController.navigate("addProject")
+                                                    }else{
+                                                        Toast.makeText(context, "Only President or Vice President can add project.", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            )
+                                            .fillMaxWidth(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
@@ -362,7 +565,17 @@ fun ProfilePage(navController: NavController){
                                         }
                                 ){
                                     Column(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    if (member?.clearance == "President" || member?.clearance == "Vice President"){
+                                                        navController.navigate("addProject")
+                                                    }else{
+                                                        Toast.makeText(context, "Only President or Vice President can add project.", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            )
+                                            .fillMaxWidth(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
@@ -480,40 +693,6 @@ fun ProfilePage(navController: NavController){
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
-                                            painter = painterResource(R.drawable.res_d),
-                                            contentDescription = "members",
-                                            modifier = Modifier.size(34.dp),
-                                            tint = YellowOne
-                                        )
-                                        Spacer(modifier = Modifier.size(10.dp))
-                                        Text(
-                                            text = "Add Resources",
-                                            color = PrimaryColor,
-                                            fontSize = 18.sp,
-                                            fontFamily = latoFontFamily,
-                                        )
-                                    }
-                                    Icon(
-                                        Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
-                                        contentDescription = "Arrow Icon",
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clickable {},
-                                        tint = YellowOne
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(0.012 * screenHeight))
-                                Row(
-                                    modifier = Modifier
-                                        .padding(horizontal = 0.025 * screenWidth)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
                                             painter = painterResource(R.drawable.review),
                                             contentDescription = "members",
                                             modifier = Modifier.size(34.dp),
@@ -600,6 +779,16 @@ fun ProfilePage(navController: NavController){
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(0.01 * screenHeight))
+                            }
+                            if (showDialog){
+                                ChangeUpdateDialog(
+                                    onDismiss = { showDialog = false },
+                                    onConfirm = {
+                                        updatesViewModel.updateMessage(
+                                            update, final
+                                        )
+                                    }
+                                )
                             }
                         }
                     }

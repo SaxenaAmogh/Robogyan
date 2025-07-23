@@ -538,5 +538,5 @@ fun ResourcesPage(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun ResourcesPagePreview() {
-    ResourcesPage(rememberNavController()) // Replace with actual NavController in real use
+    ResourcesPage(rememberNavController())
 }

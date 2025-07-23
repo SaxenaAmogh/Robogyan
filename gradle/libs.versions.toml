@@ -4,6 +4,7 @@ agp = "8.11.1"
 authKt = "3.2.1"
 coilCompose = "2.1.0"
 converterGson = "2.9.0"
+firebaseBom = "34.0.0"
 gotrueKt = "2.6.1"
 kotlin = "2.2.0"
 coreKtx = "1.15.0"
@@ -37,6 +38,7 @@ firebaseCrashlyticsBuildtools = "3.0.3"
 roomCompiler = "2.7.2"
 roomRuntime = "2.7.2"
 runtimeLivedata = "1.7.8"
+firebaseDatabaseKtx = "22.0.0"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -50,6 +52,9 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "authKt" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
 gotrue-kt = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "gotrueKt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -87,6 +92,7 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "authKt" }
 supabase-kt = { module = "io.github.jan-tennert.supabase:supabase-kt", version.ref = "authKt" }
+google-firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

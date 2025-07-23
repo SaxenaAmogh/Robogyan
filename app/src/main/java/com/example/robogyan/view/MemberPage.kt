@@ -305,97 +305,97 @@ fun MemberPage(navController: NavController) {
                                     color = if (!currentMember) PinkOne else PurpleOne
                                 )
                             }
-//                            else {
-//                                val filteredMembers = members
-//                                    .filter { memberx ->
-//                                        val isAlumni = memberx.is_alumni == true
-//
-//                                        if (currentMember) {
-//                                            // Show current members only (not alumni)
-//                                            !isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
-//                                        } else {
-//                                            // Show alumni only
-//                                            isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
-//                                        }
-//                                    }
-//                                    .sortedWith(compareBy { m ->
-//                                        when {
-//                                            currentMember && m.current_pos.equals("President", ignoreCase = true) -> 0
-//                                            currentMember && m.current_pos.equals("Vice President", ignoreCase = true) -> 1
-//                                            else -> 2
-//                                        }
-//                                    })
-//
-//                                filteredMembers.forEach() {
-//                                    Column(
-//                                        modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .clip(RoundedCornerShape(25.dp))
-//                                            .border(
-//                                                width = 2.dp,
-//                                                color = if (it.is_alumni == true) PinkOne else PurpleOne,
-//                                                shape = RoundedCornerShape(25.dp)
-//                                            )
-//                                            .padding(
-//                                                vertical = 0.01 * screenHeight,
-//                                                horizontal = 0.035 * screenWidth
-//                                            )
-//                                            .clickable {
-//                                                member = it
-//                                                showSheet = true
-//                                            }
-//                                    ) {
-//                                        Row(
-//                                            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
-//                                            verticalAlignment = Alignment.CenterVertically,
-//                                            horizontalArrangement = Arrangement.Start
-//                                        ) {
-//                                            AsyncImage(
-//                                                model = it.image,//it.image
-//                                                contentDescription = "Profile",
-//                                                modifier = Modifier
-//                                                    .clip(RoundedCornerShape(25.dp))
-//                                                    .size(130.dp)
-//                                            )
-//                                            Spacer(modifier = Modifier.size(0.04 * screenWidth))
-//                                            Box(
-//                                                modifier = Modifier.height(130.dp)
-//                                            ) {
-//                                                Column(
-//                                                    modifier = Modifier
-//                                                        .align(Alignment.CenterStart)
-//                                                        .fillMaxWidth()
-//                                                ) {
-//                                                    Text(
-//                                                        text = it.name,
-//                                                        fontFamily = latoFontFamily,
-//                                                        color = PrimaryText,
-//                                                        fontSize = 22.sp,
-//                                                        fontWeight = FontWeight.Bold,
-//                                                        modifier = Modifier
-//                                                    )
-//                                                    Text(
-//                                                        text = it.current_pos,
-//                                                        color = PrimaryColor,
-//                                                        fontFamily = latoFontFamily,
-//                                                        fontSize = 18.sp,
-//                                                        fontWeight = FontWeight.W500,
-//                                                    )
-//                                                    Text(
-//                                                        text = it.pos_period,
-//                                                        fontFamily = latoFontFamily,
-//                                                        color = Color.Gray,
-//                                                        fontSize = 16.sp,
-//                                                        fontWeight = FontWeight.W500,
-//                                                        modifier = Modifier
-//                                                    )
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                    Spacer(modifier = Modifier.size(0.02 * screenHeight))
-//                                }
-//                            }
+                            else {
+                                val filteredMembers = members
+                                    .filter { memberx ->
+                                        val isAlumni = memberx.is_alumni == true
+
+                                        if (currentMember) {
+                                            // Show current members only (not alumni)
+                                            !isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
+                                        } else {
+                                            // Show alumni only
+                                            isAlumni && memberx.name.contains(searchItem, ignoreCase = true)
+                                        }
+                                    }
+                                    .sortedWith(compareBy { m ->
+                                        when {
+                                            currentMember && m.current_pos.equals("President", ignoreCase = true) -> 0
+                                            currentMember && m.current_pos.equals("Vice President", ignoreCase = true) -> 1
+                                            else -> 2
+                                        }
+                                    })
+
+                                filteredMembers.forEach() {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(25.dp))
+                                            .border(
+                                                width = 2.dp,
+                                                color = if (it.is_alumni == true) PinkOne else PurpleOne,
+                                                shape = RoundedCornerShape(25.dp)
+                                            )
+                                            .padding(
+                                                vertical = 0.01 * screenHeight,
+                                                horizontal = 0.035 * screenWidth
+                                            )
+                                            .clickable {
+                                                member = it
+                                                showSheet = true
+                                            }
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Start
+                                        ) {
+                                            AsyncImage(
+                                                model = it.image,//it.image
+                                                contentDescription = "Profile",
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(25.dp))
+                                                    .size(130.dp)
+                                            )
+                                            Spacer(modifier = Modifier.size(0.04 * screenWidth))
+                                            Box(
+                                                modifier = Modifier.height(130.dp)
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .align(Alignment.CenterStart)
+                                                        .fillMaxWidth()
+                                                ) {
+                                                    Text(
+                                                        text = it.name,
+                                                        fontFamily = latoFontFamily,
+                                                        color = PrimaryText,
+                                                        fontSize = 22.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier
+                                                    )
+                                                    Text(
+                                                        text = it.current_pos,
+                                                        color = PrimaryColor,
+                                                        fontFamily = latoFontFamily,
+                                                        fontSize = 18.sp,
+                                                        fontWeight = FontWeight.W500,
+                                                    )
+                                                    Text(
+                                                        text = it.pos_period,
+                                                        fontFamily = latoFontFamily,
+                                                        color = Color.Gray,
+                                                        fontSize = 16.sp,
+                                                        fontWeight = FontWeight.W500,
+                                                        modifier = Modifier
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                                }
+                            }
                             Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.13 * screenHeight))
                         }
                     }

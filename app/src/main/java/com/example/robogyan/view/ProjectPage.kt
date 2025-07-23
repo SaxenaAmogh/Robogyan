@@ -409,110 +409,110 @@ fun ProjectPage(navController: NavController){
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                         Spacer(modifier = Modifier.size(6.dp))
-//                                        projectsData.forEach{ it->
-//                                            count += 1
-//                                            Row(
-//                                                modifier = Modifier
-//                                                    .fillMaxWidth()
-//                                                    .clickable(
-//                                                        onClick = {
-//                                                            if(isloggedin) {
-//                                                                navController.navigate("projectview/${it.id}")
-//                                                            }else{
-//                                                                Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
-//                                                            }
-//                                                        }
-//                                                    ),
-//                                                horizontalArrangement = Arrangement.SpaceBetween,
-//                                                verticalAlignment = Alignment.CenterVertically
-//                                            ) {
-//                                                Text(
-//                                                    text = it.name,
-//                                                    color = PrimaryColor,
-//                                                    fontSize = 16.sp,
-//                                                    fontFamily = latoFontFamily,
-//                                                    maxLines = 1,
-//                                                    overflow = TextOverflow.Ellipsis,
-//                                                    modifier = Modifier
-//                                                        .clickable(
-//                                                            onClick = {
-//                                                                if(isloggedin) {
-//                                                                    navController.navigate("projectview/${it.id}")
-//                                                                }else{
-//                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
-//                                                                }
-//                                                            }
-//                                                        )
-//                                                        .weight(0.37f)
-//                                                )
-//                                                for (member in members){
-//                                                    if (member.id == it.project_head) {
-//                                                        Text(
-//                                                            text = member.name,
-//                                                            color = SecondaryText,
-//                                                            fontSize = 16.sp,
-//                                                            fontFamily = latoFontFamily,
-//                                                            maxLines = 1,
-//                                                            overflow = TextOverflow.Ellipsis,
-//                                                            modifier = Modifier
-//                                                                .clickable(
-//                                                                    onClick = {
-//                                                                        if(isloggedin) {
-//                                                                            navController.navigate("projectview/${it.id}")
-//                                                                        }else{
-//                                                                            Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
-//                                                                        }
-//                                                                    }
-//                                                                )
-//                                                                .weight(0.2f)
-//                                                        )
-//                                                    }
-//                                                }
-//                                                Spacer(modifier = Modifier.size(4.dp))
-//                                                Box(
-//                                                    modifier = Modifier
-//                                                        .clickable(
-//                                                            onClick = {
-//                                                                if(isloggedin) {
-//                                                                    navController.navigate("projectview/${it.id}")
-//                                                                }else{
-//                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
-//                                                                }
-//                                                            }
-//                                                        )
-//                                                        .weight(0.27f)
-//                                                        .clip(RoundedCornerShape(16.dp))
-//                                                        .background(
-//                                                            if (it.status == "In Progress") Color(0xFF5C9DE5)
-//                                                            else if (it.status == "Completed") Color(0xFF009688)
-//                                                            else if (it.status == "On Hold") Color(0xFF5D5D5D)
-//                                                            else Color(0xFFC5453E)
-//                                                        )
-//                                                        .padding(horizontal = 6.dp, vertical = 2.dp),
-//                                                    contentAlignment = Alignment.Center
-//                                                ) {
-//                                                    Text(
-//                                                        text = it.status,
-//                                                        color =
-//                                                            if (it.status == "In Progress") Color(0xFFC9E3FF)
-//                                                            else if (it.status == "Completed") Color(0xFFC2FFF6)
-//                                                            else if (it.status == "On Hold") Color(0xFFCECECE)
-//                                                            else Color(0xFFFFDFDE),
-//                                                        fontSize = 15.sp,
-//                                                        fontFamily = latoFontFamily,
-//                                                    )
-//                                                }
-//                                            }
-//                                            if (count < projectsData.size){
-//                                                Spacer(modifier = Modifier.size(6.dp))
-//                                                HorizontalDivider(
-//                                                    color = Color(0xFF2D2D2D),
-//                                                    thickness = 1.dp,
-//                                                    modifier = Modifier.fillMaxWidth()
-//                                                )
-//                                                Spacer(modifier = Modifier.size(6.dp))
-//                                            }
-//                                        }
+                                        projectsData.forEach{ it->
+                                            count += 1
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable(
+                                                        onClick = {
+                                                            if(isloggedin) {
+                                                                navController.navigate("projectview/${it.id}")
+                                                            }else{
+                                                                Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                        }
+                                                    ),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(
+                                                    text = it.name,
+                                                    color = PrimaryColor,
+                                                    fontSize = 16.sp,
+                                                    fontFamily = latoFontFamily,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier
+                                                        .clickable(
+                                                            onClick = {
+                                                                if(isloggedin) {
+                                                                    navController.navigate("projectview/${it.id}")
+                                                                }else{
+                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            }
+                                                        )
+                                                        .weight(0.37f)
+                                                )
+                                                for (member in members){
+                                                    if (member.id == it.project_head) {
+                                                        Text(
+                                                            text = member.name,
+                                                            color = SecondaryText,
+                                                            fontSize = 16.sp,
+                                                            fontFamily = latoFontFamily,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier
+                                                                .clickable(
+                                                                    onClick = {
+                                                                        if(isloggedin) {
+                                                                            navController.navigate("projectview/${it.id}")
+                                                                        }else{
+                                                                            Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                        }
+                                                                    }
+                                                                )
+                                                                .weight(0.2f)
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.size(4.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clickable(
+                                                            onClick = {
+                                                                if(isloggedin) {
+                                                                    navController.navigate("projectview/${it.id}")
+                                                                }else{
+                                                                    Toast.makeText(context, "Login to view full details", Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            }
+                                                        )
+                                                        .weight(0.27f)
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .background(
+                                                            if (it.status == "In Progress") Color(0xFF5C9DE5)
+                                                            else if (it.status == "Completed") Color(0xFF009688)
+                                                            else if (it.status == "On Hold") Color(0xFF5D5D5D)
+                                                            else Color(0xFFC5453E)
+                                                        )
+                                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = it.status,
+                                                        color =
+                                                            if (it.status == "In Progress") Color(0xFFC9E3FF)
+                                                            else if (it.status == "Completed") Color(0xFFC2FFF6)
+                                                            else if (it.status == "On Hold") Color(0xFFCECECE)
+                                                            else Color(0xFFFFDFDE),
+                                                        fontSize = 15.sp,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                }
+                                            }
+                                            if (count < projectsData.size){
+                                                Spacer(modifier = Modifier.size(6.dp))
+                                                HorizontalDivider(
+                                                    color = Color(0xFF2D2D2D),
+                                                    thickness = 1.dp,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                                Spacer(modifier = Modifier.size(6.dp))
+                                            }
+                                        }
                                     }
                                 }
                             }
