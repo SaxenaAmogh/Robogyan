@@ -89,9 +89,9 @@ fun StartPage(navController: NavController) {
     )
 
     val memberViewModel: MemberViewModel = viewModel()
-    LaunchedEffect(Unit) {
-        AppDatabase.getDatabase(context)
-    }
+//    LaunchedEffect(Unit) {
+//        AppDatabase.getDatabase(context)
+//    }
 
     Scaffold(
         content = {

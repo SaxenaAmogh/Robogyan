@@ -106,11 +106,6 @@ fun HomePage(navController: NavHostController) {
     val context = LocalContext.current
 
     var door by remember { mutableStateOf(false) }
-//    val memberViewModel: MemberViewModel = viewModel()
-//    val members by memberViewModel.members.observeAsState(emptyList())
-//    val gateLogViewModel: GateLogsViewModel = viewModel()
-//    val gateLogs by gateLogViewModel.gateLogs.observeAsState(emptyList())
-//    val count = members.size
     val gateStatus by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
 

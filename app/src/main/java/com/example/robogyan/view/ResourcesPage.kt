@@ -41,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,22 +66,21 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.robogyan.R
-import com.example.robogyan.SupabaseClientProvider
-import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.Black
 import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
+import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.utils.SharedPrefManager
-import io.github.jan.supabase.auth.auth
+import com.example.robogyan.viewmodel.ResourceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -95,7 +95,6 @@ fun ResourcesPage(navController: NavController) {
     val focusManager = LocalFocusManager.current
 
     var searchItem by remember { mutableStateOf("") }
-//    var selectedOption by remember { mutableIntStateOf(0) }
     var type by remember { mutableStateOf("Videos") }
     var expanded by remember { mutableStateOf(false) }
     val resourceType = listOf("Videos", "Articles", "RG Docs", "Others")
@@ -107,173 +106,124 @@ fun ResourcesPage(navController: NavController) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
 
+    val resourcesViewModel: ResourceViewModel = viewModel()
+    val resourcesData by resourcesViewModel.resourcesFlow.collectAsState()
 
     @Composable
-    fun VideoCard(it: Int) {
+    fun VideoCard() {
+        val vidFilter = resourcesData
+            .filter {
+                it.type == "Video" && it.title.contains(searchItem, ignoreCase = true)
+            }
 
-        // Sample data for the Videos
-        val author = listOf(
-            "Robogyan",
-            "Robogyan",
-            "Robogyan",
-            "Lucca's Lab",
-            "Philipp Lackner"
-        )
-        val vidId = listOf(
-            "pFs2D4jG9EA",
-            "zhtq2LWRuQU",
-            "hAqVLvpYXHw",
-            "UuxBfKA3U5M",
-            "_tqvevHzom0"
-        )
-        val vidLink = listOf(
-            "https://www.youtube.com/watch?v=pFs2D4jG9EA",
-            "https://www.youtube.com/watch?v=zhtq2LWRuQU",
-            "https://www.youtube.com/watch?v=hAqVLvpYXHw",
-            "https://www.youtube.com/watch?v=UuxBfKA3U5M",
-            "https://www.youtube.com/watch?v=_tqvevHzom0"
-        )
-        val desc = listOf(
-            "This video showcases the design process of the PCB (Printed Circuit Board) used in various robotics projects.",
-            "This video demonstrates the construction and flight of a remote-controlled airplane designed by Robogyan.",
-            "This video introduces the ADR project by Robogyan, highlighting its features and capabilities.",
-            "This video that covers the basics of using the ESP32 microcontroller for IoT projects, including setup and programming.",
-            "Android Dev Roadmap 2025 is a video that outlines the future trends and technologies in Android development, providing insights for developers."
-        )
-        val title = listOf(
-            "RCB Designing",
-            "RC plane (THE ROBOGYAN)",
-            "ADR - THE ROBOGYAN (1)",
-            "ESP32 101",
-            "Android Dev Roadmap 2025"
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .border(
-                    width = 0.5.dp,
-                    color = Color(0xFF2D2D2D),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .background(SecondaryColor)
-                .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, vidLink[it].toUri())
-                    context.startActivity(intent)
-                },
-        ) {
-            AsyncImage(
-                model = "https://img.youtube.com/vi/${vidId[it]}/hqdefault.jpg",
-                contentDescription = "YouTube Thumbnail",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(200.dp)
-            )
+        vidFilter.forEach { it ->
             Column(
                 modifier = Modifier
-                    .padding(
-                        vertical = 10.dp,
-                        horizontal = 14.dp
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        width = 0.5.dp,
+                        color = Color(0xFF2D2D2D),
+                        shape = RoundedCornerShape(16.dp)
                     )
+                    .background(SecondaryColor)
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, it.resource_url.toUri())
+                        context.startActivity(intent)
+                    },
             ) {
-                Text(
-                    text = title[it],
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    maxLines = 1,
-                    color = PrimaryText,
-                    overflow = TextOverflow.Ellipsis
+                AsyncImage(
+                    model = it.image,
+                    contentDescription = "YouTube Thumbnail",
+                    error = painterResource(R.drawable.unav),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(200.dp)
                 )
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(
-                    text = "By - ${author[it]}",
-                    fontWeight = FontWeight.W500,
-                    fontSize = 16.sp,
-                    color = PrimaryColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(
-                    text = desc[it],
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                    color = SecondaryText,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            vertical = 10.dp,
+                            horizontal = 14.dp
+                        )
+                ) {
+                    Text(
+                        text = it.title,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        maxLines = 1,
+                        color = PrimaryText,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    it.description?.let { it1 ->
+                        Text(
+                            text = it1,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                            color = SecondaryText,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
+            Spacer(modifier = Modifier.height(0.015 * screenHeight))
         }
     }
 
     @Composable
-    fun ArticleCard(it: Int){
+    fun ArticleCard(){
+        val articleFilter = resourcesData
+            .filter {
+                it.type == "Article" && it.title.contains(searchItem, ignoreCase = true)
+            }
 
-        // Sample data for Articles
-        val articleNames = listOf(
-            "What Is Machine Learning? Definition, Types, Applications, and Trends",
-            "What Does Fabrication Mean In Engineering?",
-            "What is the Future of AI in Robotics?",
-            "ESP32 with MFRC522 RFID Reader/Writer",
-            "Getting Started with ESP32",
-        )
-        val articleLinks = listOf(
-            "https://www.spiceworks.com/tech/artificial-intelligence/articles/what-is-ml/",
-            "https://lindstromgroup.com/uk/article/what-does-fabrication-mean-in-engineering/",
-            "https://www.azorobotics.com/Article.aspx?ArticleID=700",
-            "https://randomnerdtutorials.com/esp32-mfrc522-rfid-reader-arduino/",
-            "https://lastminuteengineers.com/getting-started-with-esp32/"
-        )
-        val articleImages = listOf(
-            "https://zd-brightspot.s3.us-east-1.amazonaws.com/wp-content/uploads/2022/04/04094802/4-12-1-e1715637495321.png",
-            "https://lindstrom-sites.s3.eu-north-1.amazonaws.com/wp-content/uploads/sites/10/2022/05/daniel-smyth-njf81CyLZEQ-unsplash-scaled-1.jpg",
-            "https://www.azorobotics.com/image-handler/ts/20240707083133/ri/950/src/images/Article_Images/ImageForArticle_700_17203986828779069.jpg",
-            "https://i0.wp.com/randomnerdtutorials.com/wp-content/uploads/2024/11/ESP32-RFID-Reader-Writer-Tutorial.jpg?resize=1536%2C864&quality=100&strip=all&ssl=1",
-            "https://lastminuteengineers.com/wp-content/uploads/featuredimages/Tutorial-for-Getting-Started-with-the-ESP32.webp"
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .border(
-                    width = 0.5.dp,
-                    color = Color(0xFF2D2D2D),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .background(SecondaryColor)
-                .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW,
-                        articleLinks[it].toUri())
-                    context.startActivity(intent)
-                },
-        ) {
-            AsyncImage(
-                model = articleImages[it],
-                contentDescription = "YouTube Thumbnail",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(200.dp)
-            )
+        articleFilter.forEach { it ->
             Column(
                 modifier = Modifier
-                    .padding(
-                        vertical = 10.dp,
-                        horizontal = 14.dp
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(
+                        width = 0.5.dp,
+                        color = Color(0xFF2D2D2D),
+                        shape = RoundedCornerShape(16.dp)
                     )
+                    .background(SecondaryColor)
+                    .clickable {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            it.resource_url.toUri()
+                        )
+                        context.startActivity(intent)
+                    },
             ) {
-                Text(
-                    text = articleNames[it],
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    maxLines = 2,
-                    color = PrimaryText,
-                    overflow = TextOverflow.Ellipsis
+                AsyncImage(
+                    model = it.image,
+                    contentDescription = "YouTube Thumbnail",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(200.dp)
                 )
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            vertical = 10.dp,
+                            horizontal = 14.dp
+                        )
+                ) {
+                    Text(
+                        text = it.title,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        maxLines = 2,
+                        color = PrimaryText,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
+            Spacer(modifier = Modifier.size(0.015 * screenHeight))
         }
-        Spacer(modifier = Modifier.size(0.015 * screenHeight))
     }
 
     Scaffold(
@@ -456,14 +406,9 @@ fun ResourcesPage(navController: NavController) {
                         }
                         item{
                             if (type == "Videos"){
-                                repeat(5){
-                                    VideoCard(it)
-                                    Spacer(modifier = Modifier.size(0.015 * screenHeight))
-                                }
+                                VideoCard()
                             }else if (type == "Articles") {
-                                repeat(5) {
-                                    ArticleCard(it)
-                                }
+                                ArticleCard()
                             }
                             Spacer(modifier = Modifier.size(0.09 * screenHeight))
                         }

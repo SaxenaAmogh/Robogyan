@@ -8,14 +8,16 @@ import com.example.robogyan.data.local.dao.AllMembersDao
 import com.example.robogyan.data.local.dao.InventoryDao
 import com.example.robogyan.data.local.dao.MemberDao
 import com.example.robogyan.data.local.dao.ProjectsDao
+import com.example.robogyan.data.local.dao.ResourcesDao
 import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.Inventory
 import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.data.local.entities.Projects
+import com.example.robogyan.data.local.entities.Resources
 
 @Database(
-    entities = [MemberData::class, AllMembers::class, Inventory::class, Projects::class],
-    version = 5,
+    entities = [MemberData::class, AllMembers::class, Inventory::class, Projects::class, Resources::class],
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -27,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun allMembersDao(): AllMembersDao
     abstract fun inventoryDao(): InventoryDao
     abstract fun projectsDao(): ProjectsDao
+    abstract fun resourcesDao(): ResourcesDao
 
     companion object {
         // @Volatile annotation ensures that INSTANCE is always up-to-date and visible to all threads.
