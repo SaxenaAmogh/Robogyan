@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -59,6 +60,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -132,6 +134,10 @@ fun MemberPage(navController: NavController) {
     if (windowInsetsController != null) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
+    val userId: String = SupabaseClientProvider.client.auth.currentUserOrNull()!!.id
+    val memberFlow: Flow<MemberData?> =
+        AppDatabase.getDatabase(context).memberDao().getMemberById(userId)
+    val loggedMember by memberFlow.collectAsState(initial = null)
 
     Scaffold(
         content = { innerPadding ->
@@ -331,48 +337,58 @@ fun MemberPage(navController: NavController) {
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(25.dp))
-                                            .border(
-                                                width = 2.dp,
-                                                color = if (it.is_alumni == true) PinkOne else PurpleOne,
-                                                shape = RoundedCornerShape(25.dp)
-                                            )
+//                                            .border(
+//                                                width = 2.dp,
+//                                                color = if (it.is_alumni == true) PinkOne else PurpleOne,
+//                                                shape = RoundedCornerShape(25.dp)
+//                                            )
                                             .padding(
                                                 vertical = 0.01 * screenHeight,
-                                                horizontal = 0.035 * screenWidth
                                             )
                                             .clickable {
                                                 member = it
                                                 showSheet = true
                                             }
+                                            .background(
+                                                shape = RoundedCornerShape(25.dp),
+                                                color = SecondaryColor)
                                     ) {
                                         Row(
-                                            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    vertical = 0.02 * screenHeight,
+                                                    horizontal = 0.035 * screenWidth
+                                                ),
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.Start
                                         ) {
                                             AsyncImage(
-                                                model = it.image,//it.image
+                                                model = R.drawable.mee,//it.image
                                                 contentDescription = "Profile",
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(25.dp))
                                                     .size(130.dp)
+                                                    .weight(0.3f),
+                                                contentScale = ContentScale.Crop
                                             )
                                             Spacer(modifier = Modifier.size(0.04 * screenWidth))
                                             Box(
                                                 modifier = Modifier.height(130.dp)
+                                                    .weight(0.36f)
                                             ) {
                                                 Column(
                                                     modifier = Modifier
                                                         .align(Alignment.CenterStart)
-                                                        .fillMaxWidth()
                                                 ) {
                                                     Text(
                                                         text = it.name,
                                                         fontFamily = latoFontFamily,
-                                                        color = PrimaryText,
+                                                        color = if (it.is_alumni == true) PinkOne else PurpleOne,
                                                         fontSize = 22.sp,
                                                         fontWeight = FontWeight.Bold,
-                                                        modifier = Modifier
+                                                        overflow = TextOverflow.Ellipsis,
+                                                        maxLines = 1
                                                     )
                                                     Text(
                                                         text = it.current_pos,
@@ -391,9 +407,33 @@ fun MemberPage(navController: NavController) {
                                                     )
                                                 }
                                             }
+                                            Spacer(modifier = Modifier.size(0.04 * screenWidth))
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.edit),
+                                                contentDescription = "arrow",
+                                                modifier = Modifier
+                                                    .weight(0.1f)
+                                                    .size(26.dp)
+                                                    .align(Alignment.Top)
+                                                    .clickable(
+                                                        onClick = {
+                                                            if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
+                                                                navController.navigate("updateMember/${it.id}")
+//                                                                Log.e("&&&IDeRROR", it.id)
+                                                            } else {
+                                                                Toast.makeText(context, "You don't have permission to edit members", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                        }
+                                                    ),
+                                                tint = if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
+                                                    Color.Gray
+                                                } else{
+                                                    Color.Transparent
+                                                }
+                                            )
                                         }
                                     }
-                                    Spacer(modifier = Modifier.size(0.02 * screenHeight))
+                                    Spacer(modifier = Modifier.size(0.00 * screenHeight))
                                 }
                             }
                             Spacer(modifier = Modifier.size(innerPadding.calculateBottomPadding() + 0.13 * screenHeight))
@@ -454,6 +494,32 @@ fun MemberPage(navController: NavController) {
                                             )
                                     )
                                     Spacer(modifier = Modifier.size(0.015 * screenHeight))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                horizontal = 0.035 * screenWidth
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "Name",
+                                            color = Color.Gray,
+                                            fontFamily = latoFontFamily,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.W500,
+                                            textDecoration = TextDecoration.Underline,
+                                        )
+                                        Text(
+                                            text = " : ${member.name}",
+                                            color = PrimaryColor,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.W500,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.size(0.005 * screenHeight))
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -662,7 +728,7 @@ fun MemberPage(navController: NavController) {
                                         .clip(RoundedCornerShape(25.dp))
                                         .size(45.dp)
                                         .background(
-                                            color = Color(0xFFF5D867),
+                                            color = Color(0xFF3872D9),
                                             shape = RoundedCornerShape(50)
                                         )
                                 ) {

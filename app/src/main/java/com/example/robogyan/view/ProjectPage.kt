@@ -71,6 +71,7 @@ import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.GunmetalGray
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.PrimaryText
+import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
@@ -169,7 +170,6 @@ fun ProjectPage(navController: NavController){
                             Spacer(modifier = Modifier.size(0.02 * screenHeight))
                         }
                         item {
-
                             OutlinedTextField(
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
                                     focusedBorderColor = PrimaryText,
@@ -185,7 +185,7 @@ fun ProjectPage(navController: NavController){
                                         modifier = Modifier.size(22.dp),
                                         painter = painterResource(id = R.drawable.search),
                                         contentDescription = "search",
-                                        tint = PinkOne
+                                        tint = PurpleOne
                                     )
                                 },
                                 keyboardActions = KeyboardActions(
@@ -252,7 +252,7 @@ fun ProjectPage(navController: NavController){
                                                 painter = painterResource(R.drawable.ongoing),
                                                 contentDescription = "members",
                                                 modifier = Modifier.size(40.dp),
-                                                tint = PinkOne
+                                                tint = Color(0xFF5C9DE5)
                                             )
                                             Spacer(modifier = Modifier.size(10.dp))
                                             Text(
@@ -266,7 +266,7 @@ fun ProjectPage(navController: NavController){
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Ongoing",
-                                            color = PrimaryText,
+                                            color = Color.White,
                                             fontSize = 24.sp,
                                             fontFamily = latoFontFamily,
                                         )
@@ -301,7 +301,7 @@ fun ProjectPage(navController: NavController){
                                                 painter = painterResource(R.drawable.completed),
                                                 contentDescription = "members",
                                                 modifier = Modifier.size(40.dp),
-                                                tint = PinkOne
+                                                tint = Color(0xFF009688)
                                             )
                                             Spacer(modifier = Modifier.size(10.dp))
                                             Text(
@@ -315,7 +315,7 @@ fun ProjectPage(navController: NavController){
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
                                             text = "Completed",
-                                            color = PrimaryText,
+                                            color = Color.White,
                                             fontSize = 24.sp,
                                             fontFamily = latoFontFamily,
                                         )

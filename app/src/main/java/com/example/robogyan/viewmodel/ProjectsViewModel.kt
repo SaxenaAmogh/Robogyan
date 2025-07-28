@@ -6,7 +6,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.MemberUpdateData
+import com.example.robogyan.data.local.entities.ProjectUpdateData
 import com.example.robogyan.data.local.entities.Projects
+import com.example.robogyan.utils.SharedPrefManager
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
@@ -98,6 +101,61 @@ class ProjectsViewModel(application: Application) : AndroidViewModel(application
             Log.d("@@SupabaseInsert", "Project inserted: $result")
         }
 
+    }
+
+    fun updateProject(
+        id: Int,
+        name: String,
+        project_head: String,
+        status: String,
+        github_link: String,
+        pdf_link: String,
+        category: String,
+        description: String,
+        start_date: String,
+        completion_date: String,
+        money_spent: Float,
+        team: String,
+        components: String,
+    ){
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val isLoggedIn = SharedPrefManager.isLoggedIn(getApplication())
+                if (isLoggedIn) {
+                    val tableName = "projects"
+                    val updateData = ProjectUpdateData(
+                        name = name,
+                        project_head = project_head,
+                        status = status,
+                        github_link = github_link,
+                        pdf_link = pdf_link,
+                        category = category,
+                        description = description,
+                        start_date = start_date,
+                        completion_date = completion_date,
+                        money_spent = money_spent,
+                        team = team,
+                        components = components
+                    )
+                    val result = supabase
+                        .postgrest[tableName]
+                        .update(updateData) {
+                            filter {
+                                eq("id", id)
+                            }
+                        }
+                    Log.e("@@MemberProject", "updateProject: $result && $updateData")
+                } else {
+                    Log.d("Update Project", "Task aborted for Guest User.")
+                }
+            } catch (e: Exception) {
+                Log.e("@@Error", "updateProject: $e")
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 
     private val dao = AppDatabase.getDatabase(application).projectsDao()

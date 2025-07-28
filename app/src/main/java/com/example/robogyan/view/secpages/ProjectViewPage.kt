@@ -3,6 +3,7 @@ package com.example.robogyan.view.secpages
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,9 +51,11 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.Inventory
+import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.data.local.entities.Projects
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.BackgroundColor
@@ -62,6 +65,7 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -87,6 +91,10 @@ fun ProjectViewPage(navController: NavController, projectId: Int){
     val allMemberFlow: Flow<List<AllMembers>> =
         AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
     val members by allMemberFlow.collectAsState(initial = emptyList())
+    val userId: String = SupabaseClientProvider.client.auth.currentUserOrNull()!!.id
+    val memberFlow: Flow<MemberData?> =
+        AppDatabase.getDatabase(context).memberDao().getMemberById(userId)
+    val loggedMember by memberFlow.collectAsState(initial = null)
 
     Scaffold(
         content = {
@@ -427,6 +435,11 @@ fun ProjectViewPage(navController: NavController, projectId: Int){
                         item {
                             FloatingActionButton(
                                 onClick = {
+                                    if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
+                                        navController.navigate("editProjects/${projectId}")
+                                    } else {
+                                        Toast.makeText(context, "You don't have permission to edit projects", Toast.LENGTH_SHORT).show()
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()

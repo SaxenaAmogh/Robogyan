@@ -12,14 +12,16 @@ import com.example.robogyan.view.secpages.AddAssetPage
 import com.example.robogyan.view.secpages.AddProjectPage
 import com.example.robogyan.view.secpages.AssetViewPage
 import com.example.robogyan.view.secpages.ProjectViewPage
+import com.example.robogyan.view.secpages.UpdateMemberPage
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "splash",
+        startDestination = "splash"
     ){
+
         //start pages
         composable("splash"){
             SplashScreen(navController)
@@ -52,15 +54,15 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         //secondary pages
+        composable("addasset"){
+            AddAssetPage(navController)
+        }
         composable(
             route = "assetview/{assetId}",
             arguments = listOf(navArgument("assetId") { type = NavType.IntType })
         ) { backStackEntry ->
             val assetId = backStackEntry.arguments?.getInt("assetId") ?: 0
             AssetViewPage(navController, assetId)
-        }
-        composable("addasset"){
-            AddAssetPage(navController)
         }
         composable(
             route = "projectview/{projectId}",
@@ -69,8 +71,19 @@ fun AppNavigation(navController: NavHostController) {
             val projectId = backStackEntry.arguments?.getInt("projectId") ?: 0
             ProjectViewPage(navController, projectId)
         }
-        composable("addProject"){
-            AddProjectPage(navController)
+        composable(
+            route = "editProjects/{projectId}",
+            arguments = listOf(navArgument("projectId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getInt("projectId") ?: 0
+            AddProjectPage(navController, projectId)
+        }
+        composable(
+            route = "updateMember/{memberId}",
+            arguments = listOf(navArgument("memberId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val memberId = backStackEntry.arguments?.getString("memberId") ?: ""
+            UpdateMemberPage(navController, memberId)
         }
     }
 }

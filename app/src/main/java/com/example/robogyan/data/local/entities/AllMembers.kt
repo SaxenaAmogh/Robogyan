@@ -7,8 +7,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "all_members_table")
 @Serializable
 data class AllMembers(
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey val id: String,
     val name: String,
     val enrollment: String? = null,
     val email: String,

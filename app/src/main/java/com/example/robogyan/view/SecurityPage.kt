@@ -448,7 +448,7 @@ fun SecurityPage(navController: NavController) {
                                                 ) {
                                                     Text(
                                                         text = it.available.toString(),
-                                                        color = PinkOne,
+                                                        color = PrimaryText,
                                                         fontSize = 18.sp,
                                                         fontFamily = latoFontFamily,
                                                         fontWeight = FontWeight.Bold,
@@ -468,7 +468,7 @@ fun SecurityPage(navController: NavController) {
                                                 Icon(
                                                     Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                                     contentDescription = "View Details",
-                                                    tint = PurpleOne,
+                                                    tint = Color.Gray,
                                                     modifier = Modifier
                                                         .size(28.dp)
                                                         .weight(0.1f)

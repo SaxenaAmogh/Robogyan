@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import com.example.robogyan.data.local.entities.AllMembers
 import com.example.robogyan.data.local.entities.Inventory
 import com.example.robogyan.data.local.entities.Projects
 import kotlinx.coroutines.flow.Flow
@@ -26,4 +28,6 @@ interface ProjectsDao {
     @Query("SELECT COUNT(*) FROM projects_table")
     suspend fun getProjectsCount(): Int
 
+    @Update
+    suspend fun updateProject(member: Projects): Int
 }

@@ -74,12 +74,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.AllMembers
+import com.example.robogyan.data.local.entities.Projects
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.ProjectsViewModel
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
@@ -89,7 +91,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddProjectPage(navController: NavController){
+fun AddProjectPage(navController: NavController, projectId: Int){
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -111,7 +113,6 @@ fun AddProjectPage(navController: NavController){
     var components by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
-    val headOptions = listOf("Amogh", "Macle", "Ayush")
     var expanded2 by remember { mutableStateOf(false) }
     val statusOptions = listOf("In Progress", "Completed", "On Hold", "Abandoned")
     var expanded3 by remember { mutableStateOf(false) }
@@ -131,18 +132,31 @@ fun AddProjectPage(navController: NavController){
     val members by allMemberFlow.collectAsState(initial = emptyList())
     val projectViewModel: ProjectsViewModel = viewModel()
     var fetch by remember { mutableStateOf(false) }
+    val db = FirebaseDatabase.getInstance().getReference("DbUpdate")
+    val projectFlow: Flow<Projects?> =
+        AppDatabase.getDatabase(context).projectsDao().getProjectById(projectId)
+    val currentProject by projectFlow.collectAsState(initial = null)
 
-    LaunchedEffect(Unit) {
-        if (fetch){
-            delay(200)
-            projectViewModel.fetchProjects()
-        }
+    if (currentProject != null && projectId!=0) {
+        name = currentProject!!.name
+        head = currentProject!!.project_head
+        status = currentProject!!.status
+        github = currentProject!!.github_link.toString()
+        pdf = currentProject!!.pdf_link.toString()
+        category = currentProject!!.category
+        description = currentProject!!.description
+        start = currentProject!!.start_date
+        complete = currentProject!!.completion_date ?: ""
+        moneySpent = currentProject!!.money_spent.toString()
+        team = currentProject!!.team
+        components = currentProject!!.components.toString()
     }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DatePickerModal(
-        onDateSelected: (String) -> Unit, // Now directly returns formatted date string
+        onDateSelected: (String) -> Unit,
         onDismiss: () -> Unit
     ) {
         val datePickerState = rememberDatePickerState()
@@ -376,7 +390,7 @@ fun AddProjectPage(navController: NavController){
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "Project Desctiption",
+                                    text = "Project Description",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -898,23 +912,48 @@ fun AddProjectPage(navController: NavController){
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 FloatingActionButton(
                                     onClick = {
-                                        projectViewModel.addNewProject(
-                                            name = name,
-                                            project_head = head,
-                                            status = status,
-                                            github_link = github,
-                                            pdf_link = pdf,
-                                            category = category,
-                                            description = description,
-                                            start_date = start,
-                                            completion_date = complete,
-                                            money_spent = moneySpent,
-                                            team = team,
-                                            components = components
-                                        )
-                                        Toast.makeText(context, "Project Added", Toast.LENGTH_SHORT).show()
-                                        fetch = true
-                                        navController.popBackStack()
+                                        if (projectId==0){
+                                            projectViewModel.addNewProject(
+                                                name = name,
+                                                project_head = head,
+                                                status = status,
+                                                github_link = github,
+                                                pdf_link = pdf,
+                                                category = category,
+                                                description = description,
+                                                start_date = start,
+                                                completion_date = complete,
+                                                money_spent = moneySpent,
+                                                team = team,
+                                                components = components
+                                            )
+                                            Toast.makeText(context, "Project Added", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("home") {
+                                                popUpTo("home") { inclusive = true }
+                                            }
+                                        }else{
+                                            projectViewModel.updateProject(
+                                                id = projectId,
+                                                name = name,
+                                                project_head = head,
+                                                status = status,
+                                                github_link = github,
+                                                pdf_link = pdf,
+                                                category = category,
+                                                description = description,
+                                                start_date = start,
+                                                completion_date = complete,
+                                                money_spent = moneySpent.toFloat(),
+                                                team = team,
+                                                components = components
+                                            )
+                                            db.child("projectId").setValue(projectId)
+                                            db.child("projectUpdated").setValue(true)
+                                            Toast.makeText(context, "Project Updated", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("home") {
+                                                popUpTo("home") { inclusive = true }
+                                            }
+                                        }
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth(),
@@ -942,11 +981,10 @@ fun AddProjectPage(navController: NavController){
             }
         }
     )
-
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AddPagePreview(){
-    AddProjectPage(rememberNavController())
+    AddProjectPage(rememberNavController(), 0)
 }

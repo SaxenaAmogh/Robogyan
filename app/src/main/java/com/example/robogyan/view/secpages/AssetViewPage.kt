@@ -171,7 +171,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                     Icon(
                                         painter = painterResource(R.drawable.unav),
                                         contentDescription = "Asset Image",
-                                        tint = PrimaryText,
+                                        tint = Color.Gray,
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
                                             .padding(horizontal = 12.dp)
@@ -210,7 +210,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                     asset?.let {
                                         Text(
                                             text = it.name,
-                                            color = PurpleOne,
+                                            color = Color.White,
                                             fontSize = 28.sp,
                                             fontFamily = latoFontFamily,
                                             fontWeight = FontWeight.Bold,
@@ -271,8 +271,8 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                                         modifier = Modifier
                                                     )
                                                     Text(
-                                                        text = "${it.quantity.toString()} Units",
-                                                        color = PrimaryText,
+                                                        text = "${it.quantity} Units",
+                                                        color = PurpleOne,
                                                         fontSize = 19.sp,
                                                         fontFamily = latoFontFamily,
                                                     )

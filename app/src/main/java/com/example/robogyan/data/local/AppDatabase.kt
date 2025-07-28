@@ -16,8 +16,8 @@ import com.example.robogyan.data.local.entities.Projects
 import com.example.robogyan.data.local.entities.Resources
 
 @Database(
-    entities = [MemberData::class, AllMembers::class, Inventory::class, Projects::class, Resources::class],
-    version = 7,
+    entities = [MemberData::class, AllMembers::class, Inventory::class, Resources::class, Projects::class],
+    version = 7, // Increment this version when you change the database schema
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -30,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun inventoryDao(): InventoryDao
     abstract fun projectsDao(): ProjectsDao
     abstract fun resourcesDao(): ResourcesDao
+
 
     companion object {
         // @Volatile annotation ensures that INSTANCE is always up-to-date and visible to all threads.
@@ -51,7 +52,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "robogyan_database" // The name of your database file
                 )
-                    // .fallbackToDestructiveMigration() // Optional: Destroys database on version mismatch
+//                    .fallbackToDestructiveMigration(true) // Optional: Destroys database on version mismatch
                     // If you change the database schema (e.g., add a column, change a table name),
                     // you must increment the version number. For production, you'd implement
                     // proper migrations instead of fallbackToDestructiveMigration().

@@ -7,11 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.AllMembers
+import com.example.robogyan.data.local.entities.MemberUpdateData
+import com.example.robogyan.utils.SharedPrefManager
+import com.google.firebase.database.FirebaseDatabase
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MemberViewModel(application: Application) : AndroidViewModel(application) {
@@ -69,5 +74,59 @@ class MemberViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
+
+    fun updateMember(
+        id: String,
+        name: String,
+        enrollment: String,
+        email: String,
+        mobile: String,
+        batch: String,
+        currentPos: String,
+        posPeriod: String,
+        isAlumni: Boolean,
+        labAccess: Boolean,
+        clearance: String,
+        image: String,
+    ){
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val isLoggedIn = SharedPrefManager.isLoggedIn(getApplication())
+                if (isLoggedIn) {
+                    val tableName = "members"
+                    val updateData = MemberUpdateData(
+                        name = name,
+                        enrollment = enrollment,
+                        email = email,
+                        mobile = mobile,
+                        batch = batch,
+                        current_pos = currentPos,
+                        pos_period = posPeriod,
+                        is_alumni = isAlumni,
+                        lab_access = labAccess,
+                        clearance = clearance,
+                        image = image
+                    )
+                    val result = supabase
+                        .postgrest[tableName]
+                        .update(updateData) {
+                            filter {
+                                eq("id", id)
+                            }
+                        }
+                    Log.e("@@MemberUpdate", "updateMember: $result")
+                } else {
+                    Log.d("Update Member", "Task aborted for Guest User.")
+                }
+            } catch (e: Exception) {
+                Log.e("@@Error", "updateMember: $e")
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 }
 
