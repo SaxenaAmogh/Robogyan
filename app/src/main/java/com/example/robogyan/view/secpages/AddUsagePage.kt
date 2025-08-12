@@ -65,6 +65,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,6 +114,10 @@ fun AddUsagePage(navController: NavController, assetId: Int, usageId: Int) {
 
     var expanded by remember { mutableStateOf(false) }
     var expanded2 by remember { mutableStateOf(false) }
+
+    var expanded3 by remember { mutableStateOf(false) }
+    val statuses = listOf("In Use", "Returned", "Lost/Damaged")
+
     var showDatePicker by remember { mutableStateOf(false) }
 
     val view = LocalView.current
@@ -291,7 +296,7 @@ fun AddUsagePage(navController: NavController, assetId: Int, usageId: Int) {
                                             value = name,
                                             onValueChange = { name = it },
                                             readOnly = true,
-                                            placeholder = { Text("Select Project Head") },
+                                            placeholder = { Text("Select Granted to") },
                                             modifier = Modifier
                                                 .menuAnchor()
                                                 .fillMaxWidth(),
@@ -573,32 +578,80 @@ fun AddUsagePage(navController: NavController, assetId: Int, usageId: Int) {
                                             modifier = Modifier
                                                 .padding(start = 8.dp)
                                         )
-                                        OutlinedTextField(
+                                        Box(
                                             modifier = Modifier
-                                                .height(0.063 * screenHeight),
-                                            shape = RoundedCornerShape(size = 16.dp),
-                                            placeholder = {
-                                                Text(
-                                                    "Select Status",
-                                                    fontFamily = latoFontFamily,
-                                                    color = Color(0xFFB2B2B2),
+                                                .fillMaxWidth()
+                                        ) {
+                                            ExposedDropdownMenuBox(
+                                                expanded = expanded3,
+                                                onExpandedChange = { expanded3 = it },
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                OutlinedTextField(
+                                                    value = status,
+                                                    onValueChange = { status = it },
+                                                    readOnly = true,
+                                                    placeholder = { Text("Select Status") },
+                                                    modifier = Modifier
+                                                        .menuAnchor()
+                                                        .fillMaxWidth(),
+                                                    trailingIcon = {
+                                                        Icon(
+                                                            Icons.Default.ArrowDropDown,
+                                                            contentDescription = "Dropdown"
+                                                        )
+                                                    },
+                                                    shape = RoundedCornerShape(16.dp),
+                                                    colors = OutlinedTextFieldDefaults.colors(
+                                                        focusedBorderColor = PurpleOne,
+                                                        unfocusedBorderColor = Color(0x66ABABAB),
+                                                        focusedTextColor = Color(0xFFFFFFFF),
+                                                        unfocusedTextColor = Color(0xFFFFFFFF),
+                                                        unfocusedContainerColor = Color(0x14ABABAB),
+                                                        focusedContainerColor = Color(0x14ABABAB)
+                                                    )
                                                 )
-                                            },
-                                            keyboardOptions = KeyboardOptions(
-                                                keyboardType = KeyboardType.Number
-                                            ),
-                                            value = status,
-                                            onValueChange = { status = it },
-                                            singleLine = true,
-                                            colors = OutlinedTextFieldDefaults.colors(
-                                                focusedBorderColor = PurpleOne,
-                                                unfocusedBorderColor = Color(0x66ABABAB),
-                                                focusedTextColor = Color(0xFFFFFFFF),
-                                                unfocusedTextColor = Color(0xFFFFFFFF),
-                                                unfocusedContainerColor = Color(0x14ABABAB),
-                                                focusedContainerColor = Color(0x14ABABAB)
-                                            )
-                                        )
+                                                ExposedDropdownMenu(
+                                                    expanded = expanded3,
+                                                    onDismissRequest = { expanded3 = false },
+                                                    modifier = Modifier
+                                                        .background(Color(0xFFFFFFFF)),
+                                                ) {
+                                                    statuses.forEach { item ->
+                                                        DropdownMenuItem(
+                                                            colors = MenuItemColors(
+                                                                textColor = Color.Black,
+                                                                leadingIconColor = Color.Transparent,
+                                                                trailingIconColor = Color.Transparent,
+                                                                disabledTextColor = Color.Transparent,
+                                                                disabledLeadingIconColor = Color.Transparent,
+                                                                disabledTrailingIconColor = Color.Transparent,
+                                                            ),
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .background(Color.White),
+                                                            text = {
+                                                                Text(
+                                                                    text = item,
+                                                                    maxLines = 1,
+                                                                    overflow = TextOverflow.Ellipsis,
+                                                                    fontFamily = latoFontFamily,
+                                                                    fontSize = 16.sp,
+                                                                    modifier = Modifier
+                                                                        .fillMaxWidth(),
+                                                                    textAlign = TextAlign.Center
+                                                                )
+                                                            },
+                                                            onClick = {
+                                                                status = item
+                                                                focusManager.clearFocus()
+                                                                expanded3 = false
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
@@ -635,7 +688,7 @@ fun AddUsagePage(navController: NavController, assetId: Int, usageId: Int) {
                                         )
                                 ) {
                                     Text(
-                                        text = if (returnDate.isEmpty()) "yyyy-mm-dd" else returnDate,
+                                        text = returnDate.ifEmpty { "dd/mm/yyyy" },
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .align(Alignment.CenterStart),

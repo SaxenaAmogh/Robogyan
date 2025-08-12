@@ -2,6 +2,7 @@ package com.example.robogyan.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -409,8 +410,7 @@ fun ProjectPage(navController: NavController){
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                         Spacer(modifier = Modifier.size(6.dp))
-                                        projectsData.forEach{ it->
-                                            count += 1
+                                        projectsData.forEachIndexed { index, it ->
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -503,7 +503,7 @@ fun ProjectPage(navController: NavController){
                                                     )
                                                 }
                                             }
-                                            if (count < projectsData.size){
+                                            if (index < projectsData.size - 1) {
                                                 Spacer(modifier = Modifier.size(6.dp))
                                                 HorizontalDivider(
                                                     color = Color(0xFF2D2D2D),

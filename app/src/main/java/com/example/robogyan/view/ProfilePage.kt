@@ -618,6 +618,10 @@ fun ProfilePage(navController: NavController){
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(
+                                        modifier = Modifier
+                                            .clickable {
+                                                Toast.makeText(context, "Feature coming soon!", Toast.LENGTH_SHORT).show()
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
@@ -639,7 +643,9 @@ fun ProfilePage(navController: NavController){
                                         contentDescription = "Arrow Icon",
                                         modifier = Modifier
                                             .size(36.dp)
-                                            .clickable {},
+                                            .clickable {
+                                                Toast.makeText(context, "Feature coming soon!", Toast.LENGTH_SHORT).show()
+                                            },
                                         tint = Color.Gray
                                     )
                                 }
@@ -692,11 +698,15 @@ fun ProfilePage(navController: NavController){
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(
+                                        modifier = Modifier
+                                        .clickable {
+                                            Toast.makeText(context, "Feature coming soon!", Toast.LENGTH_SHORT).show()
+                                        },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.review),
-                                            contentDescription = "members",
+                                            contentDescription = "feedback",
                                             modifier = Modifier.size(34.dp),
                                             tint = Color.White
                                         )
@@ -713,7 +723,9 @@ fun ProfilePage(navController: NavController){
                                         contentDescription = "Arrow Icon",
                                         modifier = Modifier
                                             .size(36.dp)
-                                            .clickable {},
+                                            .clickable {
+                                                Toast.makeText(context, "Feature coming soon!", Toast.LENGTH_SHORT).show()
+                                            },
                                         tint = Color.Gray
                                     )
                                 }
