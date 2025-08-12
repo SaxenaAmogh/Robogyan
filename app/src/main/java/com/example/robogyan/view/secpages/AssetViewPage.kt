@@ -1,10 +1,13 @@
 package com.example.robogyan.view.secpages
 
 import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +28,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -37,6 +42,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +50,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -51,6 +59,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,9 +67,16 @@ import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.robogyan.R
+import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
+import com.example.robogyan.data.local.entities.AllMembers
+import com.example.robogyan.data.local.entities.AssetUsage
 import com.example.robogyan.data.local.entities.Inventory
+import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.ui.theme.BackgroundColor
 import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
@@ -70,6 +86,7 @@ import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,6 +109,34 @@ fun AssetViewPage(navController: NavController, assetId: Int){
     val assetFlow: Flow<Inventory?> =
         AppDatabase.getDatabase(context).inventoryDao().getAssetById(assetId)
     val asset by assetFlow.collectAsState(initial = null)
+
+    val assetUsageFlow: Flow<List<AssetUsage>> =
+        AppDatabase.getDatabase(context).assetUsageDao().getUsageByAssetId(assetId)
+    val usage by assetUsageFlow.collectAsState(initial = emptyList())
+
+    val allMemberFlow: Flow<List<AllMembers>> =
+        AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
+    val members by allMemberFlow.collectAsState(initial = emptyList())
+
+    val userId: String = SupabaseClientProvider.client.auth.currentUserOrNull()!!.id
+    val memberFlow: Flow<MemberData?> =
+        AppDatabase.getDatabase(context).memberDao().getMemberById(userId)
+    val loggedMember by memberFlow.collectAsState(initial = null)
+
+    var count = 0
+    var viewDetails by remember { mutableStateOf(AssetUsage(
+        id = 0,
+        asset_id = 0,
+        granted_to = "",
+        quantity = 0,
+        use_case = "",
+        project_name = "",
+        status = "",
+        return_date = "",
+        approved_by = "",
+        notes = "",
+        created = ""
+    )) }
 
     Scaffold(
         content = {innerPadding ->
@@ -120,8 +165,8 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                 modifier = Modifier
                                     .align(Alignment.CenterStart)
                                     .border(
-                                        width = 0.7.dp,
-                                        color = PurpleOne,
+                                        width = 3.dp,
+                                        color = Color(0xFF3872D9),
                                         shape = RoundedCornerShape(12.dp)
                                     )
                             ) {
@@ -135,7 +180,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                         .clickable {
                                             navController.popBackStack()
                                         },
-                                    tint = PurpleOne
+                                    tint = Color(0xFF3872D9)
                                 )
                             }
                             Text(
@@ -147,6 +192,32 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                 modifier = Modifier
                                     .align(Alignment.Center)
                             )
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .border(
+                                        width = 3.dp,
+                                        color = Color(0xFF3872D9),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                            ) {
+                                Icon(
+                                    Icons.Rounded.Add,
+                                    contentDescription = "Arrow Icon",
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .size(32.dp)
+                                        .align(Alignment.CenterStart)
+                                        .clickable {
+                                            if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
+                                                navController.navigate("editAssetUsage/${assetId}/${0}")
+                                            } else {
+                                                Toast.makeText(context, "You don't have permission to edit projects", Toast.LENGTH_SHORT).show()
+                                            }
+                                        },
+                                    tint = Color(0xFF3872D9)
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(0.01 * screenHeight))
                         LazyColumn(
@@ -286,7 +357,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                                         fontFamily = latoFontFamily,
                                                     )
                                                     Text(
-                                                        text = "${it.available.toString()} Units",
+                                                        text = "${it.available} Units",
                                                         color = PurpleOne,
                                                         fontSize = 19.sp,
                                                         fontFamily = latoFontFamily,
@@ -360,87 +431,94 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     Spacer(modifier = Modifier.size(6.dp))
-                                    Text(
-                                        text = "No data available currently.",
-                                        color = PurpleOne,
-                                        fontSize = 16.sp,
-                                        fontFamily = latoFontFamily,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textAlign = TextAlign.Center
-                                    )
-//                                    repeat(5) {
-//                                        Row(
-//                                            modifier = Modifier
-//                                                .fillMaxWidth()
-//                                                .pointerInput(Unit) {
-//                                                    detectTapGestures(onTap = {
-//                                                        showSheet = true
-//                                                    })
-//                                                }
-//                                                .padding(horizontal = 8.dp),
-//                                            horizontalArrangement = Arrangement.SpaceBetween,
-//                                        ) {
-////                                            val originalText = "Website Redesign"
-////                                            val displayText = if (originalText.length > 16) {
-////                                                originalText.take(16) + "..."
-////                                            } else {
-////                                                originalText
-////                                            }
-//                                            Text(
-//                                                text = "${it + 1}",
-//                                                color = PrimaryColor,
-//                                                textAlign = TextAlign.Center,
-//                                                fontSize = 16.sp,
-//                                                fontFamily = latoFontFamily,
-//                                                modifier = Modifier.weight(0.15f)
-//                                            )
-//                                            Text(
-//                                                text = "Amogh Saxena",
-//                                                color = PrimaryColor,
-//                                                fontSize = 16.sp,
-//                                                fontFamily = latoFontFamily,
-//                                                maxLines = 1,
-//                                                overflow = TextOverflow.Ellipsis,
-//                                                modifier = Modifier.weight(0.48f)
-//                                            )
-//                                            Text(
-//                                                text = "2",
-//                                                color = PrimaryColor,
-//                                                fontSize = 16.sp,
-//                                                textAlign = TextAlign.Center,
-//                                                fontFamily = latoFontFamily,
-//                                                modifier = Modifier.weight(0.25f)
-//                                            )
-//                                            Text(
-//                                                text = "Personal",
-//                                                textAlign = TextAlign.Center,
-//                                                color = PrimaryColor,
-//                                                fontSize = 16.sp,
-//                                                fontFamily = latoFontFamily,
-//                                                modifier = Modifier.weight(0.3f)
-//                                            )
-//                                            Icon(
-//                                                Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
-//                                                contentDescription = "Arrow Icon",
-//                                                modifier = Modifier
-//                                                    .size(28.dp)
-//                                                    .clickable {
-//                                                        showSheet = true
-//                                                    },
-//                                                tint = PinkOne
-//                                            )
-//                                        }
-//                                        if (it < 4) {
-//                                            Spacer(modifier = Modifier.size(6.dp))
-//                                            HorizontalDivider(
-//                                                color = Color(0xFF2D2D2D),
-//                                                thickness = 1.dp,
-//                                                modifier = Modifier.fillMaxWidth()
-//                                            )
-//                                            Spacer(modifier = Modifier.size(6.dp))
-//                                        }
-//                                    }
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                    if(usage.isEmpty()){
+                                        Text(
+                                            text = "No data available currently.",
+                                            color = PurpleOne,
+                                            fontSize = 16.sp,
+                                            fontFamily = latoFontFamily,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }else {
+                                        count = 0
+                                        Log.e("@@&&", "$usage")
+                                        usage.forEach {
+                                            count++
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clickable{
+                                                        showSheet = true
+                                                        viewDetails = it
+                                                        Log.e("@@&&1", "$it")
+                                                    }
+                                                    .padding(horizontal = 8.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                            ) {
+                                                Text(
+                                                    text = "$count",
+                                                    color = PrimaryColor,
+                                                    textAlign = TextAlign.Center,
+                                                    fontSize = 16.sp,
+                                                    fontFamily = latoFontFamily,
+                                                    modifier = Modifier.weight(0.15f)
+                                                )
+                                                for (member in members) {
+                                                    if (member.id == it.granted_to) {
+                                                        Text(
+                                                            text = member.name,
+                                                            color = PrimaryColor,
+                                                            fontSize = 16.sp,
+                                                            fontFamily = latoFontFamily,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier.weight(0.48f)
+                                                        )
+                                                        break
+                                                    }
+                                                }
+                                                Text(
+                                                    text = it.quantity.toString(),
+                                                    color = PrimaryColor,
+                                                    fontSize = 16.sp,
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = latoFontFamily,
+                                                    modifier = Modifier.weight(0.25f)
+                                                )
+                                                Text(
+                                                    text = it.use_case,
+                                                    textAlign = TextAlign.Center,
+                                                    color = PrimaryColor,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    maxLines = 1,
+                                                    fontSize = 16.sp,
+                                                    fontFamily = latoFontFamily,
+                                                    modifier = Modifier.weight(0.3f)
+                                                )
+                                                Icon(
+                                                    Icons.AutoMirrored.TwoTone.KeyboardArrowRight,
+                                                    contentDescription = "Arrow Icon",
+                                                    modifier = Modifier
+                                                        .size(28.dp)
+                                                        .clickable {
+                                                            showSheet = true
+                                                        },
+                                                    tint = PinkOne
+                                                )
+                                            }
+                                            if (count < 4) {
+                                                Spacer(modifier = Modifier.size(6.dp))
+                                                HorizontalDivider(
+                                                    color = Color(0xFF2D2D2D),
+                                                    thickness = 1.dp,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                                Spacer(modifier = Modifier.size(6.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                    }
                                 }
                                 Spacer(modifier = Modifier.height(0.1 * screenHeight))
                             }
@@ -477,7 +555,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                         .padding(10.dp)
                                         .width(50.dp)
                                         .height(5.dp)
-                                        .background(PinkOne, shape = RoundedCornerShape(50))
+                                        .background(Color(0xFF3872D9), shape = RoundedCornerShape(50))
                                 )
                                 Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                 Column(
@@ -494,42 +572,35 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.arduniomini),
-                                            contentDescription = "Asset Image",
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(30.dp))
-                                                .height(130.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = PinkOne,
-                                                    shape = RoundedCornerShape(30.dp)
-                                                )
-                                        )
-                                        Spacer(modifier = Modifier.size(0.05 * screenWidth))
-                                        Column {
+                                        Column(
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            for (member in members) {
+                                                if (member.id == viewDetails.granted_to) {
+                                                    Text(
+                                                        text = member.name,
+                                                        color = Color(0xFF3872D9),
+                                                        fontSize = 24.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontFamily = latoFontFamily,
+                                                    )
+                                                    break
+                                                }
+                                            }
                                             Text(
-                                                text = "Amogh Saxena",
-                                                color = PinkOne,
-                                                fontSize = 22.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = latoFontFamily,
-                                                modifier = Modifier
-                                            )
-                                            Text(
-                                                text = "Personal",
+                                                text = viewDetails.use_case,
                                                 color = PrimaryColor,
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.W500,
                                                 fontFamily = latoFontFamily,
                                             )
                                             Text(
-                                                text = "Quantity: 2",
+                                                text = "Quantity: ${viewDetails.quantity}",
                                                 color = Color.Gray,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.W500,
                                                 fontFamily = latoFontFamily,
-                                                modifier = Modifier
                                             )
                                         }
                                     }
@@ -550,14 +621,16 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             fontWeight = FontWeight.W500,
                                             textDecoration = TextDecoration.Underline,
                                         )
-                                        Text(
-                                            text = " : Maneuver Bot",
-                                            color = PrimaryColor,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.W500,
-                                            fontFamily = latoFontFamily,
-                                            modifier = Modifier
-                                        )
+                                        (if (viewDetails.project_name != "") viewDetails.project_name else "NA")?.let {
+                                            Text(
+                                                text = it,
+                                                color = PrimaryColor,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.W500,
+                                                fontFamily = latoFontFamily,
+                                                modifier = Modifier
+                                            )
+                                        }
                                     }
                                     Spacer(modifier = Modifier.size(0.005 * screenHeight))
                                     Row(
@@ -577,7 +650,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : Issued",
+                                            text = " : ${viewDetails.status}",
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -603,7 +676,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : NA",
+                                            text = (if (viewDetails.return_date != "") ": ${viewDetails.return_date}" else ": NA"),
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -629,7 +702,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : Macle",
+                                            text = " : ${viewDetails.approved_by}",
                                             color = PrimaryColor,
                                             fontSize = 16.sp,
                                             fontFamily = latoFontFamily,
@@ -646,7 +719,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             ),
                                     ) {
                                         Text(
-                                            text = "Notes",
+                                            text = "Notes ",
                                             color = Color.Gray,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -654,7 +727,7 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                             textDecoration = TextDecoration.Underline,
                                         )
                                         Text(
-                                            text = " : --",
+                                            text = (if (viewDetails.notes != "") ": ${viewDetails.notes}" else ": --"),
                                             color = PrimaryColor,
                                             fontFamily = latoFontFamily,
                                             fontSize = 16.sp,
@@ -665,6 +738,11 @@ fun AssetViewPage(navController: NavController, assetId: Int){
                                     Spacer(modifier = Modifier.size(0.02 * screenHeight))
                                     FloatingActionButton(
                                         onClick = {
+                                            if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
+                                                navController.navigate("editAssetUsage/${assetId}/${viewDetails.id}")
+                                            } else {
+                                                Toast.makeText(context, "You don't have permission to edit projects", Toast.LENGTH_SHORT).show()
+                                            }
                                             showSheet = false
                                         },
                                         modifier = Modifier

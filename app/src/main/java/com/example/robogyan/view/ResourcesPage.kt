@@ -517,7 +517,7 @@ fun ResourcesPage(navController: NavController) {
                                 .clip(RoundedCornerShape(25.dp))
                                 .size(45.dp)
                                 .background(
-                                    color = Color(0xFFF5D867),
+                                    color = Color(0xFF3872D9),
                                     shape = RoundedCornerShape(25.dp)
                                 )
                         ) {

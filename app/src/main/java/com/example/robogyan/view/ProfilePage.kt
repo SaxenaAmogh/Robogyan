@@ -294,7 +294,7 @@ fun ProfilePage(navController: NavController){
                                     .background(BackgroundColor)
                             ) {
                                 AsyncImage(
-                                    model = R.drawable.mee,//R.drawable.mee
+                                    model = member?.image,//R.drawable.mee
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
@@ -313,7 +313,7 @@ fun ProfilePage(navController: NavController){
                                             .align(Alignment.CenterStart)
                                             .border(
                                                 width = 3.dp,
-                                                color = PurpleOne,
+                                                color = Color(0xFF3872D9),
                                                 shape = RoundedCornerShape(12.dp)
                                             )
                                     ) {
@@ -327,7 +327,7 @@ fun ProfilePage(navController: NavController){
                                                 .clickable {
                                                     navController.popBackStack()
                                                 },
-                                            tint = PurpleOne
+                                            tint = Color(0xFF3872D9)
                                         )
                                     }
                                 }
@@ -570,7 +570,7 @@ fun ProfilePage(navController: NavController){
                                             .clickable(
                                                 onClick = {
                                                     if (member?.clearance == "President" || member?.clearance == "Vice President"){
-                                                        navController.navigate("addProject")
+                                                        navController.navigate("editProjects/${0}")
                                                     }else{
                                                         Toast.makeText(context, "Only President or Vice President can add project.", Toast.LENGTH_SHORT).show()
                                                     }

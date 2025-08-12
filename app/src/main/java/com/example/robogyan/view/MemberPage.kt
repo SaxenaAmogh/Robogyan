@@ -85,6 +85,7 @@ import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.PurpleOne
+import com.example.robogyan.ui.theme.SecAccentColor
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
@@ -419,14 +420,13 @@ fun MemberPage(navController: NavController) {
                                                         onClick = {
                                                             if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
                                                                 navController.navigate("updateMember/${it.id}")
-//                                                                Log.e("&&&IDeRROR", it.id)
                                                             } else {
                                                                 Toast.makeText(context, "You don't have permission to edit members", Toast.LENGTH_SHORT).show()
                                                             }
                                                         }
                                                     ),
                                                 tint = if (loggedMember?.clearance == "President" || loggedMember?.clearance == "Vice President") {
-                                                    Color.Gray
+                                                    SecAccentColor
                                                 } else{
                                                     Color.Transparent
                                                 }

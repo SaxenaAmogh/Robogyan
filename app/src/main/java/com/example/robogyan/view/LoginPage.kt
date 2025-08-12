@@ -67,6 +67,7 @@ import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.AssetUsageViewModel
 import com.example.robogyan.viewmodel.AuthState
 import com.example.robogyan.viewmodel.AuthViewModel
 import com.example.robogyan.viewmodel.InventoryViewModel
@@ -100,12 +101,14 @@ fun LoginPage(navController: NavController) {
     val inventoryViewModel: InventoryViewModel = viewModel()
     val projectViewModel: ProjectsViewModel = viewModel()
     val resourcesViewModel: ResourceViewModel = viewModel()
+    val assetUsageVM: AssetUsageViewModel = viewModel()
 
     val onLoginSuccess : () -> Unit = {
         memberViewModel.fetchMembers()
         inventoryViewModel.fetchAssets()
         projectViewModel.fetchProjects()
         resourcesViewModel.fetchResources()
+        assetUsageVM.fetchUsages()
     }
     val onNavigateToHome : () -> Unit = {
         navController.navigate("home"){
@@ -274,8 +277,9 @@ fun LoginPage(navController: NavController) {
                                 onClick = {
                                     if (email.isBlank() || password.isBlank()){
                                         Toast.makeText(context, "Enter all values.", Toast.LENGTH_SHORT).show()
+                                    }else {
+                                        authViewModel.loginWithEmailAndPassword(email, password)
                                     }
-                                    authViewModel.loginWithEmailAndPassword(email, password)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 containerColor =PurpleOne,

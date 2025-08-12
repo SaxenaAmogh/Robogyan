@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowLeft
@@ -76,18 +75,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.AllMembers
-import com.example.robogyan.data.local.entities.Projects
+import com.example.robogyan.data.local.entities.AssetUsage
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.viewmodel.AssetUsageViewModel
 import com.example.robogyan.viewmodel.ProjectsViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -96,7 +94,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddProjectPage(navController: NavController, projectId: Int){
+fun AddUsagePage(navController: NavController, assetId: Int, usageId: Int) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -105,25 +103,17 @@ fun AddProjectPage(navController: NavController, projectId: Int){
     val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
-    var head by remember { mutableStateOf("") }
+    var approvedBy by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
+    var useCase by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("") }
-    var github by remember { mutableStateOf("") }
-    var pdf by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var start by remember { mutableStateOf("") }
-    var complete by remember { mutableStateOf("") }
-    var moneySpent by remember { mutableStateOf("") }
-    var team by remember { mutableStateOf("") }
-    var components by remember { mutableStateOf("") }
+    var projectName by remember { mutableStateOf("") }
+    var returnDate by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var expanded2 by remember { mutableStateOf(false) }
-    val statusOptions = listOf("In Progress", "Completed", "On Hold", "Abandoned")
-    var expanded3 by remember { mutableStateOf(false) }
-    val categoryOptions = listOf("Software", "Hardware", "Others")
     var showDatePicker by remember { mutableStateOf(false) }
-    var showDatePicker2 by remember { mutableStateOf(false) }
 
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -132,11 +122,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
         windowInsetsController.isAppearanceLightStatusBars = false
     }
 
-    val allMemberFlow: Flow<List<AllMembers>> =
-        AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
-    val members by allMemberFlow.collectAsState(initial = emptyList())
-    val projectViewModel: ProjectsViewModel = viewModel()
-
+    val assetUsageViewModel: AssetUsageViewModel = viewModel()
     val db = FirebaseDatabase.getInstance().getReference("DbUpdate")
 
     var remoteVersion by remember { mutableIntStateOf(0) }
@@ -154,26 +140,26 @@ fun AddProjectPage(navController: NavController, projectId: Int){
             }
         })
     }
-    val projectFlow: Flow<Projects?> =
-        AppDatabase.getDatabase(context).projectsDao().getProjectById(projectId)
-    val currentProject by projectFlow.collectAsState(initial = null)
 
-    if (currentProject != null && projectId!=0) {
-        name = currentProject!!.name
-        head = currentProject!!.project_head
-        status = currentProject!!.status
-        github = currentProject!!.github_link.toString()
-        pdf = currentProject!!.pdf_link.toString()
-        category = currentProject!!.category
-        description = currentProject!!.description
-        start = currentProject!!.start_date
-        complete = currentProject!!.completion_date ?: ""
-        moneySpent = currentProject!!.money_spent.toString()
-        team = currentProject!!.team
-        components = currentProject!!.components.toString()
+    val allMemberFlow: Flow<List<AllMembers>> =
+        AppDatabase.getDatabase(context).allMembersDao().getAllMembers()
+    val members by allMemberFlow.collectAsState(initial = emptyList())
+
+    val assetUsageFlow: Flow<AssetUsage?> =
+        AppDatabase.getDatabase(context).assetUsageDao().getUsageByUsageId(usageId)
+    val updateUsage by assetUsageFlow.collectAsState(initial = null)
+    
+    if (updateUsage != null && usageId!=0) {
+        name = updateUsage!!.granted_to
+        approvedBy = updateUsage!!.approved_by
+        quantity = updateUsage!!.quantity.toString()
+        useCase = updateUsage!!.use_case
+        status = updateUsage!!.status
+        projectName = updateUsage!!.project_name.toString()
+        returnDate = updateUsage!!.return_date.toString()
+        notes = updateUsage!!.notes.toString()
     }
-
-
+    
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DatePickerModal(
@@ -204,7 +190,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                     Text(
                         text = "OK",
                         fontSize = 16.sp,
-                        )
+                    )
                 }
             },
             dismissButton = {
@@ -231,14 +217,14 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                         .padding(
                             horizontal = 0.035 * screenWidth
                         )
-                        .pointerInput(Unit){
+                        .pointerInput(Unit) {
                             detectTapGestures {
                                 focusManager.clearFocus()
                             }
                         }
                 ) {
                     LazyColumn {
-                        item{
+                        item {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth(),
@@ -266,7 +252,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                     )
                                 }
                                 Text(
-                                    text = "Add New Project",
+                                    text = "Edit Asset Usage",
                                     color = TextColor,
                                     fontSize = 24.sp,
                                     fontFamily = latoFontFamily,
@@ -284,44 +270,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                     .padding(horizontal = 8.dp)
                             ) {
                                 Text(
-                                    text = "Project Name",
-                                    fontFamily = latoFontFamily,
-                                    color = PurpleOne,
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp)
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(0.063 * screenHeight),
-                                    shape = RoundedCornerShape(size = 16.dp),
-                                    placeholder = {
-                                        Text(
-                                            "Name",
-                                            fontFamily = latoFontFamily,
-                                            color = Color(0xFFB2B2B2),
-                                        )
-                                    },
-                                    value = name,
-                                    onValueChange = { name = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
-                                    singleLine = true,
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PurpleOne,
-                                        unfocusedBorderColor = Color(0x66ABABAB),
-                                        focusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedContainerColor = Color(0x14ABABAB),
-                                        focusedContainerColor = Color(0x14ABABAB)
-                                    )
-                                )
-                                Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Text(
-                                    text = "Project Head",
+                                    text = "Granted To",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -339,8 +288,8 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         OutlinedTextField(
-                                            value = head,
-                                            onValueChange = { head = it },
+                                            value = name,
+                                            onValueChange = { name = it },
                                             readOnly = true,
                                             placeholder = { Text("Select Project Head") },
                                             modifier = Modifier
@@ -365,15 +314,14 @@ fun AddProjectPage(navController: NavController, projectId: Int){
 
                                         val leads = members
                                             .filter {
-                                            it.is_alumni == false &&
-                                                    (it.clearance == "Lead" || it.clearance == "President" || it.clearance == "Vice President")
+                                                it.is_alumni == false &&
+                                                        (it.clearance == "Lead" || it.clearance == "President" || it.clearance == "Vice President")
                                             }
 
                                         ExposedDropdownMenu(
                                             expanded = expanded,
                                             onDismissRequest = { expanded = false },
                                             modifier = Modifier
-                                                .fillParentMaxWidth()
                                                 .background(Color(0xFFFFFFFF)),
                                         ) {
                                             leads.forEach { item ->
@@ -400,7 +348,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                                         )
                                                     },
                                                     onClick = {
-                                                        head = item.id
+                                                        name = item.id
                                                         focusManager.clearFocus()
                                                         expanded = false
                                                     }
@@ -411,44 +359,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "Project Description",
-                                    fontFamily = latoFontFamily,
-                                    color = PurpleOne,
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp)
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(0.063 * screenHeight),
-                                    shape = RoundedCornerShape(size = 16.dp),
-                                    placeholder = {
-                                        Text(
-                                            "Description",
-                                            fontFamily = latoFontFamily,
-                                            color = Color(0xFFB2B2B2),
-                                        )
-                                    },
-                                    value = description,
-                                    onValueChange = { description = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
-                                    singleLine = true,
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PurpleOne,
-                                        unfocusedBorderColor = Color(0x66ABABAB),
-                                        focusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedContainerColor = Color(0x14ABABAB),
-                                        focusedContainerColor = Color(0x14ABABAB)
-                                    )
-                                )
-                                Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Text(
-                                    text = "Status",
+                                    text = "Approved By",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -466,10 +377,10 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         OutlinedTextField(
-                                            value = status,
-                                            onValueChange = { status = it },
-                                            placeholder = { Text("Select Status") },
+                                            value = approvedBy,
+                                            onValueChange = { approvedBy = it },
                                             readOnly = true,
+                                            placeholder = { Text("Select Approved by") },
                                             modifier = Modifier
                                                 .menuAnchor()
                                                 .fillMaxWidth(),
@@ -490,14 +401,19 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                             )
                                         )
 
+                                        val approved = members
+                                            .filter {
+                                                it.is_alumni == false &&
+                                                        (it.clearance == "President" || it.clearance == "Vice President")
+                                            }
+
                                         ExposedDropdownMenu(
                                             expanded = expanded2,
                                             onDismissRequest = { expanded2 = false },
                                             modifier = Modifier
-                                                .fillParentMaxWidth()
                                                 .background(Color(0xFFFFFFFF)),
                                         ) {
-                                            statusOptions.forEach { item ->
+                                            approved.forEach { item ->
                                                 DropdownMenuItem(
                                                     colors = MenuItemColors(
                                                         textColor = Color.Black,
@@ -512,7 +428,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                                         .background(Color.White),
                                                     text = {
                                                         Text(
-                                                            item,
+                                                            item.name,
                                                             fontFamily = latoFontFamily,
                                                             fontSize = 16.sp,
                                                             modifier = Modifier
@@ -521,7 +437,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                                         )
                                                     },
                                                     onClick = {
-                                                        status = item
+                                                        approvedBy = item.name
                                                         focusManager.clearFocus()
                                                         expanded2 = false
                                                     }
@@ -532,7 +448,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "Github Link",
+                                    text = "Use Case ",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -547,16 +463,13 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                     shape = RoundedCornerShape(size = 16.dp),
                                     placeholder = {
                                         Text(
-                                            "Github",
+                                            "Used for",
                                             fontFamily = latoFontFamily,
                                             color = Color(0xFFB2B2B2),
                                         )
                                     },
-                                    value = github,
-                                    onValueChange = { github = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
+                                    value = useCase,
+                                    onValueChange = { useCase = it },
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = PurpleOne,
@@ -569,7 +482,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 )
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "PDF Link",
+                                    text = "Project Name ",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -584,16 +497,13 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                     shape = RoundedCornerShape(size = 16.dp),
                                     placeholder = {
                                         Text(
-                                            "PDF",
+                                            "Project Name",
                                             fontFamily = latoFontFamily,
                                             color = Color(0xFFB2B2B2),
                                         )
                                     },
-                                    value = pdf,
-                                    onValueChange = { pdf = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
+                                    value = projectName,
+                                    onValueChange = { projectName = it },
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = PurpleOne,
@@ -605,96 +515,50 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                     )
                                 )
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Row (
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                ){
+                                ) {
                                     Column(
                                         modifier = Modifier
                                             .weight(0.5f)
                                     ) {
                                         Text(
-                                            text = "Category",
+                                            text = "Quantity",
                                             fontFamily = latoFontFamily,
                                             color = PurpleOne,
                                             fontSize = 16.sp,
                                             modifier = Modifier
+                                                .fillMaxWidth()
                                                 .padding(start = 8.dp)
                                         )
-                                        Box(
+                                        OutlinedTextField(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                        ) {
-                                            ExposedDropdownMenuBox(
-                                                expanded = expanded3,
-                                                onExpandedChange = { expanded3 = it },
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                OutlinedTextField(
-                                                    value = category,
-                                                    onValueChange = { category = it },
-                                                    readOnly = true,
-                                                    placeholder = { Text("Select") },
-                                                    modifier = Modifier
-                                                        .menuAnchor()
-                                                        .fillMaxWidth(),
-                                                    trailingIcon = {
-                                                        Icon(
-                                                            Icons.Default.ArrowDropDown,
-                                                            contentDescription = "Dropdown"
-                                                        )
-                                                    },
-                                                    shape = RoundedCornerShape(16.dp),
-                                                    colors = OutlinedTextFieldDefaults.colors(
-                                                        focusedBorderColor = PurpleOne,
-                                                        unfocusedBorderColor = Color(0x66ABABAB),
-                                                        focusedTextColor = Color(0xFFFFFFFF),
-                                                        unfocusedTextColor = Color(0xFFFFFFFF),
-                                                        unfocusedContainerColor = Color(0x14ABABAB),
-                                                        focusedContainerColor = Color(0x14ABABAB)
-                                                    )
+                                                .height(0.063 * screenHeight),
+                                            shape = RoundedCornerShape(size = 16.dp),
+                                            placeholder = {
+                                                Text(
+                                                    "Enter Quantity",
+                                                    fontFamily = latoFontFamily,
+                                                    color = Color(0xFFB2B2B2),
                                                 )
-
-                                                ExposedDropdownMenu(
-                                                    expanded = expanded3,
-                                                    onDismissRequest = { expanded3 = false },
-                                                    modifier = Modifier
-                                                        .fillParentMaxWidth()
-                                                        .background(Color(0xFFFFFFFF)),
-                                                ) {
-                                                    categoryOptions.forEach { item ->
-                                                        DropdownMenuItem(
-                                                            colors = MenuItemColors(
-                                                                textColor = Color.Black,
-                                                                leadingIconColor = Color.Transparent,
-                                                                trailingIconColor = Color.Transparent,
-                                                                disabledTextColor = Color.Transparent,
-                                                                disabledLeadingIconColor = Color.Transparent,
-                                                                disabledTrailingIconColor = Color.Transparent,
-                                                            ),
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .background(Color.White),
-                                                            text = {
-                                                                Text(
-                                                                    item,
-                                                                    fontFamily = latoFontFamily,
-                                                                    fontSize = 16.sp,
-                                                                    modifier = Modifier
-                                                                        .fillMaxWidth(),
-                                                                    textAlign = TextAlign.Center
-                                                                )
-                                                            },
-                                                            onClick = {
-                                                                category = item
-                                                                focusManager.clearFocus()
-                                                                expanded3 = false
-                                                            }
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
+                                            },
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Number
+                                            ),
+                                            value = quantity,
+                                            onValueChange = { quantity = it },
+                                            singleLine = true,
+                                            colors = OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = PurpleOne,
+                                                unfocusedBorderColor = Color(0x66ABABAB),
+                                                focusedTextColor = Color(0xFFFFFFFF),
+                                                unfocusedTextColor = Color(0xFFFFFFFF),
+                                                unfocusedContainerColor = Color(0x14ABABAB),
+                                                focusedContainerColor = Color(0x14ABABAB)
+                                            )
+                                        )
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column(
@@ -702,7 +566,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                             .weight(0.5f)
                                     ) {
                                         Text(
-                                            text = "Money Spent",
+                                            text = "Status",
                                             fontFamily = latoFontFamily,
                                             color = PurpleOne,
                                             fontSize = 16.sp,
@@ -715,7 +579,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                             shape = RoundedCornerShape(size = 16.dp),
                                             placeholder = {
                                                 Text(
-                                                    "Rs. Spent",
+                                                    "Select Status",
                                                     fontFamily = latoFontFamily,
                                                     color = Color(0xFFB2B2B2),
                                                 )
@@ -723,11 +587,8 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                             keyboardOptions = KeyboardOptions(
                                                 keyboardType = KeyboardType.Number
                                             ),
-                                            keyboardActions = KeyboardActions(
-                                                onDone = {focusManager.clearFocus()}
-                                            ),
-                                            value = moneySpent,
-                                            onValueChange = { moneySpent = it },
+                                            value = status,
+                                            onValueChange = { status = it },
                                             singleLine = true,
                                             colors = OutlinedTextFieldDefaults.colors(
                                                 focusedBorderColor = PurpleOne,
@@ -742,7 +603,7 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "Start Date",
+                                    text = "Return Date",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -760,7 +621,11 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                         )
                                         .border(
                                             width = 1.dp,
-                                            color = if (showDatePicker){ PurpleOne } else { Color(0x66ABABAB) },
+                                            color = if (showDatePicker) {
+                                                PurpleOne
+                                            } else {
+                                                Color(0x66ABABAB)
+                                            },
                                             shape = RoundedCornerShape(16.dp)
                                         )
                                         .clickable(
@@ -768,9 +633,9 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                             indication = null,
                                             interactionSource = remember { MutableInteractionSource() }
                                         )
-                                ){
+                                ) {
                                     Text(
-                                        text = if (start.isEmpty()) "yyyy-mm-dd" else start,
+                                        text = if (returnDate.isEmpty()) "yyyy-mm-dd" else returnDate,
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .align(Alignment.CenterStart),
@@ -790,75 +655,15 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 if (showDatePicker) {
                                     DatePickerModal(
                                         onDateSelected = { dateString ->
-                                            // If you want to store full date in viewModel.date:
-                                            start = dateString
+                                            returnDate = dateString
                                             showDatePicker = false
                                         },
                                         onDismiss = { showDatePicker = false }
                                     )
-
                                 }
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 Text(
-                                    text = "End Date",
-                                    fontFamily = latoFontFamily,
-                                    color = PurpleOne,
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { showDatePicker2 = true }
-                                        .height(0.063 * screenHeight)
-                                        .background(
-                                            color = Color(0x14ABABAB),
-                                            shape = RoundedCornerShape(16.dp),
-                                        )
-                                        .border(
-                                            width = 1.dp,
-                                            color = if (showDatePicker2){ PurpleOne } else { Color(0x66ABABAB) },
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                        .clickable(
-                                            onClick = { showDatePicker2 = true },
-                                            indication = null,
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        )
-                                ){
-                                    Text(
-                                        text = if (complete.isEmpty()) "yyyy-mm-dd" else complete,
-                                        modifier = Modifier
-                                            .padding(start = 12.dp)
-                                            .align(Alignment.CenterStart),
-                                        fontFamily = latoFontFamily,
-                                        color = Color(0xFFFFFFFF),
-                                        fontSize = 16.sp,
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Rounded.DateRange,
-                                        contentDescription = "Date Icon",
-                                        tint = Color(0xFFB2B2B2),
-                                        modifier = Modifier
-                                            .align(Alignment.CenterEnd)
-                                            .padding(end = 12.dp)
-                                    )
-                                }
-                                if (showDatePicker2) {
-                                    DatePickerModal(
-                                        onDateSelected = { dateString ->
-                                            // If you want to store full date in viewModel.date:
-                                            complete = dateString
-                                            showDatePicker2 = false
-                                        },
-                                        onDismiss = { showDatePicker2 = false }
-                                    )
-
-                                }
-                                Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Text(
-                                    text = "Team Members",
+                                    text = "Notes",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,
@@ -869,57 +674,17 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 OutlinedTextField(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(0.063 * screenHeight),
+                                        .height(0.15 * screenHeight),
                                     shape = RoundedCornerShape(size = 16.dp),
                                     placeholder = {
                                         Text(
-                                            "A, B, C",
+                                            "Additional Notes",
                                             fontFamily = latoFontFamily,
                                             color = Color(0xFFB2B2B2),
                                         )
                                     },
-                                    value = team,
-                                    onValueChange = { team = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
-                                    singleLine = true,
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PurpleOne,
-                                        unfocusedBorderColor = Color(0x66ABABAB),
-                                        focusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedTextColor = Color(0xFFFFFFFF),
-                                        unfocusedContainerColor = Color(0x14ABABAB),
-                                        focusedContainerColor = Color(0x14ABABAB)
-                                    )
-                                )
-                                Spacer(modifier = Modifier.height(0.02 * screenHeight))
-                                Text(
-                                    text = "Components",
-                                    fontFamily = latoFontFamily,
-                                    color = PurpleOne,
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp)
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(0.063 * screenHeight),
-                                    shape = RoundedCornerShape(size = 16.dp),
-                                    placeholder = {
-                                        Text(
-                                            "X, Y, Z",
-                                            fontFamily = latoFontFamily,
-                                            color = Color(0xFFB2B2B2),
-                                        )
-                                    },
-                                    value = components,
-                                    onValueChange = { components = it },
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {focusManager.clearFocus()}
-                                    ),
+                                    value = notes,
+                                    onValueChange = { notes = it },
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = PurpleOne,
@@ -933,47 +698,48 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                 Spacer(modifier = Modifier.height(0.02 * screenHeight))
                                 FloatingActionButton(
                                     onClick = {
-                                        if (projectId==0){
-                                            projectViewModel.addNewProject(
+                                        if (usageId != 0) {
+                                            assetUsageViewModel.updateUsage(
+                                                id = usageId,
+                                                assetId = assetId,
                                                 name = name,
-                                                project_head = head,
+                                                approvedBy = approvedBy,
+                                                quantity = quantity,
+                                                useCase = useCase,
                                                 status = status,
-                                                github_link = github,
-                                                pdf_link = pdf,
-                                                category = category,
-                                                description = description,
-                                                start_date = start,
-                                                completion_date = complete,
-                                                money_spent = moneySpent,
-                                                team = team,
-                                                components = components
+                                                projectName = projectName,
+                                                returnDate = returnDate,
+                                                notes = notes
                                             )
-                                            //change
-                                            db.child("projectId").setValue(projectId)
-                                            db.child("projectUpdated").setValue(true)
-                                            Toast.makeText(context, "Project Added", Toast.LENGTH_SHORT).show()
+                                            db.child("remoteVersion").setValue(remoteVersion + 1)
+                                            db.child("usageId").setValue(usageId)
+                                            Toast.makeText(
+                                                context,
+                                                "New Usage Added",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                             navController.navigate("home") {
                                                 popUpTo("home") { inclusive = true }
                                             }
-                                        }else{
-                                            projectViewModel.updateProject(
-                                                id = projectId,
+                                        } else {
+                                            assetUsageViewModel.addNewUsage(
+                                                assetId = assetId,
                                                 name = name,
-                                                project_head = head,
+                                                approvedBy = approvedBy,
+                                                quantity = quantity,
+                                                useCase = useCase,
                                                 status = status,
-                                                github_link = github,
-                                                pdf_link = pdf,
-                                                category = category,
-                                                description = description,
-                                                start_date = start,
-                                                completion_date = complete,
-                                                money_spent = moneySpent.toFloat(),
-                                                team = team,
-                                                components = components
+                                                projectName = projectName,
+                                                returnDate = returnDate,
+                                                notes = notes
                                             )
-                                            db.child("remoteVersion").setValue(remoteVersion + 1)
-                                            db.child("projectId").setValue(projectId)
-                                            Toast.makeText(context, "Project Updated", Toast.LENGTH_SHORT).show()
+                                            db.child("usageId").setValue(usageId)
+                                            db.child("usageUpdated").setValue(true)
+                                            Toast.makeText(
+                                                context,
+                                                "New Usage Added",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                             navController.navigate("home") {
                                                 popUpTo("home") { inclusive = true }
                                             }
@@ -997,8 +763,8 @@ fun AddProjectPage(navController: NavController, projectId: Int){
                                         fontWeight = FontWeight.Bold,
                                     )
                                 }
+                                Spacer(modifier = Modifier.height(0.3 * screenHeight))
                             }
-                            Spacer(modifier = Modifier.height(0.3 * screenHeight))
                         }
                     }
                 }
@@ -1009,6 +775,6 @@ fun AddProjectPage(navController: NavController, projectId: Int){
 
 @Preview(showBackground = true)
 @Composable
-fun AddPagePreview(){
-    AddProjectPage(rememberNavController(), 0)
+fun AddUsagePagePreview() {
+    AddUsagePage(rememberNavController(), 0, 1)
 }

@@ -1,6 +1,7 @@
 package com.example.robogyan.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
@@ -8,6 +9,10 @@ import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.utils.SharedPrefManager
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.RestException
@@ -38,6 +43,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     // Publicly exposed StateFlow for the UI to observe changes in authentication state.
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
+    private val databaseRef = FirebaseDatabase.getInstance().getReference("DbUpdate")
+
     /**
      * Initiates the login process with email and password using Supabase.
      * This function runs in a coroutine within the ViewModel's scope.
@@ -59,6 +66,24 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 fetchData()
                 val isLoggedIn = SupabaseClientProvider.client.auth.currentSessionOrNull() != null
                 SharedPrefManager.setLoggedIn(getApplication(), isLoggedIn)
+                SharedPrefManager.setUserId(getApplication())
+                databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val remoteVersion = snapshot.child("remoteVersion").getValue(Int::class.java)
+                        val addVersion = snapshot.child("addVersion").getValue(Int::class.java)
+                        if (remoteVersion != null && addVersion != null) {
+                            SharedPrefManager.setAddVersion(getApplication(), addVersion)
+                            SharedPrefManager.setRemoteVersion(getApplication(), remoteVersion)
+                            Log.d("Firebase", "Remote version fetched: $remoteVersion")
+                        } else {
+                            Log.e("Firebase", "Remote version is null")
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("Firebase", "Failed to fetch remote version: ${error.message}")
+                    }
+                })
             } catch (e: RestException) {
                 val cleanMessage = when {
                     "invalid login credentials" in e.message.orEmpty().lowercase() ->

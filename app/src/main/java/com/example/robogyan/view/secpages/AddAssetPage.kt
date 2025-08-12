@@ -83,7 +83,6 @@ fun AddAssetPage(navController: NavController) {
         windowInsetsController.isAppearanceLightStatusBars = false
     }
 
-
     Scaffold(
         content = {
             Column(
@@ -112,8 +111,8 @@ fun AddAssetPage(navController: NavController) {
                             modifier = Modifier
                                 .align(Alignment.CenterStart)
                                 .border(
-                                    width = 0.7.dp,
-                                    color = PinkOne,
+                                    width = 3.dp,
+                                    color = Color(0xFF3872D9),
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         ) {
@@ -127,7 +126,7 @@ fun AddAssetPage(navController: NavController) {
                                     .clickable {
                                         navController.popBackStack()
                                     },
-                                tint = PinkOne
+                                tint = Color(0xFF3872D9)
                             )
                         }
                         Text(
@@ -299,7 +298,7 @@ fun AddAssetPage(navController: NavController) {
                                     .weight(0.5f)
                             ) {
                                 Text(
-                                    text = "Availabe *",
+                                    text = "Available *",
                                     fontFamily = latoFontFamily,
                                     color = PurpleOne,
                                     fontSize = 16.sp,

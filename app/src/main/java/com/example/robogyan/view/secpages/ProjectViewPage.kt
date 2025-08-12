@@ -119,8 +119,8 @@ fun ProjectViewPage(navController: NavController, projectId: Int){
                             modifier = Modifier
                                 .align(Alignment.CenterStart)
                                 .border(
-                                    width = 0.7.dp,
-                                    color = PinkOne,
+                                    width = 3.dp,
+                                    color = Color(0xFF3872D9),
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         ) {
@@ -134,7 +134,7 @@ fun ProjectViewPage(navController: NavController, projectId: Int){
                                     .clickable {
                                         navController.popBackStack()
                                     },
-                                tint = PinkOne
+                                tint = Color(0xFF3872D9)
                             )
                         }
                         Text(

@@ -3,6 +3,7 @@ package com.example.robogyan.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,9 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -72,8 +70,8 @@ import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecondaryColor
 import com.example.robogyan.ui.theme.SecondaryText
 import com.example.robogyan.ui.theme.TextColor
-import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
+import com.example.robogyan.utils.SharedPrefManager
 import com.example.robogyan.viewmodel.UpdateDbViewModel
 import com.example.robogyan.viewmodel.UpdateViewModel
 import com.google.firebase.database.DataSnapshot
@@ -81,29 +79,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.delay
-
-//@RequiresApi(Build.VERSION_CODES.O)
-//fun convertToIST(utcDateTime: String): Pair<String, String> {
-//    return try {
-//        // Parse the UTC time
-//        val utcFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX")
-//            .withZone(ZoneId.of("UTC"))
-//        val instant = Instant.from(utcFormatter.parse(utcDateTime))
-//
-//        // Convert to IST
-//        val istZone = ZoneId.of("Asia/Kolkata")
-//        val istFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            .withZone(istZone)
-//        val istDateTime = istFormatter.format(instant)
-//
-//        // Split Date and Time
-//        val (date, time) = istDateTime.split(" ")
-//        date to time
-//    } catch (e: Exception) {
-//        e.printStackTrace()
-//        "Invalid Date" to "Invalid Time"
-//    }
-//}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -116,7 +91,6 @@ fun HomePage(navController: NavHostController) {
     val context = LocalContext.current
 
     var door by remember { mutableStateOf(false) }
-    val gateStatus by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
 
     val pagerState = rememberPagerState(pageCount = {8})
@@ -136,6 +110,7 @@ fun HomePage(navController: NavHostController) {
     val updateB by updatesViewModel.updateB.collectAsState()
 
     val images = listOf(
+        R.drawable.coreteam,
         R.drawable.pic1,
         R.drawable.pic2,
         R.drawable.pic3,
@@ -143,24 +118,25 @@ fun HomePage(navController: NavHostController) {
         R.drawable.pic5,
         R.drawable.pic6,
         R.drawable.pic7,
-        R.drawable.pic8,
     )
 
     val db = FirebaseDatabase.getInstance().getReference("DbUpdate")
+    val localVersion = SharedPrefManager.getRemoteVersion(context)
     val combinedListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
+            val remoteVersion = snapshot.child("remoteVersion").getValue(Int::class.java) ?: 0
             val memberId = snapshot.child("memberId").getValue(String::class.java)
-            val memberCheck = snapshot.child("memberUpdated").getValue(Boolean::class.java) == true
             val projectId = snapshot.child("projectId").getValue(Int::class.java)
-            val projectCheck = snapshot.child("projectUpdated").getValue(Boolean::class.java) == true
+            val usageId = snapshot.child("usageId").getValue(Int::class.java)
 
-            if (!memberId.isNullOrBlank() && memberCheck) {
-                updateDbViewModel.updateMemberDb(memberId)
-                db.child("memberUpdated").setValue(false)
-            }
-            if (projectCheck) {
-                updateDbViewModel.updateProjectDb(projectId?: 0)
-                db.child("projectUpdated").setValue(false)
+            Log.d("&&HomePage", "Remote Version: $remoteVersion, Local Version: $localVersion")
+            if (remoteVersion > localVersion){
+                if (!memberId.isNullOrBlank()) {
+                    updateDbViewModel.updateMemberDb(memberId)
+                }
+                updateDbViewModel.updateProjectDb(projectId ?: 0)
+                updateDbViewModel.updateUsageDb(usageId?: 0)
+                SharedPrefManager.setRemoteVersion(context, remoteVersion)
             }
         }
 
@@ -197,44 +173,44 @@ fun HomePage(navController: NavHostController) {
                                 modifier = Modifier
                                     .fillMaxWidth(),
                             ){
-//                                Column(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .background(SecondaryColor)
-//                                ) {
-//                                    LaunchedEffect(Unit) {
-//                                        while (true) {
-//                                            delay(1500)
-//                                            val nextPage = (pagerState.currentPage + 1) % images.size
-//                                            pagerState.animateScrollToPage(nextPage)
-//                                            if (pagerState.currentPage==8){
-//                                                delay(1500)
-//                                                pagerState.scrollToPage(0)
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    HorizontalPager(
-//                                        state = pagerState,
-//                                        modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .height(0.37 * screenHeight)
-//                                            .clip(
-//                                                RoundedCornerShape(
-//                                                    bottomEnd = 25.dp,
-//                                                    bottomStart = 25.dp
-//                                                )
-//                                            )
-//                                    ) { page ->
-//                                        AsyncImage(
-//                                            model = images[page],
-//                                            contentDescription = "Image $page",
-//                                            error = painterResource(R.drawable.unav),
-//                                            contentScale = ContentScale.Crop,
-//                                            modifier = Modifier.fillMaxSize()
-//                                        )
-//                                    }
-//                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(SecondaryColor)
+                                ) {
+                                    LaunchedEffect(Unit) {
+                                        while (true) {
+                                            delay(1500)
+                                            val nextPage = (pagerState.currentPage + 1) % images.size
+                                            pagerState.animateScrollToPage(nextPage)
+                                            if (pagerState.currentPage==8){
+                                                delay(1500)
+                                                pagerState.scrollToPage(0)
+                                            }
+                                        }
+                                    }
+
+                                    HorizontalPager(
+                                        state = pagerState,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(0.37 * screenHeight)
+                                            .clip(
+                                                RoundedCornerShape(
+                                                    bottomEnd = 25.dp,
+                                                    bottomStart = 25.dp
+                                                )
+                                            )
+                                    ) { page ->
+                                        AsyncImage(
+                                            model = images[page],
+                                            contentDescription = "Image $page",
+                                            error = painterResource(R.drawable.unav),
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
+                                }
                             }
                             Spacer(modifier = Modifier.size(0.01 * screenHeight))
                         }
@@ -706,7 +682,7 @@ fun HomePage(navController: NavHostController) {
                                 .clip(RoundedCornerShape(25.dp))
                                 .size(45.dp)
                                 .background(
-                                    color = Color(0xFFF5D867),
+                                    color = Color(0xFF3872D9),
                                     shape = RoundedCornerShape(50)
                                 )
                         ) {

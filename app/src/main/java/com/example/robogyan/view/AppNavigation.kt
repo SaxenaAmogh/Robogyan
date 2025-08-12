@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.robogyan.view.secpages.AddAssetPage
 import com.example.robogyan.view.secpages.AddProjectPage
+import com.example.robogyan.view.secpages.AddUsagePage
 import com.example.robogyan.view.secpages.AssetViewPage
 import com.example.robogyan.view.secpages.ProjectViewPage
 import com.example.robogyan.view.secpages.UpdateMemberPage
@@ -84,6 +85,18 @@ fun AppNavigation(navController: NavHostController) {
         ) { backStackEntry ->
             val memberId = backStackEntry.arguments?.getString("memberId") ?: ""
             UpdateMemberPage(navController, memberId)
+        }
+        composable(
+            route = "editAssetUsage/{assetId}/{usageId}",
+            arguments = listOf(
+                navArgument("assetId") { type = NavType.IntType },
+                navArgument("usageId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val assetId = backStackEntry.arguments?.getInt("assetId") ?: 0
+            val usageId = backStackEntry.arguments?.getInt("usageId") ?: 0
+
+            AddUsagePage(navController, assetId, usageId)
         }
     }
 }

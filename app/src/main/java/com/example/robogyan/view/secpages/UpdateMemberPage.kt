@@ -42,8 +42,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -74,7 +76,10 @@ import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.TextColor
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.viewmodel.MemberViewModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,6 +125,22 @@ fun UpdateMemberPage(navController: NavController, memberId: String){
 
     val memberViewModel: MemberViewModel = viewModel()
     val db = FirebaseDatabase.getInstance().getReference("DbUpdate")
+
+    var remoteVersion by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("DbUpdate/remoteVersion")
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val version = snapshot.getValue(Int::class.java) ?: 0
+                remoteVersion = version
+                Log.d("&&Firebase", "Remote version fetched: $version")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("&&Firebase", "Fetch cancelled: ${error.message}")
+            }
+        })
+    }
 
     if (member.isNotEmpty()) {
         val currentMember = member[0]
@@ -168,8 +189,8 @@ fun UpdateMemberPage(navController: NavController, memberId: String){
                                     modifier = Modifier
                                         .align(Alignment.CenterStart)
                                         .border(
-                                            width = 0.7.dp,
-                                            color = PinkOne,
+                                            width = 3.dp,
+                                            color = Color(0xFF3872D9),
                                             shape = RoundedCornerShape(12.dp)
                                         )
                                 ) {
@@ -183,7 +204,7 @@ fun UpdateMemberPage(navController: NavController, memberId: String){
                                             .clickable {
                                                 navController.popBackStack()
                                             },
-                                        tint = PinkOne
+                                        tint = Color(0xFF3872D9)
                                     )
                                 }
                                 Text(
@@ -784,8 +805,8 @@ fun UpdateMemberPage(navController: NavController, memberId: String){
                                             clearance = clearance,
                                             image = image
                                         )
+                                        db.child("remoteVersion").setValue(remoteVersion + 1)
                                         db.child("memberId").setValue(memberId)
-                                        db.child("memberUpdated").setValue(true)
                                         Toast.makeText(context, "Member Updated", Toast.LENGTH_SHORT).show()
                                         navController.navigate("home") {
                                             popUpTo("home") { inclusive = true }
