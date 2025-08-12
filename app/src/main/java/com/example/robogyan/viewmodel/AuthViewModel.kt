@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robogyan.SupabaseClientProvider
+import com.example.robogyan.SupabaseClientProvider.client
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.utils.SharedPrefManager
@@ -134,6 +135,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
         CoroutineScope(Dispatchers.IO).launch {
             AppDatabase.getDatabase(getApplication()).memberDao().insertMember(memberData)
+        }
+    }
+
+    suspend fun changePassword(newPassword: String) {
+        try {
+            client.auth.updateUser{
+                password = newPassword
+            }
+            Log.d("$@Password", "Password updated successfully!")
+        } catch (e: Exception) {
+            Log.d("$@Password", "Password update: ${e.localizedMessage ?: "Unknown error"}")
         }
     }
 

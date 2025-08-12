@@ -12,6 +12,7 @@ import com.example.robogyan.view.secpages.AddAssetPage
 import com.example.robogyan.view.secpages.AddProjectPage
 import com.example.robogyan.view.secpages.AddUsagePage
 import com.example.robogyan.view.secpages.AssetViewPage
+import com.example.robogyan.view.secpages.ChangePasswordPage
 import com.example.robogyan.view.secpages.ProjectViewPage
 import com.example.robogyan.view.secpages.UpdateMemberPage
 
@@ -57,6 +58,9 @@ fun AppNavigation(navController: NavHostController) {
         //secondary pages
         composable("addasset"){
             AddAssetPage(navController)
+        }
+        composable("changePassword"){
+            ChangePasswordPage(navController)
         }
         composable(
             route = "assetview/{assetId}",

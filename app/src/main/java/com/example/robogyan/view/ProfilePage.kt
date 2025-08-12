@@ -3,7 +3,6 @@ package com.example.robogyan.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowRight
@@ -40,7 +38,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,13 +73,11 @@ import com.example.robogyan.SupabaseClientProvider
 import com.example.robogyan.data.local.AppDatabase
 import com.example.robogyan.data.local.entities.MemberData
 import com.example.robogyan.ui.theme.BackgroundColor
-import com.example.robogyan.ui.theme.PinkOne
 import com.example.robogyan.ui.theme.PrimaryColor
 import com.example.robogyan.ui.theme.PrimaryText
 import com.example.robogyan.ui.theme.PurpleOne
 import com.example.robogyan.ui.theme.SecAccentColor
 import com.example.robogyan.ui.theme.SecondaryColor
-import com.example.robogyan.ui.theme.YellowOne
 import com.example.robogyan.ui.theme.latoFontFamily
 import com.example.robogyan.utils.SharedPrefManager
 import com.example.robogyan.viewmodel.AuthViewModel
@@ -200,10 +195,10 @@ fun ProfilePage(navController: NavController){
                             )
                         }
                     }
-                    if (update == "UpdateA"){
-                        placeholder = updateA.toString()
+                    placeholder = if (update == "UpdateA"){
+                        updateA.toString()
                     }else{
-                        placeholder = updateB.toString()
+                        updateB.toString()
                     }
                     OutlinedTextField(
                         modifier = Modifier
@@ -657,11 +652,15 @@ fun ProfilePage(navController: NavController){
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(
+                                        modifier = Modifier
+                                            .clickable {
+                                                navController.navigate("changePassword")
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.password),
-                                            contentDescription = "members",
+                                            contentDescription = "password",
                                             modifier = Modifier.size(34.dp),
                                             tint = Color.White
                                         )
@@ -678,7 +677,9 @@ fun ProfilePage(navController: NavController){
                                         contentDescription = "Arrow Icon",
                                         modifier = Modifier
                                             .size(36.dp)
-                                            .clickable {},
+                                            .clickable {
+                                                navController.navigate("changePassword")
+                                            },
                                         tint = Color.Gray
                                     )
                                 }

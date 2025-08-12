@@ -274,7 +274,7 @@ fun SecurityPage(navController: NavController) {
                                     }
                                     Spacer(modifier = Modifier.size(0.01 * screenHeight))
                                     Text(
-                                        text = "Last opened by Macle at 10:46 AM",
+                                        text = "No data to show...",
                                         color = PrimaryText,
                                         fontSize = 18.sp,
                                         fontFamily = latoFontFamily,
@@ -336,7 +336,7 @@ fun SecurityPage(navController: NavController) {
                                 Spacer(modifier = Modifier.size(0.015 * screenHeight))
                                 FloatingActionButton(
                                     onClick = {
-                                        navController.navigate("addasset")
+                                        Toast.makeText(context, "Use Supa for new assets!", Toast.LENGTH_SHORT).show()
                                     },
                                     containerColor = PurpleOne,
                                     contentColor = Black,
@@ -394,7 +394,7 @@ fun SecurityPage(navController: NavController) {
                                     placeholder = {
                                         Text(
                                             color = TextColor,
-                                            text = "Search for a member",
+                                            text = "Search for an asset",
                                             fontFamily = latoFontFamily,
                                         )
                                     }

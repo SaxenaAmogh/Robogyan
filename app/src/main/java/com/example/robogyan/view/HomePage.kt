@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -85,10 +86,11 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomePage(navController: NavHostController) {
 
+    val context = LocalContext.current
+    val isLoggedIn = SharedPrefManager.isLoggedIn(context)
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val context = LocalContext.current
 
     var door by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -514,7 +516,11 @@ fun HomePage(navController: NavHostController) {
                                         )
                                         .weight(1f)
                                         .clickable {
-                                            navController.navigate("member")
+                                            if (isLoggedIn) {
+                                                navController.navigate("profile")
+                                            }else {
+                                                Toast.makeText(context, "Login to view Profile", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                 ){
                                     Column(
@@ -523,14 +529,14 @@ fun HomePage(navController: NavHostController) {
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ){
                                         Icon(
-                                            painter = painterResource(R.drawable.member_d),
-                                            contentDescription = "members",
+                                            painter = painterResource(R.drawable.user),
+                                            contentDescription = "profile",
                                             modifier = Modifier.size(40.dp),
                                             tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.size(10.dp))
                                         Text(
-                                            text = "Members",
+                                            text = "View Profile",
                                             color = Color.Black,
                                             fontSize = 20.sp,
                                             fontFamily = latoFontFamily,
